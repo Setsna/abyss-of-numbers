@@ -1,0 +1,94 @@
+// Beute nach einem Sieg (Plan Etappe 5, Schritt 6): Erfahrung, Perlen, ggf. neue Stufe,
+// eine von drei Karten oder „Keine Karte“, darunter bis zu 5 Übungsaufgaben mit Lösung.
+// Keine Quote, keine Zeit, kein Vergleich (A7).
+import { ICON } from '../icons.js';
+import { renderCard } from '../components/card.js';
+import { addWorld } from '../components/world.js';
+
+export function mountReward(root, { config, t, reward, onPick, levels = {}, areaId = null }) {
+  root.innerHTML = `
+  <main class="screen reward">
+    <section class="panel reward-panel">
+      <p class="banner-word reward-word"></p>
+      <div class="reward-gains">
+        <span class="gain" data-ref="xp"></span>
+        <span class="gain" data-ref="pearls"></span>
+        <span class="gain gain-level" data-ref="level" hidden></span>
+        <span class="gain gain-item" data-ref="item" hidden></span>
+        <span class="gain gain-current" data-ref="current" hidden></span>
+        <span class="gain gain-cards" data-ref="cardUps" hidden></span>
+      </div>
+      <p class="reward-ask"></p>
+      <div class="reward-cards" data-ref="cards"></div>
+      <button class="btn btn-quiet reward-skip" type="button" data-ref="skip"></button>
+      <div class="reward-practice" data-ref="practice" hidden>
+        <p class="reward-practice-title"></p>
+        <ul data-ref="practiceList"></ul>
+      </div>
+      <p class="reward-lightning" data-ref="lightning" hidden></p>
+    </section>
+  </main>`;
+  const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
+  addWorld(root.querySelector('.screen'), `area.${areaId ?? config.areas.order[0]}`); // Spielwelt dahinter (D25)
+  // Schatz (Phase 5, Etappe 2): eigenes Wort, keine Erfahrung
+  root.querySelector('.reward-word').textContent = reward.treasure ? t('reward.treasureWord') : t('result.winWord');
+  ref.xp.textContent = t('reward.xp', { n: reward.xp });
+  ref.xp.hidden = reward.xp === 0;
+  ref.pearls.textContent = t('reward.pearls', { n: reward.pearls });
+  if (reward.levelUps > 0) {
+    ref.level.hidden = false;
+    ref.level.textContent = t('reward.levelUp');
+  }
+  if (reward.current) { // Strömung (D33): Gegner im nächsten Kampf stärker oder schwächer
+    ref.current.hidden = false;
+    ref.current.textContent = t(reward.current.to > reward.current.from ? 'current.up' : 'current.down');
+  }
+  if (reward.item) { // Ausrüstung gefunden (Phase 5, Etappe 7)
+    ref.item.hidden = false;
+    ref.item.textContent = t('gear.found', { name: t(`items.${reward.item}.name`) });
+  }
+  // Kartenstufen (Etappe 8): welche Kartenart in diesem Kampf stärker geworden ist
+  const ups = reward.cardLevelUps ?? [];
+  if (ups.length > 0) {
+    ref.cardUps.hidden = false;
+    ref.cardUps.replaceChildren(...ups.map(({ cardId }) => {
+      const line = document.createElement('span');
+      line.className = 'gain-card-up';
+      line.innerHTML = ICON.star;
+      line.append(t('reward.cardLevelUp', { name: t(`cards.${cardId}.name`).replaceAll('­', '') }));
+      return line;
+    }));
+  }
+  root.querySelector('.reward-ask').textContent = t('reward.pick');
+
+  let picked = false;
+  const pick = (cardId) => {
+    if (picked) return; // Doppeltipp
+    picked = true;
+    root.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+    onPick(cardId);
+  };
+
+  ref.cards.replaceChildren(...reward.cards.map((cardId, i) => {
+    const b = renderCard({ uid: `r${i}`, cardId, level: levels[cardId] ?? 1 }, config.cards[cardId], { t, why: null });
+    b.addEventListener('click', () => pick(cardId));
+    return b;
+  }));
+  ref.skip.textContent = t('reward.none');
+  ref.skip.addEventListener('click', () => pick(null));
+
+  if (reward.practice.length > 0) {
+    ref.practice.hidden = false;
+    root.querySelector('.reward-practice-title').textContent = t('reward.practice');
+    ref.practiceList.replaceChildren(...reward.practice.map((text) => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      return li;
+    }));
+  }
+  if (reward.lightningHits > 0) {
+    ref.lightning.hidden = false;
+    ref.lightning.innerHTML = `${ICON.bolt}<span></span>`;
+    ref.lightning.lastChild.textContent = t('reward.lightning', { n: reward.lightningHits });
+  }
+}

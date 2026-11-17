@@ -1,0 +1,82 @@
+{
+  "starter": [
+    "currentStrike",
+    "currentStrike",
+    "currentStrike",
+    "undertow",
+    "undertow",
+    "undertow",
+    "waveSlam",
+    "deepRift",
+    "shieldBubble",
+    "shieldBubble",
+    "shieldBubble",
+    "healingAlgae"
+  ],
+  "rewardPools": {
+    "reef": [
+      "currentStrike",
+      "undertow",
+      "waveSlam",
+      "deepRift",
+      "shieldBubble",
+      "whirlpool",
+      "harpoon",
+      "conchHorn",
+      "kelpPotion",
+      "shellCracker",
+      "bubbleChain",
+      "coralWall",
+      "pearlFind"
+    ],
+    "caves": [
+      "currentStrike",
+      "undertow",
+      "waveSlam",
+      "deepRift",
+      "shieldBubble",
+      "whirlpool",
+      "harpoon",
+      "conchHorn",
+      "kelpPotion",
+      "shellCracker",
+      "bubbleChain",
+      "coralWall",
+      "pearlFind",
+      "inkCloud"
+    ],
+    "city": [
+      "currentStrike",
+      "undertow",
+      "waveSlam",
+      "deepRift",
+      "shieldBubble",
+      "whirlpool",
+      "harpoon",
+      "conchHorn",
+      "kelpPotion",
+      "shellCracker",
+      "bubbleChain",
+      "coralWall",
+      "pearlFind",
+      "inkCloud"
+    ],
+    "trench": [
+      "currentStrike",
+      "undertow",
+      "waveSlam",
+      "deepRift",
+      "shieldBubble",
+      "whirlpool",
+      "harpoon",
+      "conchHorn",
+      "kelpPotion",
+      "shellCracker",
+      "bubbleChain",
+      "coralWall",
+      "pearlFind",
+      "inkCloud"
+    ]
+  },
+  "firstRewardIncludes": "whirlpool"
+}

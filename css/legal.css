@@ -1,0 +1,36 @@
+/* Datenschutz und Impressum (Etappe 10): ruhige Leseseite in den Farben des Spiels. */
+@font-face { font-family: "AoN Text"; src: url("../assets/fonts/aon-text-regular.woff") format("woff"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "AoN Text"; src: url("../assets/fonts/aon-text-bold.woff") format("woff"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Bangers"; src: url("../assets/fonts/bangers-regular.woff") format("woff"); font-display: swap; }
+
+:root { --ink: #14161f; --paper: #fbfbf7; --sea-deep: #0b3b5c; --sun: #ffd23f; --muted: #5d6b78; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100vh;
+  background: var(--sea-deep); color: var(--ink);
+  font-family: "AoN Text", system-ui, sans-serif; font-size: 18px; line-height: 1.55;
+  padding: 24px 16px 48px;
+}
+.legal { max-width: 760px; margin: 0 auto; background: var(--paper); border: 4px solid var(--ink); border-radius: 10px; padding: 24px 28px; }
+.legal-brand {
+  display: inline-block; margin: 0 0 4px;
+  font-family: "Bangers", "AoN Text", sans-serif; font-size: 34px; letter-spacing: 0.03em; line-height: 1;
+  color: var(--sea-deep); text-decoration: none;
+}
+h1 { font-size: 38px; margin: 4px 0 4px; }
+h2 { font-size: 29px; margin: 28px 0 8px; }
+h3 { font-size: 23px; margin: 18px 0 6px; }
+p, ul { margin: 0 0 12px; }
+ul { padding-left: 1.3em; }
+li { margin-bottom: 4px; }
+a { color: var(--sea-deep); font-weight: 700; }
+a:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; border-radius: 3px; }
+.legal-date { color: var(--muted); font-weight: 700; }
+.legal-kids { background: #fff3c4; border: 3px solid var(--ink); border-radius: 8px; padding: 12px 16px; margin: 16px 0 8px; }
+.legal-kids h2 { margin-top: 0; }
+.legal-box { border: 2px solid var(--sea-deep); border-radius: 8px; padding: 6px 14px; margin: 8px 0 12px; background: #fff; }
+.legal-back { display: inline-block; margin-top: 24px; padding: 10px 18px; background: var(--sun); color: var(--ink); border: 3px solid var(--ink); border-radius: 8px; text-decoration: none; }
+.legal-foot { max-width: 760px; margin: 14px auto 0; display: flex; gap: 18px; }
+.legal-foot a { color: var(--paper); }
+@media (max-width: 520px) { .legal { padding: 18px 16px; } h1 { font-size: 32px; } h2 { font-size: 25px; } h3 { font-size: 21px; } }

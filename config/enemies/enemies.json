@@ -1,0 +1,274 @@
+{
+  "crab": {
+    "hp": 20,
+    "immune": "add",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "block",
+        "amount": 4
+      }
+    ]
+  },
+  "puffer": {
+    "hp": 18,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 4
+      },
+      {
+        "type": "block",
+        "amount": 5
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      }
+    ]
+  },
+  "jelly": {
+    "hp": 16,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 4
+      }
+    ]
+  },
+  "urchin": {
+    "hp": 24,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "block",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 7
+      }
+    ]
+  },
+  "lanternFish": {
+    "hp": 26,
+    "immune": "add",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "block",
+        "amount": 4
+      }
+    ]
+  },
+  "stoneFish": {
+    "hp": 24,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 5
+      },
+      {
+        "type": "block",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 10
+      }
+    ]
+  },
+  "caveIsopod": {
+    "hp": 22,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 5
+      }
+    ]
+  },
+  "snakeEel": {
+    "hp": 31,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "block",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      }
+    ]
+  },
+  "armorCrab": {
+    "hp": 29,
+    "immune": "add",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "block",
+        "amount": 5
+      }
+    ]
+  },
+  "shellWarden": {
+    "hp": 26,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 6
+      },
+      {
+        "type": "block",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 12
+      }
+    ]
+  },
+  "statueFish": {
+    "hp": 23,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 6
+      }
+    ]
+  },
+  "seahorseKnight": {
+    "hp": 35,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "block",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      }
+    ]
+  },
+  "anglerFish": {
+    "hp": 31,
+    "immune": "add",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 10
+      },
+      {
+        "type": "block",
+        "amount": 5
+      }
+    ]
+  },
+  "deepJelly": {
+    "hp": 28,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 6
+      },
+      {
+        "type": "block",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 12
+      }
+    ]
+  },
+  "giantIsopod": {
+    "hp": 25,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "attack",
+        "amount": 6
+      }
+    ]
+  },
+  "vampireSquid": {
+    "hp": 37,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "block",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      }
+    ]
+  }
+}

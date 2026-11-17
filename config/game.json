@@ -1,0 +1,80 @@
+{
+  "hero": {
+    "maxHp": 40,
+    "energy": 3,
+    "handSize": 5,
+    "discardsPerTurn": 2
+  },
+  "stats": {
+    "strengthDamagePerPoint": 1,
+    "calmMsPerPoint": 1000,
+    "hpPerPoint": 3
+  },
+  "tempo": {
+    "tiers": [
+      {
+        "id": "lightning",
+        "num": 1,
+        "den": 3,
+        "multiplier": 1.25
+      },
+      {
+        "id": "fast",
+        "num": 2,
+        "den": 3,
+        "multiplier": 1.1
+      }
+    ],
+    "appliesTo": [
+      "damage",
+      "block",
+      "heal"
+    ]
+  },
+  "penalty": {
+    "wrong": 2,
+    "timeout": 2,
+    "minHp": 1
+  },
+  "baseTimeMs": {
+    "solve": 10000,
+    "pickTrue": 20000,
+    "pickFalse": 20000,
+    "numberLine": 12000,
+    "sequence": 15000,
+    "complement": 10000,
+    "chain": 10000,
+    "wall": 15000,
+    "match": 10000,
+    "twoStep": 15000,
+    "pointBeforeLine": 15000,
+    "compareTerms": 20000
+  },
+  "moreTime": {
+    "off": 1,
+    "plus50": 1.5,
+    "plus100": 2,
+    "noTimer": 0
+  },
+  "practiceListMax": 30,
+  "practiceShownAfterCombat": 5,
+  "streak": {
+    "from": 2,
+    "bonusPerStep": 1,
+    "maxBonus": 2
+  },
+  "cardLevels": [
+    15,
+    40
+  ],
+  "current": {
+    "recentAnswers": 10,
+    "minAnswers": 6,
+    "step": 0.1,
+    "min": 0.9,
+    "max": 1.4,
+    "upAccuracy": 0.9,
+    "upFastShare": 0.5,
+    "downAccuracy": 0.75
+  }
+}

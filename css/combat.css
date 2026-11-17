@@ -1,0 +1,536 @@
+/* Abyss of Numbers – Kampfbildschirm. Aufbau und Werte aus dem Prototyp (Phase 3, DESIGN.md). */
+
+/* ---------- Bühne ---------- */
+.stage {
+  height: 100dvh; width: 100vw;
+  display: grid;
+  grid-template-rows: minmax(0, 64fr) minmax(0, 36fr);
+  gap: var(--gap);
+  padding: var(--gap);
+  padding-left: max(var(--gap), env(safe-area-inset-left));
+  padding-right: max(var(--gap), env(safe-area-inset-right));
+}
+.panel {
+  position: relative;
+  border: var(--line) solid var(--ink);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* ---------- Szenenpanel ---------- */
+.scene { background: var(--sea); }
+.scene-bg { position: absolute; inset: 0; }
+.scene-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; display: block; }
+
+.caption {
+  position: absolute; top: 0; left: 0; z-index: 4;
+  max-width: 46%;
+  background: var(--sun);
+  border-right: var(--line) solid var(--ink);
+  border-bottom: var(--line) solid var(--ink);
+  border-bottom-right-radius: var(--radius);
+  padding: calc(8 * var(--u)) calc(16 * var(--u));
+  font-weight: 700;
+  font-size: calc(24 * var(--u));
+  line-height: 1.2;
+}
+.caption:empty { display: none; }
+
+/* Held */
+.hero {
+  position: absolute; z-index: 2;
+  left: 3%; bottom: 4%;
+  width: 21%; height: 80%;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: calc(6 * var(--u));
+}
+.hero-art { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.hero-art img { max-height: 100%; max-width: 100%; object-fit: contain; display: block; }
+
+.plate {
+  display: flex; gap: calc(8 * var(--u)); align-items: center; justify-content: center;
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: calc(999 * var(--u));
+  padding: calc(4 * var(--u)) calc(12 * var(--u));
+  font-weight: 700;
+  font-size: calc(24 * var(--u));
+  white-space: nowrap;
+}
+.stat { display: inline-flex; align-items: center; gap: calc(4 * var(--u)); }
+.stat svg, .intent svg, .pile svg, .card-op svg { width: 1em; height: 1em; flex: none; }
+.stat.block { color: var(--sea-deep); }
+/* Serie (Etappe 8): ruhige Zahl, keine Signalfarbe, kein Puls */
+.stat.streak { font-size: 0.8em; color: var(--ink); }
+/* Strömung (D33): Gegner verstärkt (dunkel) oder geschwächt (hell) */
+.current { font-weight: 700; font-size: calc(17 * var(--u)); background: var(--sea-deep); color: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: calc(2 * var(--u)) calc(10 * var(--u)); white-space: nowrap; }
+.current[hidden] { display: none; }
+.current.is-low { background: var(--paper); color: var(--ink); }
+.hpbar {
+  width: 86%; height: calc(14 * var(--u));
+  background: var(--sea-night);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: calc(999 * var(--u));
+  overflow: hidden;
+}
+.hpbar i { display: block; height: 100%; background: var(--heal); transition: width var(--t-mid) var(--ease-out); }
+.foe .hpbar i { background: var(--coral); }
+
+/* Gegner */
+.foes {
+  position: absolute; z-index: 2;
+  right: 2%; bottom: 4%; top: 8%;
+  width: 36%;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr);
+  gap: calc(10 * var(--u));
+  align-items: end;
+}
+.foes[data-n="2"] { --cols: 2; }
+.foes[data-n="3"], .foes[data-n="4"] { --cols: 2; }
+.foe {
+  position: relative;
+  height: 100%; min-height: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: calc(5 * var(--u));
+  border-radius: var(--radius);
+  padding: calc(6 * var(--u)) calc(4 * var(--u));
+  transition: transform var(--t-fast) var(--ease-out), opacity var(--t-mid);
+}
+.foe-art { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.foe-art img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.foe[aria-pressed="true"] { outline: var(--line) solid var(--sun); outline-offset: calc(-2 * var(--u)); }
+.foe[aria-pressed="true"] .foe-name { background: var(--sun); }
+.foe.is-dead { opacity: 0.25; pointer-events: none; }
+.foe.is-hit { animation: hit 360ms var(--ease-out); }
+.foe-name {
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: calc(6 * var(--u));
+  padding: 0 calc(8 * var(--u));
+  font-weight: 700; font-size: calc(20 * var(--u));
+}
+.foe-row { display: flex; gap: calc(6 * var(--u)); align-items: center; }
+.intent {
+  display: inline-flex; align-items: center; gap: calc(4 * var(--u));
+  background: var(--coral); color: var(--ink);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: calc(999 * var(--u));
+  padding: calc(2 * var(--u)) calc(12 * var(--u));
+  font-weight: 700; font-size: calc(26 * var(--u));
+}
+.intent.is-shield { background: var(--shield); color: var(--ink); }
+.immune {
+  display: inline-grid; place-items: center;
+  width: calc(48 * var(--u)); height: calc(48 * var(--u));
+  background: var(--paper);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: 50%;
+  font-weight: 700; font-size: calc(26 * var(--u)); line-height: 1;
+  position: relative;
+}
+.immune svg { width: 80%; height: 80%; }
+.immune::after { /* Durchstreichung */
+  content: ""; position: absolute; left: 12%; right: 12%; top: 50%;
+  height: calc(4 * var(--u)); background: var(--coral);
+  transform: rotate(-58deg); border-radius: calc(2 * var(--u));
+}
+.foe .plate { font-size: calc(20 * var(--u)); padding: calc(2 * var(--u)) calc(10 * var(--u)); }
+.foes[data-n="3"] .foe-name, .foes[data-n="4"] .foe-name { font-size: calc(17 * var(--u)); }
+/* Arme: Name steht nur in der Ansage (alle heißen „Krakenarm“), damit das Bild Platz hat */
+.foes[data-n="4"] .foe:nth-child(-n+3) .foe-name { display: none; }
+
+/* Sprechblase mit der Aufgabe */
+.bubble {
+  position: absolute; z-index: 5;
+  left: 24%; top: 50%;
+  transform: translateY(-50%);
+  width: calc(430 * var(--u));
+  max-width: 39%;
+  background: var(--paper);
+  border: var(--line) solid var(--ink);
+  border-radius: calc(36 * var(--u));
+  padding: calc(14 * var(--u)) calc(18 * var(--u)) calc(18 * var(--u));
+  text-align: center;
+  animation: pop 220ms var(--ease-out);
+}
+.bubble.is-wide { width: calc(430 * var(--u)); max-width: 39%; }
+.bubble::before, .bubble::after { /* Sprechblasen-Zipfel zum Helden */
+  content: ""; position: absolute; left: calc(-34 * var(--u)); bottom: calc(40 * var(--u));
+  border-style: solid;
+}
+.bubble::before { border-width: calc(18 * var(--u)) calc(40 * var(--u)) calc(18 * var(--u)) 0; border-color: transparent var(--ink) transparent transparent; }
+.bubble::after { left: calc(-24 * var(--u)); border-width: calc(12 * var(--u)) calc(30 * var(--u)) calc(12 * var(--u)) 0; border-color: transparent var(--paper) transparent transparent; bottom: calc(46 * var(--u)); }
+
+.timer {
+  position: relative;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  height: calc(22 * var(--u));
+  border: var(--line-thin) solid var(--ink);
+  border-radius: calc(999 * var(--u));
+  overflow: hidden;
+  margin-bottom: calc(8 * var(--u));
+  background: var(--paper);
+}
+.timer i { border-right: var(--line-thin) solid var(--ink); }
+.timer i:last-of-type { border-right: 0; }
+.timer i:nth-of-type(1) { background: var(--sun-3); }
+.timer i:nth-of-type(2) { background: var(--sun-2); }
+.timer i:nth-of-type(3) { background: var(--sun); }
+.timer b { /* verbrauchte Zeit wächst von rechts */
+  position: absolute; top: 0; bottom: 0; right: 0; width: 0%;
+  background: var(--sea-night);
+}
+.bubble-ask { font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); min-height: 0; }
+.bubble-ask:empty { display: none; }
+.eq { font-weight: 700; font-size: calc(64 * var(--u)); line-height: 1.12; letter-spacing: 0.01em; white-space: nowrap; }
+.answers { display: grid; grid-template-columns: 1fr 1fr; gap: calc(12 * var(--u)); margin-top: calc(10 * var(--u)); }
+.answer {
+  min-height: calc(76 * var(--u));
+  background: var(--sun);
+  border: var(--line) solid var(--ink);
+  border-radius: calc(14 * var(--u));
+  font-weight: 700; font-size: calc(42 * var(--u));
+  white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: calc(10 * var(--u));
+  transition: transform var(--t-fast) var(--ease-out), background-color var(--t-fast);
+}
+.answers.is-equations { grid-template-columns: 1fr; }
+.answers.is-equations .answer { font-size: calc(34 * var(--u)); min-height: calc(58 * var(--u)); }
+.answer { position: relative; }
+.answer .key { position: absolute; top: calc(4 * var(--u)); right: calc(6 * var(--u)); font-size: calc(14 * var(--u)); line-height: 1; padding: calc(2 * var(--u)) calc(5 * var(--u)); border: calc(2 * var(--u)) solid var(--sea-deep); border-radius: calc(4 * var(--u)); color: var(--sea-deep); display: none; }
+@media (hover: hover) and (pointer: fine) { .answers:not(.is-equations) .answer .key { display: inline; } }
+.answer:active { transform: scale(0.97); }
+.answer:disabled { cursor: default; }
+.answer.is-right { background: var(--heal); }
+.answer.is-wrong { background: var(--paper); color: var(--muted); text-decoration: line-through; text-decoration-thickness: calc(3 * var(--u)); }
+.solution .eq { color: var(--ink); }
+.bubble .btn-go { margin-top: calc(14 * var(--u)); }
+
+/* Lautwort und Zahlen */
+.boom {
+  position: absolute; z-index: 6; pointer-events: none;
+  left: 50%; top: 22%;
+  font-family: var(--font-loud);
+  font-size: calc(84 * var(--u));
+  letter-spacing: 0.02em;
+  color: var(--sun);
+  -webkit-text-stroke: calc(4 * var(--u)) var(--ink);
+  paint-order: stroke fill;
+  transform: translateX(-50%) rotate(-6deg);
+  opacity: 0;
+  white-space: nowrap;
+}
+.boom.is-on { animation: boom 900ms var(--ease-out); }
+.float {
+  position: absolute; z-index: 6; pointer-events: none;
+  font-family: var(--font-loud);
+  font-size: calc(56 * var(--u));
+  -webkit-text-stroke: calc(3 * var(--u)) var(--ink); paint-order: stroke fill;
+  color: var(--coral);
+  animation: float 900ms var(--ease-out) forwards;
+}
+.float.is-heal { color: var(--heal); }
+.float.is-block { color: var(--shield); }
+.float.is-self { color: var(--paper); } /* eigener Fehler: nie Koralle (Regel Koralle) */
+
+/* Sieg / Niederlage */
+.banner {
+  position: absolute; z-index: 7; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: calc(14 * var(--u));
+  background: rgb(8 42 66 / 0.55);
+}
+.banner-word {
+  font-family: var(--font-loud);
+  font-size: calc(120 * var(--u));
+  color: var(--sun);
+  -webkit-text-stroke: calc(5 * var(--u)) var(--ink); paint-order: stroke fill;
+  transform: rotate(-4deg);
+  line-height: 1;
+}
+.banner-text {
+  background: var(--paper); border: var(--line) solid var(--ink); border-radius: var(--radius);
+  padding: calc(10 * var(--u)) calc(20 * var(--u));
+  font-weight: 700; font-size: calc(28 * var(--u)); text-align: center; max-width: 70%;
+}
+
+/* ---------- Unterer Streifen ---------- */
+.strip {
+  background: var(--sea-deep);
+  padding: calc(10 * var(--u)) calc(12 * var(--u));
+  display: grid;
+  grid-template-columns: calc(150 * var(--u)) minmax(0, 1fr) calc(170 * var(--u));
+  gap: var(--gap);
+  min-height: 0;
+}
+.stats {
+  border: 0; outline: 0; border-radius: 0;
+  border-right: var(--line-thin) solid var(--sea-night);
+  color: var(--paper);
+  display: flex; flex-direction: column; justify-content: space-around; align-items: center;
+  padding: calc(10 * var(--u));
+}
+.energy { display: flex; gap: calc(6 * var(--u)); }
+.energy svg { width: calc(34 * var(--u)); height: calc(46 * var(--u)); }
+.energy .is-empty { opacity: 0.35; }
+.energy-label { font-weight: 700; font-size: calc(20 * var(--u)); }
+.piles { display: flex; flex-direction: column; gap: calc(6 * var(--u)); width: 100%; }
+.pile { display: flex; align-items: center; gap: calc(6 * var(--u)); font-weight: 700; font-size: calc(20 * var(--u)); }
+
+.hand {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: calc(10 * var(--u));
+  align-items: stretch;
+  min-height: 0;
+  padding-top: calc(16 * var(--u));
+}
+.card {
+  position: relative;
+  display: flex; flex-direction: column;
+  background: var(--paper);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--radius);
+  padding: calc(6 * var(--u));
+  text-align: left;
+  min-height: 0;
+  transition: transform var(--t-fast) var(--ease-out), opacity var(--t-mid);
+}
+.card-art {
+  flex: 1 1 auto; min-height: calc(40 * var(--u));
+  border: var(--line-thin) solid var(--ink);
+  border-radius: calc(4 * var(--u));
+  background: var(--kind, var(--sea));
+  display: grid; place-items: center;
+  overflow: hidden;
+}
+.card-op svg { width: calc(54 * var(--u)); height: calc(54 * var(--u)); }
+.card-name { font-weight: 700; font-size: calc(19 * var(--u)); line-height: 1.15; margin-top: calc(6 * var(--u)); hyphens: manual; }
+.card-eff { font-weight: 700; font-size: calc(21 * var(--u)); line-height: 1.15; color: var(--sea-deep); }
+.cost {
+  position: absolute; top: calc(-14 * var(--u)); left: calc(-10 * var(--u));
+  width: calc(44 * var(--u)); height: calc(44 * var(--u));
+  display: grid; place-items: center;
+  background: var(--sun);
+  border: var(--line-thin) solid var(--ink);
+  border-radius: 50%;
+  font-weight: 700; font-size: calc(24 * var(--u));
+}
+.card[aria-pressed="true"] { transform: translateY(calc(-14 * var(--u))); outline: var(--line) solid var(--sun); }
+/* Kartenstufe (Etappe 8): Sterne oben in der Mitte (links Kosten, rechts im Logbuch die Anzahl) */
+.card-stars { position: absolute; top: calc(-14 * var(--u)); left: 50%; transform: translateX(-50%); display: flex; }
+.card-stars svg { width: calc(30 * var(--u)); height: calc(30 * var(--u)); margin-left: calc(-6 * var(--u)); }
+.card.is-off { opacity: 0.5; }
+.card.is-off .cost { background: var(--paper); }
+.card-why {
+  position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%) rotate(-6deg);
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
+  padding: calc(2 * var(--u)) calc(8 * var(--u));
+  font-weight: 700; font-size: calc(17 * var(--u)); line-height: 1.1; text-align: center;
+  width: max-content; max-width: 92%; white-space: normal; /* bleibt in der Karte, bricht bei schmalen Karten um */
+}
+.hand.is-discard .card:not(.is-gone) { outline: var(--line-thin) dashed var(--paper); outline-offset: calc(3 * var(--u)); }
+.card.is-gone { visibility: hidden; }
+
+.actions { display: flex; flex-direction: column; gap: var(--gap); padding-top: calc(16 * var(--u)); }
+
+/* ---------- Hochformat ---------- */
+@media (orientation: portrait) {
+  .stage { grid-template-rows: minmax(0, 62fr) minmax(0, 38fr); }
+  .hero { width: 26%; height: 58%; bottom: 3%; }
+  .foes { width: 60%; top: 3%; bottom: auto; height: 44%; right: 2%; }
+  .foes[data-n="3"] .intent, .foes[data-n="4"] .intent { font-size: calc(20 * var(--u)); padding: 0 calc(8 * var(--u)); }
+  .foes[data-n="3"] .immune, .foes[data-n="4"] .immune { width: calc(36 * var(--u)); height: calc(36 * var(--u)); }
+  .foes[data-n="3"] .hpbar, .foes[data-n="4"] .hpbar { display: none; }
+  .foes[data-n="3"], .foes[data-n="4"] { --cols: 4; }
+  .foes[data-n="2"] { --cols: 2; }
+  .bubble, .bubble.is-wide { left: auto; right: 3%; top: auto; bottom: 4%; transform: none; width: 68%; max-width: none; }
+  .bubble::before { bottom: calc(60 * var(--u)); }
+  .bubble::after { bottom: calc(66 * var(--u)); }
+  .caption { max-width: 38%; font-size: calc(22 * var(--u)); }
+  .answers.is-equations { grid-template-columns: 1fr 1fr; }
+  .strip {
+    grid-template-columns: calc(280 * var(--u)) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .stats { grid-row: 1; grid-column: 1; flex-direction: row; gap: calc(14 * var(--u)); justify-content: flex-start; }
+  .piles { width: auto; }
+  .actions { grid-row: 1; grid-column: 2; flex-direction: row; padding-top: 0; }
+  .actions .btn { flex: 1 1 0; }
+  .hand { grid-row: 2; grid-column: 1 / -1; }
+}
+
+/* ---------- Bewegung ---------- */
+@keyframes pop { from { transform: translateY(-50%) scale(0.92); opacity: 0; } to { transform: translateY(-50%) scale(1); opacity: 1; } }
+@media (orientation: portrait) { @keyframes pop { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } } }
+@keyframes boom {
+  0% { opacity: 0; transform: translateX(-50%) rotate(-6deg) scale(0.6); }
+  25% { opacity: 1; transform: translateX(-50%) rotate(-6deg) scale(1.08); }
+  70% { opacity: 1; transform: translateX(-50%) rotate(-6deg) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) rotate(-6deg) scale(1); }
+}
+@keyframes hit { 0%,100% { transform: translateX(0); } 30% { transform: translateX(calc(10 * var(--u))); } 60% { transform: translateX(calc(-6 * var(--u))); } }
+@keyframes float { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, calc(-60 * var(--u))); } }
+
+
+/* Reduzierte Bewegung: Lautwort und Zahlen erscheinen ohne Bewegung, stehen kurz, verschwinden */
+@keyframes still { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
+.is-calm .boom.is-on { animation: still 1000ms steps(1, end) forwards !important; transform: translateX(-50%) rotate(-6deg); }
+.is-calm .float { animation: still 1000ms steps(1, end) forwards !important; transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) {
+  .boom.is-on { animation: still 1000ms steps(1, end) forwards !important; transform: translateX(-50%) rotate(-6deg); }
+  .float { animation: still 1000ms steps(1, end) forwards !important; transform: translate(-50%, 0); }
+}
+/* Ergänzungen Phase 4 */
+.foe .shield-tag {
+  background: var(--sea-deep); color: var(--paper);
+  border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
+  padding: 0 calc(8 * var(--u)); font-weight: 700; font-size: calc(17 * var(--u));
+}
+.card.is-picked { transform: translateY(calc(-14 * var(--u))); outline: var(--line) solid var(--sun); }
+.card.is-pending { visibility: hidden; }
+.hand.is-cycle .card:not(.is-gone):not(.is-picked) { outline: var(--line-thin) dashed var(--paper); outline-offset: calc(3 * var(--u)); }
+/* Drei Gegner im Querformat: eine Reihe statt zwei, damit keiner winzig wird */
+@media (orientation: landscape) {
+  .foes[data-n="3"] { --cols: 3; width: 46%; top: 14%; }
+  .foes[data-n="3"] .intent { font-size: calc(22 * var(--u)); padding: 0 calc(8 * var(--u)); }
+  .foes[data-n="3"] .immune { width: calc(40 * var(--u)); height: calc(40 * var(--u)); }
+}
+@media (orientation: portrait) {
+  .foes[data-n="3"] { --cols: 3; }
+}
+
+/* Vier Ziele gibt es nur beim Boss (normale Räume haben 1 bis 3 Gegner, geprüft in validate.js):
+   drei Arme oben in einer Reihe, der Körper (letzter Gegner der Begegnung) darunter über die ganze Breite. */
+.foes[data-n="4"] { --cols: 3; grid-template-rows: minmax(0, 1fr) minmax(0, 1.5fr); }
+.foes[data-n="4"] .foe:nth-child(4) { grid-column: 1 / -1; }
+.foes[data-n="4"] .foe-name { font-size: calc(17 * var(--u)); }
+/* Arme: Name steht nur in der Ansage (alle heißen „Krakenarm“), damit das Bild Platz hat */
+.foes[data-n="4"] .foe:nth-child(-n+3) .foe-name { display: none; }
+.foes[data-n="4"] .intent { font-size: calc(22 * var(--u)); padding: 0 calc(8 * var(--u)); }
+.foes[data-n="4"] .immune { width: calc(38 * var(--u)); height: calc(38 * var(--u)); }
+.foes[data-n="4"] .foe .plate { font-size: calc(18 * var(--u)); }
+@media (orientation: landscape) {
+  .foes[data-n="4"] { width: 52%; top: 4%; bottom: 3%; }
+  .foes[data-n="4"] .hpbar { display: none; }
+}
+@media (orientation: portrait) {
+  .foes[data-n="4"] { --cols: 3; height: 92%; width: 64%; }
+}
+/* Boss mit Bildern: Absicht oben, Leben unten rechts, Name und „geschützt“ unten links liegen über dem Bild,
+   damit Arme und Körper groß bleiben. */
+.foes[data-n="4"] .foe { justify-content: stretch; padding: calc(4 * var(--u)); }
+.foes[data-n="4"] .foe-art { flex: 1 1 auto; height: 100%; align-items: center; }
+.foes[data-n="4"] .foe-row { position: absolute; z-index: 1; top: calc(4 * var(--u)); left: 50%; transform: translateX(-50%); }
+.foes[data-n="4"] .foe .plate { position: absolute; z-index: 1; bottom: calc(4 * var(--u)); right: calc(4 * var(--u)); }
+.foes[data-n="4"] .foe:nth-child(4) .foe-name,
+.foes[data-n="4"] .foe:nth-child(4) .shield-tag { position: absolute; z-index: 1; left: calc(8 * var(--u)); }
+.foes[data-n="4"] .foe:nth-child(4) .foe-name { bottom: calc(40 * var(--u)); }
+.foes[data-n="4"] .foe:nth-child(4) .shield-tag { bottom: calc(8 * var(--u)); }
+.foes[data-n="4"] .foe:nth-child(4) .plate { right: auto; left: calc(8 * var(--u)); bottom: calc(74 * var(--u)); }
+
+/* ---------- Erklärung im ersten Kampf (Etappe 8) ---------- */
+.caption.is-tutorial {
+  font-size: calc(30 * var(--u));
+  max-width: 52%;
+  animation: tutorial-call 1.6s var(--ease-out) infinite;
+}
+.is-tutorial-focus { outline: calc(5 * var(--u)) dashed var(--paper); outline-offset: calc(6 * var(--u)); border-radius: var(--radius); animation: tutorial-ring 1.6s var(--ease-out) infinite; }
+@keyframes tutorial-call { 50% { transform: translateY(calc(3 * var(--u))); } }
+@keyframes tutorial-ring { 50% { outline-color: var(--sun); } }
+.caption.is-tutorial.is-quiet { animation: none; }
+/* Satz zur Kartenart beim ersten Ausspielen: oben in der Sprechblase, nie über der Aufgabe */
+.bubble .card-hint {
+  background: var(--sun-3);
+  border-radius: calc(6 * var(--u));
+  padding: calc(4 * var(--u)) calc(10 * var(--u));
+  margin-bottom: calc(6 * var(--u));
+  font-weight: 700; font-size: calc(19 * var(--u)); line-height: 1.25;
+}
+@media (orientation: portrait) {
+  .caption.is-tutorial { max-width: 60%; font-size: calc(26 * var(--u)); }
+}
+
+/* D27 (Phase 5, Etappe 1): Boss im Hochformat. Solange die Aufgabe offen ist, stehen Arme und Körper
+   in einer Reihe über der Sprechblase, damit Körper, Leben und Absicht sichtbar bleiben. */
+@media (orientation: portrait) {
+  .scene:has(> .bubble:not([hidden])) .foes[data-n="4"] {
+    --cols: 4; grid-template-rows: minmax(0, 1fr); height: 40%; width: 80%; top: 15%;
+  }
+  .scene:has(> .bubble:not([hidden])) .foes[data-n="4"] .foe:nth-child(4) { grid-column: auto; }
+}
+
+/* Panzerknacker (Phase 5, Etappe 3): Immunität aufgehoben – Zeichen blass, ohne Durchstreichung,
+   dazu ein kleiner gelber Kreis mit den restlichen Zügen. */
+.immune.is-broken { background: var(--disabled-fill); border-style: dashed; }
+.immune.is-broken svg { opacity: 0.5; }
+.immune.is-broken::after { display: none; }
+.immune-turns {
+  position: absolute; right: calc(-10 * var(--u)); bottom: calc(-8 * var(--u));
+  display: grid; place-items: center;
+  width: calc(26 * var(--u)); height: calc(26 * var(--u));
+  background: var(--sun); color: var(--ink);
+  border: var(--line-thin) solid var(--ink); border-radius: 50%;
+  font-size: calc(16 * var(--u)); font-weight: 700;
+}
+
+/* ---------- Zahlenstrahl in der Blase (Phase 5, Etappe 3) ---------- */
+.nline { width: 100%; }
+.nline-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.nline-axis { stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
+.nline-tick { stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.nline-tick.is-half { stroke-width: 3; }
+.nline-num { font-family: var(--font-text); font-weight: 700; font-size: 52px; text-anchor: middle; fill: var(--ink); }
+.nline-num.is-answer { fill: var(--sea-deep); font-size: 56px; }
+.nline-pin { fill: var(--ink); }
+.nline-dot { fill: var(--paper); stroke: var(--ink); stroke-width: 4; }
+.nline-letter { font-family: var(--font-text); font-weight: 700; font-size: 36px; text-anchor: middle; fill: var(--ink); }
+.nline-mark.is-right .nline-dot { fill: var(--heal); }
+.nline-mark.is-right .nline-pin { fill: var(--heal); stroke: var(--ink); stroke-width: 3; }
+.bubble.is-line .answers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (orientation: landscape) {
+  .bubble.is-line { width: calc(480 * var(--u)); max-width: 44%; }
+}
+.eq.is-long { white-space: normal; line-height: 1.15; text-align: center; }
+
+/* ---------- Mehrschrittige Aufgaben (Phase 5, Etappe 4) ---------- */
+.steps-dots { display: flex; justify-content: center; gap: calc(10 * var(--u)); margin: calc(2 * var(--u)) 0; }
+.steps-dots i { width: calc(18 * var(--u)); height: calc(18 * var(--u)); border-radius: 50%; border: var(--line-thin) solid var(--ink); background: var(--paper); }
+.steps-dots i.is-done { background: var(--heal); }
+.steps-dots i.is-now { background: var(--sun); }
+.free-note { margin: 0; text-align: center; font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); }
+.timer.no-tempo i { background: var(--shield); }
+.nwall { display: flex; flex-direction: column; align-items: center; gap: calc(4 * var(--u)); padding: calc(2 * var(--u)) 0; }
+.nwall-row { display: flex; gap: calc(6 * var(--u)); }
+.nwall-stone {
+  display: grid; place-items: center;
+  min-width: calc(80 * var(--u)); height: calc(46 * var(--u));
+  padding: 0 calc(8 * var(--u));
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
+  font-weight: 700; font-size: calc(30 * var(--u));
+}
+.nwall-stone.is-empty { background: var(--sun-3); }
+.nwall-stone.is-current { background: var(--sun); box-shadow: 0 0 0 calc(4 * var(--u)) var(--paper), 0 0 0 calc(7 * var(--u)) var(--ink); }
+.nwall-stone.is-solved { background: var(--heal); }
+.answer.is-used { opacity: 0.45; }
+
+/* Hintergründe der Gebiete 2 bis 4: seit 17.11.2026 eigene Bilder (Gemini), die Farbfilter-Platzhalter sind entfernt. */
+
+/* ---------- Bossregeln und Tintenwolke (Phase 5, Etappe 6) ---------- */
+/* Höhlenmuräne: versteckt – Bild blass, gestrichelter Rahmen */
+.foe.is-hidden .foe-art { opacity: 0.55; filter: saturate(0.6); }
+.foe.is-hidden { outline: var(--line-thin) dashed var(--paper); outline-offset: calc(-6 * var(--u)); }
+/* geschwächter Angriff: Absicht schutzblau umrandet, kleiner gelber Kreis mit den restlichen Zügen */
+.intent.is-weak { box-shadow: 0 0 0 calc(3 * var(--u)) var(--shield); }
+.intent { position: relative; }
+.weak-turns {
+  position: absolute; right: calc(-10 * var(--u)); bottom: calc(-10 * var(--u));
+  display: grid; place-items: center;
+  width: calc(24 * var(--u)); height: calc(24 * var(--u));
+  background: var(--sun); color: var(--ink);
+  border: var(--line-thin) solid var(--ink); border-radius: 50%;
+  font-size: calc(15 * var(--u)); font-weight: 700;
+}
+.answers.is-equations.is-terms { grid-template-columns: 1fr 1fr; }

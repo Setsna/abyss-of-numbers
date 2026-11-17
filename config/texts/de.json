@@ -1,0 +1,566 @@
+{
+  "title": {
+    "name": "Abyss of Numbers",
+    "start": "Los!",
+    "continue": "Weiter"
+  },
+  "boot": {
+    "loading": "Das Spiel lädt …",
+    "configError": "Die Spieldaten sind fehlerhaft:"
+  },
+  "login": {
+    "ask": "Wie lautet dein Code?",
+    "info": "Dein Code hat 8 Zeichen: Buchstaben und Zahlen. Es ist derselbe Code wie beim Perlentaucher.",
+    "go": "Weiter",
+    "wait": "Einen Moment …",
+    "partial": "Der Code wurde nicht ganz gelesen. Tippe ihn bitte ein.",
+    "who": "Angemeldet: {name}",
+    "logout": "Abmelden",
+    "privacy": "Datenschutz",
+    "offline": "Gerade ohne Internet. Dein Stand bleibt auf diesem Gerät und wird später abgeglichen.",
+    "failed": "Dein Stand konnte gerade nicht im Internet gespeichert werden. Er bleibt auf diesem Gerät. Bitte sag deiner Lehrkraft Bescheid.",
+    "restarted": "Deine Lehrkraft hat Abyss of Numbers neu gestartet. Du fängst von vorn an."
+  },
+  "task": {
+    "pickTrue": "Welche Rechnung stimmt?",
+    "pickFalse": "Welche Rechnung ist falsch?",
+    "numberLine": "Wo ist die {n}?",
+    "sequence": "Wie geht es weiter?",
+    "complement": "Was fehlt?",
+    "chain": "Kette: Glied {n} von {of}",
+    "wall": "Welche Zahl gehört in den hellen Stein?",
+    "match": "Welches Ergebnis gehört dazu?",
+    "stepOf": "Schritt {n} von {of}",
+    "wallLabel": "Zahlenmauer: {stones}",
+    "twoStep": "Rechne Schritt für Schritt.",
+    "pointBeforeLine": "Punkt vor Strich!",
+    "compareTerms": "Welche Rechnung hat denselben Wert wie {expr}?",
+    "solveStep": "Gefunden! Jetzt rechne:"
+  },
+  "cards": {
+    "currentStrike": {
+      "name": "Strömungs­stoß"
+    },
+    "undertow": {
+      "name": "Sogwirbel"
+    },
+    "waveSlam": {
+      "name": "Wellen­schlag"
+    },
+    "deepRift": {
+      "name": "Tiefen­riss"
+    },
+    "shieldBubble": {
+      "name": "Schild­blase"
+    },
+    "healingAlgae": {
+      "name": "Heilalge"
+    },
+    "whirlpool": {
+      "name": "Strudel"
+    },
+    "harpoon": {
+      "name": "Harpune"
+    },
+    "conchHorn": {
+      "name": "Muschel­horn"
+    },
+    "kelpPotion": {
+      "name": "Seetang-Trank"
+    },
+    "shellCracker": {
+      "name": "Panzer­knacker"
+    },
+    "bubbleChain": {
+      "name": "Blasen­kette"
+    },
+    "coralWall": {
+      "name": "Korallen­mauer"
+    },
+    "pearlFind": {
+      "name": "Perlen­fund"
+    },
+    "inkCloud": {
+      "name": "Tinten­wolke"
+    }
+  },
+  "enemies": {
+    "crab": {
+      "name": "Krabbe"
+    },
+    "puffer": {
+      "name": "Kugelfisch"
+    },
+    "jelly": {
+      "name": "Qualle"
+    },
+    "urchin": {
+      "name": "Seeigel"
+    },
+    "krakenArmAdd": {
+      "name": "Krakenarm"
+    },
+    "krakenArmSub": {
+      "name": "Krakenarm"
+    },
+    "krakenArmMul": {
+      "name": "Krakenarm"
+    },
+    "krakenBody": {
+      "name": "Riffkrake"
+    },
+    "lanternFish": {
+      "name": "Laternenfisch"
+    },
+    "stoneFish": {
+      "name": "Steinfisch"
+    },
+    "caveIsopod": {
+      "name": "Höhlenassel"
+    },
+    "snakeEel": {
+      "name": "Schlangenaal"
+    },
+    "armorCrab": {
+      "name": "Panzerkrebs"
+    },
+    "shellWarden": {
+      "name": "Muschelwächter"
+    },
+    "statueFish": {
+      "name": "Statuenfisch"
+    },
+    "seahorseKnight": {
+      "name": "Seepferd-Ritter"
+    },
+    "anglerFish": {
+      "name": "Anglerfisch"
+    },
+    "deepJelly": {
+      "name": "Tiefseequalle"
+    },
+    "giantIsopod": {
+      "name": "Riesenassel"
+    },
+    "vampireSquid": {
+      "name": "Vampirkalmar"
+    },
+    "caveMoray": {
+      "name": "Höhlenmuräne"
+    },
+    "cityWarden": {
+      "name": "Wächter der Stadt"
+    },
+    "trenchLord": {
+      "name": "Herr des Grabens"
+    }
+  },
+  "hero": {
+    "name": "Mutige Taucherin"
+  },
+  "caption": {
+    "pickFoe": "Tippe einen Gegner an.",
+    "pickCard": "Tippe eine Karte an.",
+    "solve": "Rechne und tippe das Ergebnis an.",
+    "pickTrue": "Tippe die richtige Rechnung an.",
+    "pickFalse": "Tippe die falsche Rechnung an.",
+    "next": "Schau dir die Lösung an. Dann tippe auf „Weiter“.",
+    "noEnergy": "Keine Energie mehr. Tippe auf „Zug beenden“.",
+    "discard": "Tippe eine Karte zum Abwerfen an.",
+    "cycle": "Tippe {n} Karten zum Abwerfen an.",
+    "cycleOne": "Tippe 1 Karte zum Abwerfen an.",
+    "foeTurn": "Die Gegner sind dran …",
+    "shieldedTarget": "Geschützt! Besiege zuerst die Arme.",
+    "numberLine": "Tippe den richtigen Buchstaben an.",
+    "sequence": "Tippe die nächste Zahl an.",
+    "complement": "Tippe die fehlende Zahl an.",
+    "chain": "Rechne und tippe das Ergebnis an. Dann geht die Kette weiter.",
+    "wall": "Tippe die Zahl für den hellen Stein an.",
+    "match": "Tippe das passende Ergebnis an.",
+    "twoStep": "Rechne erst den ersten Teil, dann weiter.",
+    "pointBeforeLine": "Erst mal oder geteilt, dann plus oder minus.",
+    "compareTerms": "Tippe die Rechnung mit demselben Wert an."
+  },
+  "ask": {
+    "wrong": "Nicht ganz. So stimmt es:",
+    "timeout": "Die Zeit ist um. So stimmt es:",
+    "wrongTrue": "Nicht ganz. Diese Rechnung stimmt:",
+    "wrongFalse": "Nicht ganz. Diese Rechnung ist falsch. Richtig ist:",
+    "freeMistake": "Noch 1 Fehler frei.",
+    "freeMistakes": "Noch {n} Fehler frei.",
+    "freeNone": "Kein Fehler mehr frei."
+  },
+  "btn": {
+    "next": "Weiter",
+    "end": "Zug beenden",
+    "discard": "Abwerfen · noch {n}",
+    "discardStop": "Fertig",
+    "again": "Noch einmal",
+    "toBase": "Zur Station",
+    "surface": "Auftauchen",
+    "dive": "Abtauchen"
+  },
+  "boom": {
+    "lightning": "Blitzschnell!",
+    "fast": "Schnell!",
+    "normal": "Treffer!"
+  },
+  "result": {
+    "winWord": "Geschafft!",
+    "winText": "Alle Gegner sind besiegt.",
+    "loseWord": "Auftauchen!",
+    "loseText": "Du tauchst zur Station auf. Alles Gesammelte bleibt."
+  },
+  "reject": {
+    "phase": "jetzt nicht",
+    "card": "diese Karte geht nicht",
+    "target": "erst einen Gegner antippen",
+    "energy": "zu wenig Energie",
+    "immune": "immun",
+    "shielded": "geschützt",
+    "cycleCount": "falsche Anzahl",
+    "discards": "nicht mehr abwerfen",
+    "command": "unbekannt",
+    "pearls": "Dafür hast du zu wenig Perlen.",
+    "soldOut": "Diese Karte ist schon verkauft.",
+    "deckTooSmall": "Dein Deck braucht mindestens {n} Karten.",
+    "lastAttackTypes": "Du brauchst Angriffskarten mit zwei verschiedenen Rechenarten.",
+    "removedAlready": "Hier hast du schon eine Karte abgegeben.",
+    "notOffered": "Diese Karte gibt es hier nicht.",
+    "noImmunity": "keine Immunität",
+    "item": "Diesen Gegenstand hast du nicht.",
+    "slot": "Diesen Platz gibt es nicht."
+  },
+  "eff": {
+    "damage": "{n} Schaden",
+    "block": "{n} Schutz",
+    "heal": "{n} Leben",
+    "cycle": "Wirf {discard} ab, zieh {draw}",
+    "buff": "+{n} Kraft im Kampf",
+    "breakImmunity": "Immunität weg, {turns} Züge",
+    "damagePerStep": "{n} Schaden je Glied",
+    "energy": "+{n} Energie",
+    "weaken": "Gegner {n} schwächer, {turns} Züge"
+  },
+  "hud": {
+    "energy": "Energie {n} von {max}",
+    "hp": "Leben {n} von {max}",
+    "drawPile": "Stapel {n}",
+    "discardPile": "Ablage {n}",
+    "immune": "immun gegen {op}",
+    "intentAttack": "greift mit {n} an",
+    "intentBlock": "schützt sich mit {n}",
+    "shielded": "geschützt",
+    "cardLabel": "{name}, kostet {cost}, {effect}",
+    "pearls": "Perlen {n}",
+    "level": "Stufe {n}",
+    "immuneBroken": "Immunität gegen {op} aufgehoben, noch {n} Züge",
+    "weak": "greift noch {n} Züge schwächer an",
+    "hidden": "versteckt",
+    "streak": "Serie {n}",
+    "cardLevel": "Stufe {n}"
+  },
+  "reward": {
+    "xp": "+{n} Erfahrung",
+    "pearls": "+{n} Perlen",
+    "levelUp": "Neue Stufe! Du bekommst einen Punkt.",
+    "pick": "Nimm eine Karte für dein Deck:",
+    "none": "Keine Karte",
+    "practice": "Diese Aufgaben kannst du noch üben:",
+    "lightning": "Blitzschnell-Treffer: {n}",
+    "treasureWord": "Schatz!",
+    "cardLevelUp": "{name} ist stärker geworden!"
+  },
+  "save": {
+    "unavailable": "Speichern geht gerade nicht. Du kannst trotzdem spielen."
+  },
+  "areas": {
+    "reef": {
+      "name": "Korallenriff",
+      "bossDefeated": "Der Riffkrake ist besiegt."
+    },
+    "caves": {
+      "name": "Unter­wasser­höhlen",
+      "bossDefeated": "Die Höhlenmuräne ist besiegt.",
+      "intro": "Hier rechnest du mit Zahlen bis 1000: mit glatten Zehnern und Hundertern, zum Beispiel 450 + 300."
+    },
+    "city": {
+      "name": "Versunkene Stadt",
+      "bossDefeated": "Der Wächter der Stadt ist besiegt.",
+      "intro": "Hier rechnest du mal und geteilt mit Zehnerzahlen, zum Beispiel 3 · 60 oder 210 : 30."
+    },
+    "trench": {
+      "name": "Tiefsee­graben",
+      "bossDefeated": "Der Herr des Grabens ist besiegt.",
+      "intro": "Hier kommt alles vor, was du schon kannst. Zeig, was du gelernt hast!"
+    },
+    "introOk": "Los geht’s!"
+  },
+  "map": {
+    "title": "{area}",
+    "pick": "Tippe den nächsten Raum an.",
+    "room": {
+      "combat": "Kampf",
+      "rest": "Ruheplatz",
+      "boss": "Boss",
+      "treasure": "Schatz",
+      "shop": "Händler"
+    },
+    "done": "geschafft",
+    "roomLabel": "{type}, {state}",
+    "stateOpen": "jetzt möglich",
+    "stateLater": "später",
+    "stateDone": "geschafft",
+    "restHealed": "+{n} Leben",
+    "restFull": "Deine Leben sind schon voll.",
+    "hud": "Stufe {stufe}"
+  },
+  "cleared": {
+    "word": "Gebiet geschafft!",
+    "next": "Neues Gebiet: {area}",
+    "soon": "kommt bald"
+  },
+  "base": {
+    "title": "Station",
+    "text": "Hier startest du deine Tauchgänge.",
+    "resume": "Weiter tauchen",
+    "logbook": "Logbuch",
+    "gear": "Ausrüstung",
+    "freeOne": "1 freier Punkt",
+    "freeMany": "{n} freie Punkte",
+    "diveTo": "Abtauchen: {area}",
+    "soon": "{area}: kommt bald"
+  },
+  "figures": {
+    "diver": {
+      "name": "Taucherin"
+    },
+    "researcher": {
+      "name": "Forscher"
+    },
+    "tinkerer": {
+      "name": "Tüftlerin"
+    },
+    "merfolk": {
+      "name": "Meereswesen"
+    }
+  },
+  "grade": {
+    "ask": "In welche Klasse gehst du?",
+    "k3": "Klasse 3",
+    "k4": "Klasse 4",
+    "notice4": "Klasse 4 folgt bald. Bis dahin bekommst du die Aufgaben von Klasse 3.",
+    "ok": "Verstanden"
+  },
+  "heroCreate": {
+    "title": "Wähle deine Figur",
+    "name": "Dein Name",
+    "other": "anderes Wort",
+    "dice": "Würfeln",
+    "done": "Fertig",
+    "figureLabel": "{name} wählen"
+  },
+  "logbook": {
+    "title": "Logbuch",
+    "close": "Zurück",
+    "tab": {
+      "hero": "Held",
+      "deck": "Deck",
+      "rules": "Regeln",
+      "practice": "Übungsliste",
+      "gear": "Ausrüstung"
+    },
+    "stat": {
+      "kraft": "Kraft",
+      "ruhe": "Ruhe",
+      "leben": "Leben"
+    },
+    "statHelp": {
+      "kraft": "+1 Schaden bei jedem Angriff",
+      "ruhe": "+1 Sekunde bei jeder Aufgabe",
+      "leben": "+3 Leben"
+    },
+    "add": "{stat} +1",
+    "freeOne": "1 freier Punkt",
+    "freeMany": "{n} freie Punkte",
+    "freeNone": "Keine freien Punkte",
+    "reset": "Neu verteilen",
+    "level": "Stufe {n}",
+    "xp": "{n} Erfahrung",
+    "nextLevel": "Noch {n} Erfahrung bis Stufe {stufe}",
+    "maxLevel": "Höchste Stufe erreicht",
+    "hp": "{n} Leben",
+    "deckCount": "{n}×",
+    "deckTotal": "{n} Karten im Deck",
+    "deckNext": "noch {n} richtige",
+    "deckMax": "stärkste Stufe",
+    "rules": [
+      "Tippe einen Gegner an.",
+      "Tippe eine Karte an.",
+      "Rechne und tippe das Ergebnis an.",
+      "Schnell rechnen macht die Karte stärker.",
+      "Eine falsche Antwort kostet {n} Leben.",
+      "Keine Karte mehr? Tippe auf „Zug beenden“."
+    ],
+    "practiceText": "Diese Aufgaben kannst du noch üben:",
+    "practiceEmpty": "Noch keine Aufgaben zum Üben. Prima!"
+  },
+  "tutorial": {
+    "step1": "Tippe den Gegner an.",
+    "step2": "Tippe eine Karte an.",
+    "step3": "Rechne und tippe das Ergebnis an. Diesmal ohne Zeit!",
+    "step4": "Spiel noch eine Karte oder tippe auf „Zug beenden“.",
+    "step4end": "Tippe auf „Zug beenden“."
+  },
+  "hint": {
+    "card": {
+      "currentStrike": "Rechne plus. Richtig? Dann trifft die Karte.",
+      "undertow": "Rechne minus. Richtig? Dann trifft die Karte.",
+      "waveSlam": "Rechne mal. Diese Karte trifft hart.",
+      "deepRift": "Rechne geteilt. Diese Karte trifft hart.",
+      "shieldBubble": "Finde die richtige Rechnung. Dann schützt dich die Blase.",
+      "healingAlgae": "Finde die falsche Rechnung. Dann bekommst du Leben.",
+      "whirlpool": "Wirf Karten ab. Zieh neue Karten.",
+      "harpoon": "Finde die Zahl am Zahlenstrahl. Richtig? Dann trifft die Harpune.",
+      "conchHorn": "Wie geht die Zahlenfolge weiter? Richtig? Dann bist du in diesem Kampf stärker.",
+      "kelpPotion": "Was fehlt bis zur Zahl? Richtig? Dann bekommst du Leben.",
+      "shellCracker": "Tippe einen Gegner mit Immunität an. Finde die richtige Rechnung. Dann wirkt drei Züge lang jede Karte gegen ihn.",
+      "bubbleChain": "Rechne mit dem Ergebnis weiter. Jedes richtige Glied trifft einen Gegner.",
+      "coralWall": "Fülle die Zahlenmauer. Zwei Fehler sind frei. Dann trifft die Mauer sehr hart.",
+      "pearlFind": "Finde zu jeder Aufgabe das Ergebnis. Zwei Fehler sind frei. Dann bekommst du Energie.",
+      "inkCloud": "Tippe einen Gegner an. Finde die Rechnung mit demselben Wert. Dann greift er drei Züge lang schwächer an."
+    }
+  },
+  "adult": {
+    "open": "Für Erwachsene",
+    "title": "Für Erwachsene",
+    "back": "Zurück",
+    "about": "Abyss of Numbers ist ein Rechenspiel für Klasse 3. Die Kinder kämpfen mit Rechenkarten gegen Meeresbewohner. Eine Karte wirkt nur, wenn die Aufgabe richtig gelöst ist. Schnelles Rechnen gibt einen Bonus, Fehler kosten etwas Leben, aber nie den Fortschritt.",
+    "moreTime": "Mehr Zeit für Aufgaben",
+    "moreTimeOpt": {
+      "off": "normal",
+      "plus50": "+50 %",
+      "plus100": "+100 %",
+      "noTimer": "ohne Zeitleiste"
+    },
+    "ton": "Ton",
+    "musik": "Musik",
+    "wenigBewegung": "Weniger Bewegung",
+    "on": "an",
+    "off": "aus",
+    "volume": "Lautstärke",
+    "volumeOpt": {
+      "v0": "leise",
+      "v1": "mittel",
+      "v2": "laut"
+    },
+    "pendingNote": "Es gibt noch keinen Spielstand. Die Einstellungen gelten für den Helden, der als Nächstes angelegt wird.",
+    "storage": "Der Spielstand liegt nur auf diesem Gerät in diesem Browser. Es werden keine Daten verschickt.",
+    "reset": "Spielstand zurücksetzen",
+    "resetHelp": "Löscht Held, Stufe, Karten und Perlen auf diesem Gerät.",
+    "gateAsk": "Dieser Bereich ist für Erwachsene. Bitte tippen Sie diese Zahl als Ziffern ein:",
+    "gateWrong": "Das stimmt nicht. Hier ist eine neue Zahl.",
+    "gateOk": "Öffnen",
+    "resetConfirm": "Wirklich alles löschen? Held, Stufe, Karten und Perlen sind danach weg. Das lässt sich nicht rückgängig machen.",
+    "resetOk": "Löschen",
+    "gateDelete": "Ziffer löschen",
+    "cancel": "Abbrechen",
+    "done": "Der Spielstand ist gelöscht.",
+    "noSave": "Es gibt noch keinen Spielstand.",
+    "storageAccount": "Die Kinder melden sich mit ihrem Zugangscode an. Es ist derselbe wie beim Perlentaucher. Gespeichert wird unter diesem Code der Spielstand: Held, Stufe, Karten, Perlen, Ausrüstung, Fortschritt in den Gebieten und diese Einstellungen. So ist der Stand auf jedem Gerät da. Der Stand liegt zusätzlich im Browser des Geräts, damit auch ohne Internet gespielt werden kann. Andere Kinder sehen ihn nicht. Zurücksetzen oder löschen lassen können Sie den Stand über die Lehrkraft. Auf einem fremden Gerät am Ende bitte auf „Abmelden“ tippen.",
+    "privacy": "Datenschutz",
+    "imprint": "Impressum"
+  },
+  "shop": {
+    "title": "Händler",
+    "buyTitle": "Karten kaufen",
+    "buy": "Kaufen",
+    "price": "{n} Perlen",
+    "soldOut": "Gekauft",
+    "tooExpensive": "Zu wenig Perlen",
+    "removeTitle": "Eine Karte abgeben",
+    "removeOpen": "Karte abgeben ({n} Perlen)",
+    "removeAsk": "Welche Karte soll weg?",
+    "removeDone": "Abgegeben. Beim nächsten Händler geht es wieder.",
+    "removeCancel": "Doch nicht",
+    "cardCount": "{n}×",
+    "leave": "Weiter tauchen",
+    "bought": "{name} ist jetzt in deinem Deck.",
+    "removed": "{name} ist nicht mehr in deinem Deck.",
+    "itemTitle": "Ausrüstung"
+  },
+  "boss": {
+    "phase2": "Phase 2!",
+    "rule": {
+      "caveMoray": "Die Höhlenmuräne versteckt sich. Finde sie zuerst am Zahlenstrahl. Dann trifft deine Karte doppelt.",
+      "cityWarden": "Der Wächter rechnet in zwei Schritten. Rechne erst den ersten Teil, dann weiter.",
+      "trenchLord": "Beim Herrn des Grabens gilt: Punkt vor Strich. Erst mal, dann plus oder minus."
+    }
+  },
+  "items": {
+    "helmet": {
+      "name": "Taucherhelm",
+      "eff": "+4 Leben"
+    },
+    "lamp": {
+      "name": "Stirnlampe",
+      "eff": "+1 Sekunde bei jeder Aufgabe"
+    },
+    "shellHat": {
+      "name": "Muschelhut",
+      "eff": "1 Karte mehr abwerfen"
+    },
+    "coralArmor": {
+      "name": "Korallenpanzer",
+      "eff": "jeder Kampf beginnt mit 3 Schutz"
+    },
+    "kelpVest": {
+      "name": "Seetangweste",
+      "eff": "+6 Leben"
+    },
+    "streamSuit": {
+      "name": "Strömungsanzug",
+      "eff": "+1 Schaden bei jedem Angriff"
+    },
+    "pearlNet": {
+      "name": "Perlennetz",
+      "eff": "+1 Perle für jeden Gegner"
+    },
+    "compass": {
+      "name": "Kompass",
+      "eff": "+1 Sekunde bei jeder Aufgabe"
+    },
+    "harpoonGlove": {
+      "name": "Harpunenhandschuh",
+      "eff": "+1 Schaden bei jedem Angriff"
+    }
+  },
+  "slots": {
+    "kopf": "Kopf",
+    "koerper": "Körper",
+    "hand": "Hand"
+  },
+  "perks": {
+    "diver": "Stärke: 6 Leben mehr",
+    "researcher": "Stärke: 2 Sekunden mehr bei jeder Aufgabe",
+    "tinkerer": "Stärke: jeder Kampf beginnt mit 4 Schutz",
+    "merfolk": "Stärke: Heilkarten heilen 2 mehr"
+  },
+  "gear": {
+    "empty": "leer",
+    "equip": "Anlegen",
+    "unequip": "Ablegen",
+    "worn": "angelegt",
+    "none": "Noch keine Ausrüstung. Du findest sie in Schätzen, beim Händler und bei Bossen.",
+    "found": "Gefunden: {name}!",
+    "hint": "In jedem Platz kannst du einen Gegenstand tragen."
+  },
+  "current": {
+    "strong": "Starke Strömung: Gegner sind zäher",
+    "calm": "Ruhige Strömung: Gegner sind schwächer",
+    "up": "Die Strömung wird stärker!",
+    "down": "Die Strömung wird ruhiger.",
+    "strongShort": "Strömung stark",
+    "calmShort": "Strömung ruhig"
+  }
+}

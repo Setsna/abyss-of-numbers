@@ -1,0 +1,510 @@
+{
+  "grade": 3,
+  "areas": {
+    "reef": {
+      "maxNumber": 100,
+      "add": {
+        "aMin": 11,
+        "aMax": 89,
+        "bMin": 2,
+        "bMax": 89,
+        "sumMax": 100,
+        "levels": {
+          "1": {
+            "carry": false
+          },
+          "2": {
+            "carry": true
+          }
+        }
+      },
+      "sub": {
+        "aMin": 20,
+        "aMax": 100,
+        "bMin": 2,
+        "resultMin": 1,
+        "levels": {
+          "1": {
+            "borrow": false
+          },
+          "2": {
+            "borrow": true
+          }
+        }
+      },
+      "mul": {
+        "bMin": 2,
+        "bMax": 10,
+        "levels": {
+          "1": {
+            "a": [
+              2,
+              5,
+              10
+            ]
+          },
+          "2": {
+            "a": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ]
+          }
+        }
+      },
+      "div": {
+        "quotientMin": 2,
+        "quotientMax": 10,
+        "levels": {
+          "1": {
+            "divisor": [
+              2,
+              5,
+              10
+            ]
+          },
+          "2": {
+            "divisor": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ]
+          }
+        }
+      },
+      "numberLine": {
+        "min": 0,
+        "max": 100,
+        "step": 10,
+        "labelEvery": 50
+      },
+      "sequence": {
+        "startMin": 2,
+        "startMax": 50,
+        "stepMin": 2,
+        "stepMax": 10,
+        "min": 0,
+        "max": 100
+      },
+      "complement": {
+        "aMin": 11,
+        "aMax": 89,
+        "levels": {
+          "1": {
+            "to": "ten"
+          },
+          "2": {
+            "to": 100
+          }
+        }
+      },
+      "chain": {
+        "startMin": 5,
+        "startMax": 40,
+        "links": 3,
+        "addMax": 20,
+        "subMax": 20,
+        "mulFactors": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "mulMaxStart": 20,
+        "resultMin": 1,
+        "max": 100
+      },
+      "wall": {
+        "baseMin": 1,
+        "baseMax": 30,
+        "topMax": 100,
+        "levels": {
+          "1": {
+            "patterns": [
+              "sum"
+            ]
+          },
+          "2": {
+            "patterns": [
+              "sum",
+              "oneBase",
+              "fromTop"
+            ]
+          }
+        }
+      },
+      "match": {
+        "operations": [
+          "add",
+          "sub",
+          "mul",
+          "div"
+        ],
+        "level": 1
+      }
+    },
+    "caves": {
+      "maxNumber": 1000,
+      "add": {
+        "aUnit": 10,
+        "aMin": 10,
+        "aMax": 90,
+        "sumMax": 1000,
+        "levels": {
+          "1": {
+            "bUnit": 100,
+            "bMin": 1,
+            "bMax": 9
+          },
+          "2": {
+            "bUnit": 10,
+            "bMin": 1,
+            "bMax": 9
+          }
+        }
+      },
+      "sub": {
+        "aUnit": 10,
+        "aMin": 11,
+        "aMax": 100,
+        "resultMin": 10,
+        "levels": {
+          "1": {
+            "bUnit": 100,
+            "bMin": 1,
+            "bMax": 9
+          },
+          "2": {
+            "bUnit": 10,
+            "bMin": 1,
+            "bMax": 9
+          }
+        }
+      },
+      "mul": {
+        "bMin": 2,
+        "bMax": 10,
+        "levels": {
+          "1": {
+            "a": [
+              2,
+              5,
+              10
+            ]
+          },
+          "2": {
+            "a": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ]
+          }
+        }
+      },
+      "div": {
+        "quotientMin": 2,
+        "quotientMax": 10,
+        "levels": {
+          "1": {
+            "divisor": [
+              2,
+              5,
+              10
+            ]
+          },
+          "2": {
+            "divisor": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10
+            ]
+          }
+        }
+      },
+      "numberLine": {
+        "min": 0,
+        "max": 1000,
+        "step": 100,
+        "labelEvery": 500,
+        "targetStep": 10
+      },
+      "sequence": {
+        "startMin": 100,
+        "startMax": 500,
+        "stepMin": 10,
+        "stepMax": 100,
+        "stepMultiple": 10,
+        "min": 0,
+        "max": 1000
+      },
+      "complement": {
+        "unit": 10,
+        "aMin": 11,
+        "aMax": 99,
+        "levels": {
+          "1": {
+            "to": "ten"
+          },
+          "2": {
+            "to": 1000
+          }
+        }
+      },
+      "chain": {
+        "unit": 10,
+        "startMin": 10,
+        "startMax": 50,
+        "links": 3,
+        "addMax": 9,
+        "subMax": 9,
+        "mulFactors": [],
+        "mulMaxStart": 0,
+        "resultMin": 1,
+        "max": 100
+      },
+      "wall": {
+        "unit": 10,
+        "baseMin": 1,
+        "baseMax": 30,
+        "topMax": 1000,
+        "levels": {
+          "1": {
+            "patterns": [
+              "sum"
+            ]
+          },
+          "2": {
+            "patterns": [
+              "sum",
+              "oneBase",
+              "fromTop"
+            ]
+          }
+        }
+      },
+      "match": {
+        "operations": [
+          "add",
+          "sub",
+          "mul",
+          "div"
+        ],
+        "level": 1
+      }
+    },
+    "city": {
+      "maxNumber": 1000,
+      "add": {
+        "aUnit": 10,
+        "aMin": 10,
+        "aMax": 90,
+        "sumMax": 1000,
+        "levels": {
+          "1": {
+            "bUnit": 100,
+            "bMin": 1,
+            "bMax": 9
+          },
+          "2": {
+            "bUnit": 10,
+            "bMin": 1,
+            "bMax": 9
+          }
+        }
+      },
+      "sub": {
+        "aUnit": 10,
+        "aMin": 11,
+        "aMax": 100,
+        "resultMin": 10,
+        "levels": {
+          "1": {
+            "bUnit": 100,
+            "bMin": 1,
+            "bMax": 9
+          },
+          "2": {
+            "bUnit": 10,
+            "bMin": 1,
+            "bMax": 9
+          }
+        }
+      },
+      "mul": {
+        "bUnit": 10,
+        "bMin": 2,
+        "bMax": 9,
+        "levels": {
+          "1": {
+            "a": [
+              2,
+              3,
+              4,
+              5
+            ]
+          },
+          "2": {
+            "a": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        }
+      },
+      "div": {
+        "divisorUnit": 10,
+        "quotientMin": 2,
+        "quotientMax": 9,
+        "levels": {
+          "1": {
+            "divisor": [
+              2,
+              3,
+              4,
+              5
+            ]
+          },
+          "2": {
+            "divisor": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          }
+        }
+      },
+      "numberLine": {
+        "min": 0,
+        "max": 1000,
+        "step": 100,
+        "labelEvery": 500,
+        "targetStep": 10
+      },
+      "sequence": {
+        "startMin": 100,
+        "startMax": 500,
+        "stepMin": 10,
+        "stepMax": 100,
+        "stepMultiple": 10,
+        "min": 0,
+        "max": 1000
+      },
+      "complement": {
+        "unit": 10,
+        "aMin": 11,
+        "aMax": 99,
+        "levels": {
+          "1": {
+            "to": "ten"
+          },
+          "2": {
+            "to": 1000
+          }
+        }
+      },
+      "chain": {
+        "unit": 10,
+        "startMin": 10,
+        "startMax": 50,
+        "links": 3,
+        "addMax": 9,
+        "subMax": 9,
+        "mulFactors": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "mulMaxStart": 9,
+        "resultMin": 1,
+        "max": 100
+      },
+      "wall": {
+        "unit": 10,
+        "baseMin": 1,
+        "baseMax": 30,
+        "topMax": 1000,
+        "levels": {
+          "1": {
+            "patterns": [
+              "sum"
+            ]
+          },
+          "2": {
+            "patterns": [
+              "sum",
+              "oneBase",
+              "fromTop"
+            ]
+          }
+        }
+      },
+      "match": {
+        "operations": [
+          "add",
+          "sub",
+          "mul",
+          "div"
+        ],
+        "level": 1
+      },
+      "twoStep": {
+        "unit": 10,
+        "cMin": 1,
+        "cMax": 9
+      }
+    },
+    "trench": {
+      "maxNumber": 1000,
+      "mixOf": [
+        "reef",
+        "caves",
+        "city"
+      ],
+      "pointBeforeLine": {
+        "factorMin": 2,
+        "factorMax": 10,
+        "addMin": 2,
+        "addMax": 40,
+        "subMin": 20,
+        "subMax": 100,
+        "max": 100
+      }
+    }
+  }
+}

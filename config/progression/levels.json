@@ -1,0 +1,10 @@
+{
+  "xpThresholds": [
+    0,
+    20,
+    50,
+    90,
+    140
+  ],
+  "pointsPerLevel": 1
+}

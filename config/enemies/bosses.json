@@ -1,0 +1,164 @@
+{
+  "bosses": {
+    "krakenArmAdd": {
+      "hp": 10,
+      "immune": "add",
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 2
+        }
+      ]
+    },
+    "krakenArmSub": {
+      "hp": 10,
+      "immune": "sub",
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 2
+        }
+      ]
+    },
+    "krakenArmMul": {
+      "hp": 10,
+      "immune": "mul",
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 2
+        }
+      ]
+    },
+    "krakenBody": {
+      "hp": 28,
+      "immune": null,
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 4
+        },
+        {
+          "type": "block",
+          "amount": 5
+        },
+        {
+          "type": "attack",
+          "amount": 8
+        }
+      ],
+      "shieldedBy": [
+        "krakenArmAdd",
+        "krakenArmSub",
+        "krakenArmMul"
+      ]
+    },
+    "caveMoray": {
+      "hp": 64,
+      "immune": null,
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 7
+        },
+        {
+          "type": "block",
+          "amount": 6
+        },
+        {
+          "type": "attack",
+          "amount": 10
+        }
+      ],
+      "rule": {
+        "type": "hidden",
+        "find": "numberLine",
+        "multiplier": 2
+      }
+    },
+    "cityWarden": {
+      "hp": 70,
+      "immune": null,
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 7
+        },
+        {
+          "type": "block",
+          "amount": 6
+        },
+        {
+          "type": "attack",
+          "amount": 12
+        }
+      ],
+      "rule": {
+        "type": "taskModifier",
+        "format": "twoStep"
+      }
+    },
+    "trenchLord": {
+      "hp": 74,
+      "immune": null,
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 8
+        },
+        {
+          "type": "block",
+          "amount": 7
+        },
+        {
+          "type": "attack",
+          "amount": 12
+        }
+      ],
+      "rule": {
+        "type": "taskModifier",
+        "format": "pointBeforeLine"
+      },
+      "phases": [
+        {
+          "belowHpPercent": 50,
+          "pattern": [
+            {
+              "type": "attack",
+              "amount": 10
+            },
+            {
+              "type": "attack",
+              "amount": 7
+            },
+            {
+              "type": "block",
+              "amount": 8
+            },
+            {
+              "type": "attack",
+              "amount": 14
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "encounters": {
+    "reefKraken": [
+      "krakenArmAdd",
+      "krakenArmSub",
+      "krakenArmMul",
+      "krakenBody"
+    ],
+    "cavesBoss": [
+      "caveMoray"
+    ],
+    "cityBoss": [
+      "cityWarden"
+    ],
+    "trenchBoss": [
+      "trenchLord"
+    ]
+  }
+}

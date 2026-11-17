@@ -1,0 +1,434 @@
+{
+  "order": [
+    "reef",
+    "caves",
+    "city",
+    "trench"
+  ],
+  "areas": {
+    "reef": {
+      "curriculum": "reef",
+      "layers": [
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "crab"
+                ]
+              ],
+              "level": 1,
+              "tutorial": true
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "puffer",
+                  "jelly"
+                ],
+                [
+                  "jelly",
+                  "crab"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "urchin",
+                  "puffer"
+                ],
+                [
+                  "urchin",
+                  "crab"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "choices": [
+                "treasure",
+                "combat"
+              ],
+              "pool": [
+                [
+                  "urchin",
+                  "jelly"
+                ],
+                [
+                  "puffer",
+                  "crab"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "jelly",
+                  "puffer"
+                ],
+                [
+                  "crab",
+                  "urchin"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "shop"
+            },
+            {
+              "type": "rest"
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "boss",
+              "encounter": "reefKraken",
+              "level": 2
+            }
+          ]
+        }
+      ],
+      "background": "area.reef"
+    },
+    "caves": {
+      "curriculum": "caves",
+      "background": "area.caves",
+      "intro": "areas.caves.intro",
+      "layers": [
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "caveIsopod"
+                ]
+              ],
+              "level": 1
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "stoneFish",
+                  "caveIsopod"
+                ],
+                [
+                  "caveIsopod",
+                  "lanternFish"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "snakeEel",
+                  "stoneFish"
+                ],
+                [
+                  "snakeEel",
+                  "lanternFish"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "choices": [
+                "treasure",
+                "combat"
+              ],
+              "pool": [
+                [
+                  "snakeEel",
+                  "caveIsopod"
+                ],
+                [
+                  "stoneFish",
+                  "lanternFish"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "caveIsopod",
+                  "stoneFish"
+                ],
+                [
+                  "lanternFish",
+                  "snakeEel"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "shop"
+            },
+            {
+              "type": "rest"
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "boss",
+              "encounter": "cavesBoss",
+              "level": 2
+            }
+          ]
+        }
+      ]
+    },
+    "city": {
+      "curriculum": "city",
+      "background": "area.city",
+      "intro": "areas.city.intro",
+      "layers": [
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "statueFish"
+                ]
+              ],
+              "level": 1
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "shellWarden",
+                  "statueFish"
+                ],
+                [
+                  "statueFish",
+                  "armorCrab"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "seahorseKnight",
+                  "shellWarden"
+                ],
+                [
+                  "seahorseKnight",
+                  "armorCrab"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "choices": [
+                "treasure",
+                "combat"
+              ],
+              "pool": [
+                [
+                  "seahorseKnight",
+                  "statueFish"
+                ],
+                [
+                  "shellWarden",
+                  "armorCrab"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "statueFish",
+                  "shellWarden"
+                ],
+                [
+                  "armorCrab",
+                  "seahorseKnight"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "shop"
+            },
+            {
+              "type": "rest"
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "boss",
+              "encounter": "cityBoss",
+              "level": 2
+            }
+          ]
+        }
+      ]
+    },
+    "trench": {
+      "curriculum": "trench",
+      "background": "area.trench",
+      "intro": "areas.trench.intro",
+      "layers": [
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "giantIsopod"
+                ]
+              ],
+              "level": 1
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "deepJelly",
+                  "giantIsopod"
+                ],
+                [
+                  "giantIsopod",
+                  "anglerFish"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "vampireSquid",
+                  "deepJelly"
+                ],
+                [
+                  "vampireSquid",
+                  "anglerFish"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "choices": [
+                "treasure",
+                "combat"
+              ],
+              "pool": [
+                [
+                  "vampireSquid",
+                  "giantIsopod"
+                ],
+                [
+                  "deepJelly",
+                  "anglerFish"
+                ]
+              ],
+              "level": 2
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "giantIsopod",
+                  "deepJelly"
+                ],
+                [
+                  "anglerFish",
+                  "vampireSquid"
+                ]
+              ],
+              "level": 2
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "shop"
+            },
+            {
+              "type": "rest"
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "boss",
+              "encounter": "trenchBoss",
+              "level": 2
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "figures": {
+    "diver": {
+      "asset": "hero.diver",
+      "perk": {
+        "maxHp": 6
+      }
+    },
+    "researcher": {
+      "asset": "hero.researcher",
+      "perk": {
+        "calmMs": 2000
+      }
+    },
+    "tinkerer": {
+      "asset": "hero.tinkerer",
+      "perk": {
+        "startBlock": 4
+      }
+    },
+    "merfolk": {
+      "asset": "hero.merfolk",
+      "perk": {
+        "healBonus": 2
+      }
+    }
+  },
+  "nameA": [
+    "Mutiger",
+    "Schneller",
+    "Kluger",
+    "Flinker",
+    "Starker",
+    "Schlauer",
+    "Fröhlicher",
+    "Wilder",
+    "Leiser",
+    "Tapferer",
+    "Bunter",
+    "Kleiner"
+  ],
+  "nameB": [
+    "Rochen",
+    "Delfin",
+    "Krake",
+    "Seestern",
+    "Hai",
+    "Wal",
+    "Tintenfisch",
+    "Seeigel",
+    "Hummer",
+    "Krebs",
+    "Schwertfisch",
+    "Kugelfisch"
+  ]
+}

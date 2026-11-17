@@ -1,0 +1,306 @@
+{
+  "currentStrike": {
+    "cost": 1,
+    "effect": {
+      "type": "damage",
+      "amount": 6
+    },
+    "upgrades": [
+      {
+        "amount": 8
+      },
+      {
+        "amount": 10
+      }
+    ],
+    "task": {
+      "format": "solve",
+      "operation": "add"
+    },
+    "target": "enemy",
+    "price": 5
+  },
+  "undertow": {
+    "cost": 1,
+    "effect": {
+      "type": "damage",
+      "amount": 6
+    },
+    "upgrades": [
+      {
+        "amount": 8
+      },
+      {
+        "amount": 10
+      }
+    ],
+    "task": {
+      "format": "solve",
+      "operation": "sub"
+    },
+    "target": "enemy",
+    "price": 5
+  },
+  "waveSlam": {
+    "cost": 2,
+    "effect": {
+      "type": "damage",
+      "amount": 14
+    },
+    "upgrades": [
+      {
+        "amount": 17
+      },
+      {
+        "amount": 20
+      }
+    ],
+    "task": {
+      "format": "solve",
+      "operation": "mul"
+    },
+    "target": "enemy",
+    "price": 5
+  },
+  "deepRift": {
+    "cost": 2,
+    "effect": {
+      "type": "damage",
+      "amount": 14
+    },
+    "upgrades": [
+      {
+        "amount": 17
+      },
+      {
+        "amount": 20
+      }
+    ],
+    "task": {
+      "format": "solve",
+      "operation": "div"
+    },
+    "target": "enemy",
+    "price": 5
+  },
+  "shieldBubble": {
+    "cost": 1,
+    "effect": {
+      "type": "block",
+      "amount": 6
+    },
+    "upgrades": [
+      {
+        "amount": 8
+      },
+      {
+        "amount": 10
+      }
+    ],
+    "task": {
+      "format": "pickTrue"
+    },
+    "target": "hero",
+    "price": 5
+  },
+  "healingAlgae": {
+    "cost": 1,
+    "effect": {
+      "type": "heal",
+      "amount": 5
+    },
+    "upgrades": [
+      {
+        "amount": 7
+      },
+      {
+        "amount": 9
+      }
+    ],
+    "exhaust": true,
+    "task": {
+      "format": "pickFalse"
+    },
+    "target": "hero",
+    "price": 5
+  },
+  "whirlpool": {
+    "cost": 1,
+    "effect": {
+      "type": "cycle",
+      "discard": 2,
+      "draw": 3
+    },
+    "task": null,
+    "target": "hero",
+    "price": 5
+  },
+  "harpoon": {
+    "cost": 2,
+    "effect": {
+      "type": "damage",
+      "amount": 16
+    },
+    "upgrades": [
+      {
+        "amount": 19
+      },
+      {
+        "amount": 22
+      }
+    ],
+    "task": {
+      "format": "numberLine"
+    },
+    "target": "enemy",
+    "price": 8
+  },
+  "conchHorn": {
+    "cost": 1,
+    "effect": {
+      "type": "buff",
+      "stat": "strength",
+      "amount": 2
+    },
+    "upgrades": [
+      {
+        "amount": 3
+      },
+      {
+        "amount": 4
+      }
+    ],
+    "exhaust": true,
+    "task": {
+      "format": "sequence"
+    },
+    "target": "hero",
+    "price": 8
+  },
+  "kelpPotion": {
+    "cost": 1,
+    "effect": {
+      "type": "heal",
+      "amount": 12
+    },
+    "upgrades": [
+      {
+        "amount": 14
+      },
+      {
+        "amount": 16
+      }
+    ],
+    "exhaust": true,
+    "task": {
+      "format": "complement"
+    },
+    "target": "hero",
+    "price": 8
+  },
+  "shellCracker": {
+    "cost": 1,
+    "effect": {
+      "type": "breakImmunity",
+      "turns": 3
+    },
+    "upgrades": [
+      {
+        "turns": 4
+      },
+      {
+        "turns": 5
+      }
+    ],
+    "task": {
+      "format": "pickTrue"
+    },
+    "target": "enemy",
+    "price": 8
+  },
+  "bubbleChain": {
+    "cost": 1,
+    "effect": {
+      "type": "damagePerStep",
+      "amount": 4
+    },
+    "upgrades": [
+      {
+        "amount": 5
+      },
+      {
+        "amount": 6
+      }
+    ],
+    "task": {
+      "format": "chain",
+      "freeMistakes": 0
+    },
+    "target": "enemies",
+    "price": 8
+  },
+  "coralWall": {
+    "cost": 3,
+    "effect": {
+      "type": "damage",
+      "amount": 26
+    },
+    "upgrades": [
+      {
+        "amount": 30
+      },
+      {
+        "amount": 34
+      }
+    ],
+    "task": {
+      "format": "wall",
+      "freeMistakes": 2
+    },
+    "target": "enemy",
+    "price": 8
+  },
+  "pearlFind": {
+    "cost": 0,
+    "effect": {
+      "type": "energy",
+      "amount": 2
+    },
+    "upgrades": [
+      {
+        "amount": 2
+      },
+      {
+        "amount": 3
+      }
+    ],
+    "exhaust": true,
+    "task": {
+      "format": "match",
+      "freeMistakes": 2
+    },
+    "target": "hero",
+    "price": 8
+  },
+  "inkCloud": {
+    "cost": 1,
+    "effect": {
+      "type": "weaken",
+      "amount": 3,
+      "turns": 3
+    },
+    "upgrades": [
+      {
+        "amount": 4
+      },
+      {
+        "amount": 5
+      }
+    ],
+    "task": {
+      "format": "compareTerms"
+    },
+    "target": "enemy",
+    "price": 8
+  }
+}
