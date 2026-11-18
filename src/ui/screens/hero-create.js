@@ -1,9 +1,9 @@
 // Heldenwahl (Plan Etappe 7): vier Figuren zum Antippen, Name aus zwei Wortlisten mit je einem Knopf
 // „anderes Wort“ und einem Würfel für beide. Keine Texteingabe (Konzept 10, Datenschutz).
 // Der Würfel nutzt Math.random: nur Oberfläche, der Spielstand bekommt ohnehin nur die zwei Nummern.
-import { ICON } from '../icons.js?v=32c8e2da';
-import { renderAsset } from '../assets.js?v=32c8e2da';
-import { addWorld } from '../components/world.js?v=32c8e2da';
+import { ICON } from '../icons.js?v=a8133bc4';
+import { renderAsset } from '../assets.js?v=a8133bc4';
+import { addWorld } from '../components/world.js?v=a8133bc4';
 
 // Ändern-Modus (initial, onCancel; seit 18.11.2026): gleiche Wahl aus dem Logbuch, die jetzige Figur und der
 // jetzige Name sind vorausgewählt, dazu ein Knopf „Zurück“.

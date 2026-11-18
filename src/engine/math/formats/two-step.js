@@ -3,10 +3,10 @@
 // an der Stelle der letzten Ziffer ≠ 0 des Zwischenergebnisses, ohne Übergang:
 // 3 · 60 − 30 = 150, 450 + 300 + 20 = 770. Der Punkt-Teil steht vorn, die Reihenfolge ist eindeutig.
 // Falsche Antworten: zweiter Schritt vergessen (immer dabei), Vorzeichen vertauscht, an dieser Stelle um 1 daneben.
-import { LADDERS } from '../ladders/index.js?v=32c8e2da';
-import { OPERATOR_SIGN, formatNumber } from '../format.js?v=32c8e2da';
-import { calcPlace, digitAt } from '../places.js?v=32c8e2da';
-import { pickWrong, placeCorrect, MAX_TRIES } from './common.js?v=32c8e2da';
+import { LADDERS } from '../ladders/index.js?v=a8133bc4';
+import { OPERATOR_SIGN, formatNumber } from '../format.js?v=a8133bc4';
+import { calcPlace, digitAt } from '../places.js?v=a8133bc4';
+import { pickWrong, placeCorrect, MAX_TRIES } from './common.js?v=a8133bc4';
 
 // first: { operation, a, b, result }; op2: 'add' | 'sub'; c: zweiter Schritt
 export function composeTwoStep(first, op2, c, area, rng) {
