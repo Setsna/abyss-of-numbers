@@ -1,7 +1,7 @@
 // Startbildschirm (Plan Etappe 7): Titel und ein großer Knopf, „Los!“ ohne Stand, „Weiter“ mit Stand.
 // Unten unauffällig „Für Erwachsene“ (Etappe 8). Mit Konto (Etappe 10) unten links: wer angemeldet ist,
 // „Abmelden“ und, wenn nötig, eine Zeile zum Netz (account: { name, onLogout, onNet(f) }).
-import { renderAsset } from '../assets.js?v=511d1702';
+import { renderAsset, assetUrl } from '../assets.js?v=32c8e2da';
 
 export function mountTitle(root, { t, hasSave, onStart, onAdult, account = null }) {
   root.innerHTML = `
@@ -18,7 +18,10 @@ export function mountTitle(root, { t, hasSave, onStart, onAdult, account = null 
     </div>
     <button class="title-adult" type="button"></button>
   </main>`;
-  root.querySelector('[data-ref=bg]').append(renderAsset('area.reef', ''));
+  // Titelbild (18.11.2026, von Ingo): Heldin taucht in die Tiefe; Titel und Knopf oben im freien Wasser
+  const hasArt = Boolean(assetUrl('place.title'));
+  root.querySelector('[data-ref=bg]').append(renderAsset(hasArt ? 'place.title' : 'area.reef', ''));
+  root.querySelector('.title-screen').classList.toggle('has-art', hasArt);
   root.querySelector('.title-word').textContent = t('title.name');
   const go = root.querySelector('.title-go');
   go.textContent = hasSave ? t('title.continue') : t('title.start');

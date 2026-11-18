@@ -556,6 +556,7 @@
   },
   "shop": {
     "title": "Händler",
+    "hello": "Willkommen, kleine Taucherseele! Schau dich ruhig um.",
     "buyTitle": "Karten kaufen",
     "buy": "Kaufen",
     "price": "{n} Perlen",

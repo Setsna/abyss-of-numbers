@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=511d1702';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=511d1702';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=511d1702';
-import { chooseSource } from '../learning/learning.js?v=511d1702';
-import { crossPlace } from '../math/places.js?v=511d1702';
-import { neighborWay } from '../math/ways.js?v=511d1702';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=511d1702';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=511d1702';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=511d1702';
-import { cardEffect } from '../cards/effect.js?v=511d1702';
+import { createRng, deriveSeed } from '../rng.js?v=32c8e2da';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=32c8e2da';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=32c8e2da';
+import { chooseSource } from '../learning/learning.js?v=32c8e2da';
+import { crossPlace } from '../math/places.js?v=32c8e2da';
+import { neighborWay } from '../math/ways.js?v=32c8e2da';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=32c8e2da';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=32c8e2da';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=32c8e2da';
+import { cardEffect } from '../cards/effect.js?v=32c8e2da';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];

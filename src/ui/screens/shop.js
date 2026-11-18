@@ -1,19 +1,23 @@
 // Händler (Phase 5, Etappe 2; Konzept 10 und 11): drei Karten gegen Perlen, darunter
 // „Eine Karte abgeben“ mit Auswahl aus dem Deck, „Weiter tauchen“. Jeder Tipp sperrt die
 // Knöpfe, bis die Engine geantwortet hat (Doppeltipp, Prüfschwerpunkt 2).
-import { ICON } from '../icons.js?v=511d1702';
-import { renderCard } from '../components/card.js?v=511d1702';
-import { addWorld } from '../components/world.js?v=511d1702';
+import { ICON } from '../icons.js?v=32c8e2da';
+import { renderAsset } from '../assets.js?v=32c8e2da';
+import { renderCard } from '../components/card.js?v=32c8e2da';
+import { addWorld } from '../components/world.js?v=32c8e2da';
 
 export function mountShop(root, { t, config, game, onCommand, onLeave }) {
   root.innerHTML = `
   <main class="screen shop">
+    <aside class="shop-keeper">
+      <p class="shop-say" data-ref="msg" role="status"></p>
+      <div class="shop-keeper-art" data-ref="keeper"></div>
+    </aside>
     <section class="panel shop-panel">
       <header class="shop-head">
         <h1 class="shop-title"><span class="shop-icon">${ICON.shop}</span><span data-ref="title"></span></h1>
         <span class="chip shop-pearls" data-ref="pearls"></span>
       </header>
-      <p class="shop-msg" data-ref="msg" role="status" hidden></p>
       <h2 class="shop-sub" data-ref="buyTitle"></h2>
       <div class="shop-offer" data-ref="offer"></div>
       <h2 class="shop-sub" data-ref="itemTitle" hidden></h2>
@@ -34,7 +38,20 @@ export function mountShop(root, { t, config, game, onCommand, onLeave }) {
   let busy = false;
   let choosing = false; // Auswahl „welche Karte soll weg?“ offen
 
-  const say = (text) => { ref.msg.textContent = text; ref.msg.hidden = !text; };
+  // Der Händler (18.11.2026, Bilder von Ingo): spricht die Meldungen in seiner Sprechblase, ohne Meldung grüßt er.
+  // Nach einem Kauf winkt er kurz (eigenes Bild), dann steht er wieder normal da.
+  const keeper = renderAsset('place.merchant', '');
+  const keeperHappy = renderAsset('place.merchant.happy', '');
+  keeperHappy.hidden = true;
+  ref.keeper.append(keeper, keeperHappy);
+  let happyTimer = null;
+  const cheer = () => {
+    keeper.hidden = true; keeperHappy.hidden = false;
+    clearTimeout(happyTimer);
+    happyTimer = setTimeout(() => { keeper.hidden = false; keeperHappy.hidden = true; }, 1600);
+  };
+  const say = (text) => { ref.msg.textContent = text || t('shop.hello'); };
+  say('');
   const cardName = (id) => t(`cards.${id}.name`).replaceAll('­', '');
 
   function send(command, onOk) {
@@ -68,7 +85,7 @@ export function mountShop(root, { t, config, game, onCommand, onLeave }) {
       b.lastChild.textContent = String(item.price);
       b.setAttribute('aria-label', `${cardName(item.cardId)}: ${t('shop.buy')}, ${t('shop.price', { n: item.price })}`);
       if (b.disabled) b.title = t('shop.tooExpensive');
-      b.addEventListener('click', () => send({ type: 'buyCard', cardId: item.cardId }, () => say(t('shop.bought', { name: cardName(item.cardId) }))));
+      b.addEventListener('click', () => send({ type: 'buyCard', cardId: item.cardId }, () => { cheer(); say(t('shop.bought', { name: cardName(item.cardId) })); }));
     }
     box.append(card, b);
     return box;
@@ -129,7 +146,8 @@ export function mountShop(root, { t, config, game, onCommand, onLeave }) {
     ref.itemTitle.hidden = !it;
     ref.gear.hidden = !it;
     if (it) {
-      ref.gear.innerHTML = '<span class="shop-gear-text"><b></b><small></small></span><button class="btn btn-quiet shop-buy" type="button"></button>';
+      ref.gear.innerHTML = '<span class="item-pic"></span><span class="shop-gear-text"><b></b><small></small></span><button class="btn btn-quiet shop-buy" type="button"></button>';
+      ref.gear.querySelector('.item-pic').append(renderAsset(`item.${it.itemId}`, ''));
       ref.gear.querySelector('b').textContent = `${t(`items.${it.itemId}.name`)} (${t(`slots.${config.items[it.itemId].slot}`)})`;
       ref.gear.querySelector('small').textContent = t(`items.${it.itemId}.eff`);
       const b = ref.gear.querySelector('button');
@@ -139,7 +157,7 @@ export function mountShop(root, { t, config, game, onCommand, onLeave }) {
         b.firstChild.textContent = t('shop.buy');
         b.lastChild.textContent = String(it.price);
         b.disabled = pearls < it.price;
-        b.addEventListener('click', () => send({ type: 'buyItem' }, () => say(t('gear.found', { name: t(`items.${it.itemId}.name`) }))));
+        b.addEventListener('click', () => send({ type: 'buyItem' }, () => { cheer(); say(t('gear.found', { name: t(`items.${it.itemId}.name`) })); }));
       }
     }
     ref.remove.replaceChildren(...removeArea(v.shop, v.profile));

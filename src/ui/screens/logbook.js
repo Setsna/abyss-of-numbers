@@ -3,11 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=511d1702';
-import { ICON } from '../icons.js?v=511d1702';
-import { renderAsset } from '../assets.js?v=511d1702';
-import { renderCard } from '../components/card.js?v=511d1702';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=511d1702';
+import { wayText } from '../text.js?v=32c8e2da';
+import { ICON } from '../icons.js?v=32c8e2da';
+import { renderAsset } from '../assets.js?v=32c8e2da';
+import { renderCard } from '../components/card.js?v=32c8e2da';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=32c8e2da';
 
 const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
 const SLOTS = ['kopf', 'koerper', 'hand'];
@@ -124,7 +124,8 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose, onEdit
         const worn = p.gear.angelegt[slot] === id;
         const item = document.createElement('div');
         item.className = 'lb-item' + (worn ? ' is-worn' : '');
-        item.innerHTML = '<span class="lb-item-text"><b></b><small></small></span><button class="btn btn-quiet lb-item-btn" type="button"></button>';
+        item.innerHTML = '<span class="item-pic"></span><span class="lb-item-text"><b></b><small></small></span><button class="btn btn-quiet lb-item-btn" type="button"></button>';
+        item.querySelector('.item-pic').append(renderAsset(`item.${id}`, '')); // Bild des Gegenstands (18.11.2026)
         item.querySelector('b').textContent = t(`items.${id}.name`) + (worn ? ` · ${t('gear.worn')}` : '');
         item.querySelector('small').textContent = t(`items.${id}.eff`);
         const b = item.querySelector('button');

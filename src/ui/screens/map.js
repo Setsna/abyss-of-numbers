@@ -3,9 +3,9 @@
 // zeigen kleine Bilder die Gegner, damit die Wahl des Wegs eine Entscheidung ist.
 // Oben: Leben, Stufe, Perlen und „Auftauchen“. Ruheplatz: kurze Meldung „+25 Leben“.
 // Seit Phase 5, Etappe 2 auch Schatz und Händler (eigene Bildschirme: Beute bzw. Laden).
-import { ICON } from '../icons.js?v=511d1702';
-import { renderAsset } from '../assets.js?v=511d1702';
-import { worldLayer, bossOfArea } from '../components/world.js?v=511d1702';
+import { ICON } from '../icons.js?v=32c8e2da';
+import { renderAsset, assetUrl } from '../assets.js?v=32c8e2da';
+import { worldLayer, bossOfArea } from '../components/world.js?v=32c8e2da';
 
 const ROOM_ICON = { combat: ICON.attack, rest: ICON.rest, boss: ICON.boss, treasure: ICON.treasure, shop: ICON.shop };
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -197,10 +197,12 @@ export function mountAreaCleared(root, { t, config, cleared, profile, onDone }) 
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
   const big = root.querySelector('.comic-big');
   big.prepend(worldLayer(`area.${cleared.areaId}`, 'scene-bg'));
-  if (profile) ref.hero.append(renderAsset(profile.asset, profile.name));
+  // Siegerpose des Helden und Trefferbild des Bosses, wenn es sie gibt (18.11.2026)
+  const pick = (key, fallback) => (assetUrl(key) ? key : fallback);
+  if (profile) ref.hero.append(renderAsset(pick(`${profile.asset}.win`, profile.asset), profile.name));
   const boss = bossOfArea(config, cleared.areaId);
   if (boss) {
-    ref.boss.append(renderAsset(`enemy.${boss}`, t(`enemies.${boss}.name`)));
+    ref.boss.append(renderAsset(pick(`enemy.${boss}.hit`, `enemy.${boss}`), t(`enemies.${boss}.name`)));
     // Schwindelsterne über dem besiegten Boss (gezeichnet, Comic-Zeichen für „k. o.“)
     const dizzy = document.createElement('span');
     dizzy.className = 'comic-dizzy';

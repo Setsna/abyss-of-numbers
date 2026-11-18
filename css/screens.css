@@ -175,6 +175,10 @@
 .title-word { max-width: 92vw; }
 @media (orientation: portrait) { .title-word { font-size: calc(118 * var(--u)); } }
 .title-go { font-size: calc(44 * var(--u)); min-width: calc(320 * var(--u)); min-height: calc(96 * var(--u)); }
+/* mit Titelbild: Titel und Knopf oben im freien Wasser über der Heldin */
+.title-screen.has-art { align-content: start; }
+.title-screen.has-art .title-bg img { object-position: 50% 70%; }
+.title-screen.has-art .title-box { margin-top: calc(28 * var(--u)); gap: calc(20 * var(--u)); }
 
 /* ---------- Klassenstufe ---------- */
 .grade-choices { display: grid; grid-template-columns: 1fr 1fr; gap: calc(24 * var(--u)); width: 100%; }
@@ -407,7 +411,8 @@
 
 /* ---------- Händler (Phase 5, Etappe 2) ---------- */
 .shop-panel {
-  width: min(100%, calc(980 * var(--u)));
+  flex: 0 1 auto; min-width: 0;
+  width: min(100%, calc(780 * var(--u)));
   max-height: 100%;
   background: var(--sea);
   padding: calc(18 * var(--u)) calc(24 * var(--u));
@@ -423,15 +428,26 @@
   align-self: stretch; margin: 0;
   font-size: calc(22 * var(--u)); color: var(--paper);
 }
-.shop-msg {
-  align-self: stretch; margin: 0;
-  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
-  padding: calc(6 * var(--u)) calc(14 * var(--u));
-  font-weight: 700; font-size: calc(22 * var(--u)); text-align: center;
+/* Händler (18.11.2026): links neben dem Angebot, darüber seine Sprechblase */
+.screen.shop { display: flex; align-items: center; justify-content: center; gap: calc(12 * var(--u)); }
+.shop-panel { gap: calc(8 * var(--u)); padding-block: calc(12 * var(--u)); }
+.screen.shop > .shop-keeper, .screen.shop > .shop-panel { position: relative; }
+.shop-keeper { flex: none; width: calc(250 * var(--u)); display: flex; flex-direction: column; align-items: center; gap: calc(10 * var(--u)); }
+.shop-keeper-art img { width: 100%; height: auto; display: block; }
+.shop-keeper-art img[hidden] { display: none; }
+.shop-say {
+  position: relative; margin: 0; width: 100%;
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
+  padding: calc(8 * var(--u)) calc(12 * var(--u));
+  font-weight: 700; font-size: calc(21 * var(--u)); line-height: 1.25; text-align: center;
+}
+.shop-say::after {
+  content: ''; position: absolute; left: 55%; bottom: calc(-14 * var(--u));
+  border: calc(12 * var(--u)) solid transparent; border-top-color: var(--ink); border-bottom: 0;
 }
 .shop-offer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(18 * var(--u)); width: 100%; }
 .shop-item { display: flex; flex-direction: column; gap: calc(8 * var(--u)); }
-.shop-item .card { min-height: calc(170 * var(--u)); }
+.shop-item .card { min-height: calc(220 * var(--u)); } /* höher, damit das Kartenbild zu sehen ist (18.11.2026) */
 .shop-item .card.is-display:disabled { opacity: 1; cursor: default; }
 .shop-buy { display: flex; align-items: center; justify-content: center; gap: calc(6 * var(--u)); min-height: 48px; font-size: calc(24 * var(--u)); }
 .shop-buy svg { width: calc(26 * var(--u)); height: calc(26 * var(--u)); }
@@ -444,6 +460,11 @@
 .shop-leave { min-width: calc(260 * var(--u)); }
 @media (orientation: portrait) {
   .shop-offer { gap: calc(10 * var(--u)); }
+  .screen.shop { flex-direction: column; }
+  .shop-keeper { flex-direction: row-reverse; justify-content: flex-end; width: min(100%, calc(780 * var(--u))); align-items: center; gap: calc(16 * var(--u)); }
+  .shop-keeper-art { flex: none; width: calc(220 * var(--u)); }
+  .shop-say { width: auto; max-width: calc(420 * var(--u)); }
+  .shop-say::after { left: auto; right: calc(-14 * var(--u)); bottom: calc(20 * var(--u)); border: calc(12 * var(--u)) solid transparent; border-left-color: var(--ink); border-right: 0; }
 }
 
 /* Seekarte quer (Phase 5, Etappe 2): fünf Schichten passen im Querformat nicht untereinander.
@@ -716,3 +737,14 @@
 .hero-actions .btn[hidden] { display: none; }
 .hero-actions .btn:not(.btn-go) { background: var(--paper); min-width: calc(180 * var(--u)); }
 @media (orientation: portrait) { .lb-change { width: calc(260 * var(--u)); } }
+
+/* Bilder der Ausrüstung (18.11.2026): im Logbuch und beim Händler links in einem runden Fenster, in der Beute im Schild */
+.item-pic {
+  flex: none; width: calc(76 * var(--u)); height: calc(76 * var(--u));
+  display: grid; place-items: center;
+  background: var(--sand-light); border: var(--line-thin) solid var(--ink); border-radius: 50%;
+}
+.item-pic img { width: 86%; height: 86%; object-fit: contain; display: block; }
+.gain-item { display: inline-flex; align-items: center; gap: calc(8 * var(--u)); }
+.gain-item[hidden] { display: none; }
+.gain-item img { width: calc(48 * var(--u)); height: calc(48 * var(--u)); object-fit: contain; margin-block: calc(-8 * var(--u)); }

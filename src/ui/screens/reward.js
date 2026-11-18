@@ -1,10 +1,11 @@
 // Beute nach einem Sieg (Plan Etappe 5, Schritt 6): Erfahrung, Perlen, ggf. neue Stufe,
 // eine von drei Karten oder „Keine Karte“, darunter bis zu 5 Übungsaufgaben mit Lösung.
 // Keine Quote, keine Zeit, kein Vergleich (A7).
-import { wayText } from '../text.js?v=511d1702';
-import { ICON } from '../icons.js?v=511d1702';
-import { renderCard } from '../components/card.js?v=511d1702';
-import { addWorld } from '../components/world.js?v=511d1702';
+import { wayText } from '../text.js?v=32c8e2da';
+import { ICON } from '../icons.js?v=32c8e2da';
+import { renderCard } from '../components/card.js?v=32c8e2da';
+import { renderAsset } from '../assets.js?v=32c8e2da';
+import { addWorld } from '../components/world.js?v=32c8e2da';
 
 export function mountReward(root, { config, t, reward, onPick, levels = {}, areaId = null }) {
   root.innerHTML = `
@@ -48,6 +49,7 @@ export function mountReward(root, { config, t, reward, onPick, levels = {}, area
   if (reward.item) { // Ausrüstung gefunden (Phase 5, Etappe 7)
     ref.item.hidden = false;
     ref.item.textContent = t('gear.found', { name: t(`items.${reward.item}.name`) });
+    ref.item.prepend(renderAsset(`item.${reward.item}`, '')); // Bild des Gegenstands (18.11.2026)
   }
   // Lernstufen (Phase 6b, Regelwerk 7.4): neue Aufgaben warten, dazu die Perlen; keine Stufenzahl, ein Abstieg zeigt nichts
   const stageUps = reward.stageUps ?? [];
