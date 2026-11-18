@@ -4,29 +4,29 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=5b590f55';
-import { createStorage, STORAGE_KEY } from './platform/storage.js?v=5b590f55';
-import { createAccount, accountBackend } from './platform/account.js?v=5b590f55';
-import { FIREBASE } from './platform/firebase-config.js?v=5b590f55';
-import { createAudio } from './platform/audio.js?v=5b590f55';
-import { validateConfig } from './engine/config/validate.js?v=5b590f55';
-import { createSave } from './engine/save/save.js?v=5b590f55';
-import { createGame } from './engine/game.js?v=5b590f55';
-import { setTexts, t } from './ui/text.js?v=5b590f55';
-import { setManifest } from './ui/assets.js?v=5b590f55';
-import { isLocalHost } from './ui/app.js?v=5b590f55';
-import { mountCombat } from './ui/screens/combat.js?v=5b590f55';
-import { mountReward } from './ui/screens/reward.js?v=5b590f55';
-import { mountShop } from './ui/screens/shop.js?v=5b590f55';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=5b590f55';
-import { mountBase } from './ui/screens/base.js?v=5b590f55';
-import { mountTitle } from './ui/screens/title.js?v=5b590f55';
-import { mountLogin } from './ui/screens/login.js?v=5b590f55';
-import { mountGrade } from './ui/screens/grade.js?v=5b590f55';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=5b590f55';
-import { mountLogbook } from './ui/screens/logbook.js?v=5b590f55';
-import { mountAdult } from './ui/screens/adult.js?v=5b590f55';
-import { createRng } from './engine/rng.js?v=5b590f55';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=2f0fe1f9';
+import { createStorage, STORAGE_KEY } from './platform/storage.js?v=2f0fe1f9';
+import { createAccount, accountBackend } from './platform/account.js?v=2f0fe1f9';
+import { FIREBASE } from './platform/firebase-config.js?v=2f0fe1f9';
+import { createAudio } from './platform/audio.js?v=2f0fe1f9';
+import { validateConfig } from './engine/config/validate.js?v=2f0fe1f9';
+import { createSave } from './engine/save/save.js?v=2f0fe1f9';
+import { createGame } from './engine/game.js?v=2f0fe1f9';
+import { setTexts, t } from './ui/text.js?v=2f0fe1f9';
+import { setManifest } from './ui/assets.js?v=2f0fe1f9';
+import { isLocalHost } from './ui/app.js?v=2f0fe1f9';
+import { mountCombat } from './ui/screens/combat.js?v=2f0fe1f9';
+import { mountReward } from './ui/screens/reward.js?v=2f0fe1f9';
+import { mountShop } from './ui/screens/shop.js?v=2f0fe1f9';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=2f0fe1f9';
+import { mountBase } from './ui/screens/base.js?v=2f0fe1f9';
+import { mountTitle } from './ui/screens/title.js?v=2f0fe1f9';
+import { mountLogin } from './ui/screens/login.js?v=2f0fe1f9';
+import { mountGrade } from './ui/screens/grade.js?v=2f0fe1f9';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=2f0fe1f9';
+import { mountLogbook } from './ui/screens/logbook.js?v=2f0fe1f9';
+import { mountAdult } from './ui/screens/adult.js?v=2f0fe1f9';
+import { createRng } from './engine/rng.js?v=2f0fe1f9';
 
 const app = document.getElementById('app');
 
@@ -413,5 +413,19 @@ function enter(config, LK) {
     if (r.ok) play(r); else fail(r);
   }, () => { if (!playing) login.ready(); });
 }
+
+// Zweite Absicherung gegen den Doppeltipp-Zoom (Ingo, 19.11.2026: Kinder tippen schnell zweimal auf dieselbe
+// Stelle, Safari zoomt hinein). Ein zweiter Tipp innerhalb von 350 ms an fast derselben Stelle löst keinen Zoom
+// aus. Knöpfe, Karten und Eingabefelder bleiben unberührt (dort reicht touch-action aus base.css), damit schnelles
+// Tippen auf der Zahlentastatur (33, 100) jede Ziffer zählt.
+let lastTap = { t: 0, x: 0, y: 0 };
+document.addEventListener('touchend', (e) => {
+  if (e.touches.length > 0 || e.changedTouches.length !== 1) return;
+  const p = e.changedTouches[0];
+  const now = e.timeStamp;
+  const near = Math.abs(p.clientX - lastTap.x) < 40 && Math.abs(p.clientY - lastTap.y) < 40;
+  if (now - lastTap.t < 350 && near && !e.target.closest?.('button, a, input, textarea, select, label, [role=button], [tabindex], .card')) e.preventDefault();
+  lastTap = { t: now, x: p.clientX, y: p.clientY };
+}, { passive: false });
 
 boot();

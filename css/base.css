@@ -52,6 +52,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; }
+/* kein Zoom per Doppeltipp auf dem iPad (19.11.2026): touch-action wird nicht vererbt, deshalb an jedem Element */
+html, *, *::before, *::after { touch-action: manipulation; }
 body {
   background: var(--paper);
   color: var(--ink);

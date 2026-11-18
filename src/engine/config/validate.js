@@ -1,8 +1,8 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=5b590f55';
-import { REJECT_REASONS } from '../combat/combat.js?v=5b590f55';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=5b590f55';
+import { CONFIG_FILES } from './files.js?v=2f0fe1f9';
+import { REJECT_REASONS } from '../combat/combat.js?v=2f0fe1f9';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=2f0fe1f9';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);

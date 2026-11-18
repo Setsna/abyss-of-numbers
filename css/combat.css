@@ -81,6 +81,7 @@
   border-radius: calc(999 * var(--u));
   box-shadow: 0 0 0 calc(3 * var(--u)) var(--paper);
   overflow: hidden;
+  flex: none; /* in der Gegnerspalte nicht zusammendrücken (Ingo, iPad hoch 19.11.2026: Balken dünner als beim Helden) */
 }
 .hpbar i { display: block; height: 100%; background: var(--heal); border-right: var(--line-thin) solid var(--ink); transition: width var(--t-mid) var(--ease-out); }
 .foe .hpbar i { background: var(--coral); }
@@ -399,7 +400,7 @@
 @media (orientation: portrait) {
   .stage { grid-template-rows: minmax(0, 62fr) minmax(0, 38fr); }
   .hero { width: 26%; height: 58%; bottom: 3%; }
-  .foes { width: 60%; top: 3%; bottom: auto; height: 44%; right: 2%; }
+  .foes { width: 60%; top: 3%; bottom: auto; height: 41%; right: 2%; } /* 41 %: der dickere Balken bleibt über der Sprechblase */
   .foes[data-n="3"] .intent, .foes[data-n="4"] .intent { font-size: calc(20 * var(--u)); padding: 0 calc(8 * var(--u)); }
   .foes[data-n="3"] .immune, .foes[data-n="4"] .immune { width: calc(36 * var(--u)); height: calc(36 * var(--u)); }
   .foes[data-n="3"] .hpbar, .foes[data-n="4"] .hpbar { display: none; }
@@ -515,6 +516,14 @@
 }
 @media (orientation: portrait) {
   .caption.is-tutorial { max-width: 60%; font-size: calc(26 * var(--u)); }
+}
+
+/* Hochformat ohne offene Aufgabe (Ingo, iPad 19.11.2026: Gegner schwebte zu hoch): Die Gegner stehen unten auf
+   dem Sand wie der Held. Öffnet sich die Aufgabe, gleiten sie nach oben über die Sprechblase. Nicht beim Boss
+   mit vier Teilen, der füllt die Höhe ohnehin. */
+@media (orientation: portrait) {
+  .foes:not([data-n="4"]) { transition: transform var(--t-mid) var(--ease-out); }
+  .scene:not(:has(> .bubble:not([hidden]))) .foes:not([data-n="4"]) { transform: translateY(var(--foes-drop, 99%)); }
 }
 
 /* D27 (Phase 5, Etappe 1): Boss im Hochformat. Solange die Aufgabe offen ist, stehen Arme und Körper
