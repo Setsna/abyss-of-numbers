@@ -19,7 +19,9 @@
     "privacy": "Datenschutz",
     "offline": "Gerade ohne Internet. Dein Stand bleibt auf diesem Gerät und wird später abgeglichen.",
     "failed": "Dein Stand konnte gerade nicht im Internet gespeichert werden. Er bleibt auf diesem Gerät. Bitte sag deiner Lehrkraft Bescheid.",
-    "restarted": "Deine Lehrkraft hat Abyss of Numbers neu gestartet. Du fängst von vorn an."
+    "restarted": "Deine Lehrkraft hat Abyss of Numbers neu gestartet. Du fängst von vorn an.",
+    "slow": "Das dauert gerade zu lange. Lade die Seite neu und versuch es noch einmal. (Stelle: {step})",
+    "crash": "Beim Start ist ein Fehler passiert. Bitte sag deiner Lehrkraft Bescheid. ({msg})"
   },
   "task": {
     "pickTrue": "Welche Rechnung stimmt?",

@@ -77,7 +77,10 @@
 
     /* Die Firebase-Skripte stehen in der Seite hinter den eigenen, damit die Seite nicht auf sie wartet. */
     let geladen = null;
+    /* Wo die Anmeldung gerade steht (19.11.2026, Fehlersuche Schul-iPad): zeigt die Seite, wenn es zu lange dauert. */
+    let schritt = 'start';
     function ladenAbwarten() {
+      schritt = 'skripte';
       if (typeof firebase !== 'undefined' || document.readyState === 'complete') return Promise.resolve();
       if (!geladen) geladen = new Promise(ok => { window.addEventListener('load', ok, { once: true }); setTimeout(ok, LADE_WARTE); });
       return geladen;
@@ -145,6 +148,7 @@
       return ladenAbwarten().then(() => einrichten() ? beiFirebaseAnmelden(code).then(() => nachAnmeldung(code)).catch(e => ohneNetz(code, e)) : ohneNetz(code, null));
     }
     function beiFirebaseAnmelden(code) {
+      schritt = 'anmelden';
       const mail = mailVon(code);
       return auth.signInWithEmailAndPassword(mail, code).catch(e => {
         /* Beim allerersten Anmelden gibt es das Konto noch nicht. */
@@ -172,10 +176,13 @@
     /* Nach der Anmeldung bei Firebase: Konto prüfen, Stand holen, auf dem Gerät öffnen. */
     function nachAnmeldung(code) {
       const id = idVon(code);
+      schritt = 'konto';
       return db.collection(KINDER).doc(id).get().then(snap => {
+        schritt = 'stand';
         if (!snap.exists) return auth.signOut().catch(() => {}).then(() => { throw { kindText: TEXT.gesperrt }; });
         const name = String((snap.data() || {}).vorname || '').trim().slice(0, NAME_MAX) || 'Taucher';
         return db.collection(opt.sammlung).doc(id).get().then(st => {
+          schritt = 'oeffnen';
           const fern = st.exists ? st.data() : null;
           if (opt.brauchtAngaben && !fern && !S.vorhanden(code)) {
             wartend = { code, name };
@@ -276,6 +283,7 @@
     return {
       TEXT, start, anmelden, anlegen, abmelden, schreiben, wiederNetz,
       aktiv: () => aktiv,
+      schritt: () => schritt,
       angemeldet: () => bereit,
       kind: () => kind,
       zustand: () => zustand,

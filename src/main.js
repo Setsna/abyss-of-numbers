@@ -4,29 +4,29 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=650280d9';
-import { createStorage, STORAGE_KEY } from './platform/storage.js?v=650280d9';
-import { createAccount, accountBackend } from './platform/account.js?v=650280d9';
-import { FIREBASE } from './platform/firebase-config.js?v=650280d9';
-import { createAudio } from './platform/audio.js?v=650280d9';
-import { validateConfig } from './engine/config/validate.js?v=650280d9';
-import { createSave } from './engine/save/save.js?v=650280d9';
-import { createGame } from './engine/game.js?v=650280d9';
-import { setTexts, t } from './ui/text.js?v=650280d9';
-import { setManifest } from './ui/assets.js?v=650280d9';
-import { isLocalHost } from './ui/app.js?v=650280d9';
-import { mountCombat } from './ui/screens/combat.js?v=650280d9';
-import { mountReward } from './ui/screens/reward.js?v=650280d9';
-import { mountShop } from './ui/screens/shop.js?v=650280d9';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=650280d9';
-import { mountBase } from './ui/screens/base.js?v=650280d9';
-import { mountTitle } from './ui/screens/title.js?v=650280d9';
-import { mountLogin } from './ui/screens/login.js?v=650280d9';
-import { mountGrade } from './ui/screens/grade.js?v=650280d9';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=650280d9';
-import { mountLogbook } from './ui/screens/logbook.js?v=650280d9';
-import { mountAdult } from './ui/screens/adult.js?v=650280d9';
-import { createRng } from './engine/rng.js?v=650280d9';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=5b590f55';
+import { createStorage, STORAGE_KEY } from './platform/storage.js?v=5b590f55';
+import { createAccount, accountBackend } from './platform/account.js?v=5b590f55';
+import { FIREBASE } from './platform/firebase-config.js?v=5b590f55';
+import { createAudio } from './platform/audio.js?v=5b590f55';
+import { validateConfig } from './engine/config/validate.js?v=5b590f55';
+import { createSave } from './engine/save/save.js?v=5b590f55';
+import { createGame } from './engine/game.js?v=5b590f55';
+import { setTexts, t } from './ui/text.js?v=5b590f55';
+import { setManifest } from './ui/assets.js?v=5b590f55';
+import { isLocalHost } from './ui/app.js?v=5b590f55';
+import { mountCombat } from './ui/screens/combat.js?v=5b590f55';
+import { mountReward } from './ui/screens/reward.js?v=5b590f55';
+import { mountShop } from './ui/screens/shop.js?v=5b590f55';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=5b590f55';
+import { mountBase } from './ui/screens/base.js?v=5b590f55';
+import { mountTitle } from './ui/screens/title.js?v=5b590f55';
+import { mountLogin } from './ui/screens/login.js?v=5b590f55';
+import { mountGrade } from './ui/screens/grade.js?v=5b590f55';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=5b590f55';
+import { mountLogbook } from './ui/screens/logbook.js?v=5b590f55';
+import { mountAdult } from './ui/screens/adult.js?v=5b590f55';
+import { createRng } from './engine/rng.js?v=5b590f55';
 
 const app = document.getElementById('app');
 
@@ -334,7 +334,16 @@ function enter(config, LK) {
 
   function play(r) {
     if (playing) return;
+    clearTimeout(slowTimer);
     playing = true;
+    try { startPlay(r); } catch (e) {
+      // Fehlersuche (19.11.2026): Ein Fehler beim Start darf nicht unsichtbar im „Einen Moment …“ hängen bleiben.
+      playing = false;
+      showLogin(t('login.crash', { msg: String(e?.message ?? e).slice(0, 160) }));
+    }
+  }
+
+  function startPlay(r) {
     const title = {
       name: r.name,
       onLogout: () => { cloud.abmelden().then(() => location.reload(), () => location.reload()); },
@@ -353,17 +362,32 @@ function enter(config, LK) {
   }
 
   function fail(r) {
+    clearTimeout(slowTimer);
     // Die Lehrkraft hat den Code gesperrt: nicht auf dem Gerät weiterspielen lassen
     if (r.grund === cloud.TEXT.gesperrt && S.aktiv()) S.abmelden();
     if (login) login.fail(r.grund || cloud.TEXT.sonst);
     else showLogin(r.grund || cloud.TEXT.sonst);
   }
 
+  // Dauert die Anmeldung länger als 15 Sekunden, sagt die Seite, an welcher Stelle sie steht (Fehlersuche Schul-iPad,
+  // 19.11.2026). Kommt die Antwort doch noch, geht das Spiel trotzdem los.
+  let slowTimer = null;
+  let lastError = '';
+  window.addEventListener('error', (e) => { lastError = String(e.message ?? '').slice(0, 120); });
+  window.addEventListener('unhandledrejection', (e) => { lastError = String(e.reason?.message ?? e.reason ?? '').slice(0, 120); });
+  const watch = () => {
+    clearTimeout(slowTimer);
+    slowTimer = setTimeout(() => {
+      if (!playing && login) login.fail(t('login.slow', { step: `${cloud.schritt()}, Firebase ${typeof firebase === 'undefined' ? 'fehlt' : 'da'}${lastError ? `, Fehler: ${lastError}` : ''}` }));
+    }, 15000);
+  };
+
   function showLogin(hint = '', busy = false) {
     login = mountLogin(app, {
       t, hint, busy,
-      onSubmit: (code) => cloud.anmelden(code).then((r) => (r.ok ? play(r) : fail(r)), () => fail({ grund: cloud.TEXT.sonst })),
+      onSubmit: (code) => { watch(); return cloud.anmelden(code).then((r) => (r.ok ? play(r) : fail(r)), (e) => fail({ grund: `${cloud.TEXT.sonst} (${String(e?.message ?? e).slice(0, 120)})` })); },
     });
+    if (busy) watch();
   }
 
   const LA = LK.adresse;
