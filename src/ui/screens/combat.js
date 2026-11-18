@@ -1,17 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=e972392a';
-import { combatView } from '../../engine/combat/combat.js?v=e972392a';
-import { ICON } from '../icons.js?v=e972392a';
-import { renderAsset } from '../assets.js?v=e972392a';
-import { playEvents, wait, isCalm } from '../app.js?v=e972392a';
-import { bindKeys } from '../input.js?v=e972392a';
-import { renderEnemy } from '../components/enemy.js?v=e972392a';
-import { renderCard, emptySlot } from '../components/card.js?v=e972392a';
-import { createTaskPanel } from '../components/task-panel.js?v=e972392a';
-import { startTimerBar } from '../components/timer-bar.js?v=e972392a';
-import { createTutorial } from '../tutorial.js?v=e972392a';
+import { wayText, hintAsk } from '../text.js?v=2c640ccc';
+import { combatView } from '../../engine/combat/combat.js?v=2c640ccc';
+import { ICON } from '../icons.js?v=2c640ccc';
+import { renderAsset, assetUrl } from '../assets.js?v=2c640ccc';
+import { poseBox, dashDistance } from '../components/pose.js?v=2c640ccc';
+import { playEvents, wait, isCalm } from '../app.js?v=2c640ccc';
+import { bindKeys } from '../input.js?v=2c640ccc';
+import { renderEnemy } from '../components/enemy.js?v=2c640ccc';
+import { renderCard, emptySlot } from '../components/card.js?v=2c640ccc';
+import { createTaskPanel } from '../components/task-panel.js?v=2c640ccc';
+import { startTimerBar } from '../components/timer-bar.js?v=2c640ccc';
+import { createTutorial } from '../tutorial.js?v=2c640ccc';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -89,7 +90,28 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
   $('scene').dataset.area = areaId;
   $('sceneBg').append(renderAsset(config.areas.areas[areaId]?.background ?? 'area.reef', ''));
   const profile = game.view().profile; // Testkampf ohne Stand: erste Figur
-  $('heroArt').append(renderAsset(profile?.asset ?? 'hero.diver', profile?.name ?? t('hero.name')));
+  const heroAsset = profile?.asset ?? 'hero.diver';
+  $('heroArt').append(renderAsset(heroAsset, profile?.name ?? t('hero.name')));
+  // Kampfposen (D36, Weg 2): Schlüssel <Bild>.attack und <Bild>.hit im Manifest, für Helden und Gegner.
+  // Vorladen, damit der Wechsel ohne Flackern klappt; fehlt ein Bild, bleibt das Grundbild.
+  const poseImgs = new Map();
+  function poseImg(key) {
+    if (!poseImgs.has(key)) {
+      const url = assetUrl(key);
+      let img = null;
+      if (url) {
+        img = new Image();
+        img.src = url;
+        img.alt = '';
+        img.className = 'pose-img';
+        img.draggable = false;
+      }
+      poseImgs.set(key, img);
+    }
+    return poseImgs.get(key);
+  }
+  const foeAsset = (uid) => `enemy.${shown?.enemies.find((x) => x.uid === uid)?.typeId}`;
+  for (const kind of ['attack', 'hit']) poseImg(`${heroAsset}.${kind}`);
 
   // ---------- Darstellung ----------
   const live = () => combatView(combat, { targetUid });
@@ -101,7 +123,8 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     if (!targetUid && candidates.length === 1 && tut.step !== 1) targetUid = candidates[0].uid; // Schritt 1 der Erklärung: selbst antippen
   }
 
-  function render(v = live()) {
+  // keepFoes: Gegner nicht neu zeichnen (ein Gegner steht gerade mitten im Angriff beim Helden)
+  function render(v = live(), { keepFoes = false } = {}) {
     shown = v;
     const h = v.hero;
     $('heroHp').innerHTML = `${ICON.heart}<span>${h.hp}/${h.maxHp}</span>`;
@@ -125,7 +148,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
 
     const foes = $('foes');
     foes.dataset.n = v.enemies.length;
-    foes.replaceChildren(...v.enemies.map((e) => renderEnemy(e, { t, selected: e.uid === targetUid })));
+    if (!keepFoes) foes.replaceChildren(...v.enemies.map((e) => renderEnemy(e, { t, selected: e.uid === targetUid })));
 
     const maxEnergy = config.game.hero.energy;
     $('energy').innerHTML = Array.from({ length: Math.max(maxEnergy, h.energy) },
@@ -209,24 +232,61 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(0)' }], { duration: 260 });
   }
   const foeEl = (uid) => root.querySelector(`.foe[data-uid="${uid}"]`);
-  const hitAnim = (el) => {
-    if (!el || isCalm()) return;
-    el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(0)' }], { duration: 360, easing: 'cubic-bezier(0.16,1,0.3,1)' });
-  };
 
   // ---------- Animationen im Kampf (D36, Weg 1; 18.11.2026) ----------
   // Nur mit den vorhandenen Bildern; alles erst nach der Antwort, nie über der Aufgabe.
   // „Weniger Bewegung“ (isCalm) schaltet alles ab, die Zahlen erscheinen dann wie bisher.
   const EASE = 'cubic-bezier(0.16,1,0.3,1)';
-  // Angriff: die Figur springt nach vorn und wieder zurück (dir 1 nach rechts, -1 nach links)
-  function lunge(el, dir = 1) {
-    if (!el || isCalm()) return;
-    const d = el.getBoundingClientRect().width * 0.35 * dir;
-    el.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${d}px)`, offset: 0.35 }, { transform: 'translateX(0)' }], { duration: 420, easing: EASE });
+  // Angriff (D36, Weg 2; Ingos Wunsch 18.11.2026): die Figur läuft bis an den Gegner (dir 1 nach rechts, -1 nach links).
+  // Gibt den Rückweg als Funktion zurück; der Lauf selbst ist abgeschlossen, wenn das Versprechen erfüllt ist.
+  const NO_BACK = async () => {};
+  // Ende einer Animation abwarten, höchstens etwas länger als geplant (im Hintergrund kann die Zeitleiste stehen)
+  const settled = (anim, ms) => Promise.race([anim.finished.catch(() => {}), wait(ms + 200)]);
+  // reach: wie weit die Pose (Waffenspitze) über das Grundbild hinausragt; sie soll den Gegner treffen, nicht die Figur
+  async function dash(mover, target, dir = 1, reach = 0) {
+    if (!mover || !target || isCalm()) return NO_BACK;
+    const rect = (el) => (el.querySelector('img:not(.pose-img)') ?? el).getBoundingClientRect();
+    const m = rect(mover);
+    const d = dashDistance({ left: m.left - (dir < 0 ? reach : 0), right: m.right + (dir > 0 ? reach : 0) }, rect(target), dir, 0.15);
+    const layer = mover.closest('.hero, .foes') ?? mover;
+    layer.style.zIndex = '4'; // vor die andere Seite
+    const go = mover.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${d}px)` }],
+      { duration: 240, easing: 'cubic-bezier(0.55,0,0.8,0.3)', fill: 'forwards' });
+    await settled(go, 240);
+    return async () => {
+      const back = mover.animate([{ transform: `translateX(${d}px)` }, { transform: 'translateX(0)' }], { duration: 300, easing: EASE, fill: 'forwards' });
+      await settled(back, 300);
+      go.cancel(); back.cancel();
+      layer.style.zIndex = '';
+    };
   }
-  // Treffer: das Bild des Getroffenen blitzt hell auf und federt zurück
+  // Lage einer Pose im Bildbereich art (null, wenn es sie nicht gibt oder die Bilder noch laden).
+  // Helden: Hüfte aus den Heldendaten (poseAnchor); Gegner: Bildmitte, die Posenbilder sind darauf zugeschnitten.
+  // reach: wie weit die Pose links und rechts über das Grundbild hinausragt (Waffe, Schere, Tentakel)
+  function poseLayout(art, key, anchor = 0.5) {
+    const pose = poseImg(key);
+    const base = art?.querySelector('img:not(.pose-img)');
+    if (!pose || !base || isCalm() || !pose.naturalWidth || !base.naturalWidth) return null;
+    const a = art.getBoundingClientRect();
+    const b = base.getBoundingClientRect();
+    const box = poseBox({ left: b.left - a.left, bottom: a.bottom - b.bottom, width: b.width, height: b.height },
+      { width: base.naturalWidth, height: base.naturalHeight }, { width: pose.naturalWidth, height: pose.naturalHeight }, anchor);
+    return { pose, art, box, reach: Math.max(0, a.left + box.left + box.width - b.right), reachLeft: Math.max(0, b.left - a.left - box.left) };
+  }
+  const heroPose = (kind) => poseLayout($('heroArt'), `${heroAsset}.${kind}`, profile?.poseAnchor ?? 0.5);
+  const foePose = (uid, kind) => poseLayout(foeEl(uid)?.querySelector('.foe-art'), `${foeAsset(uid)}.${kind}`);
+  // Pose kurz zeigen; gibt die Funktion zum Zurückwechseln aufs Grundbild zurück
+  function showPose(layout) {
+    if (!layout) return () => {};
+    const { pose, art, box } = layout;
+    Object.assign(pose.style, { left: `${box.left}px`, bottom: `${box.bottom}px`, width: `${box.width}px`, height: `${box.height}px` });
+    art.append(pose);
+    art.classList.add('is-posing');
+    return () => { pose.remove(); art.classList.remove('is-posing'); };
+  }
+  // Treffer: das Bild des Getroffenen blitzt hell auf und federt zurück (beim Helden das gerade sichtbare Bild)
   function flash(el, dir = 1) {
-    const img = el?.querySelector('img');
+    const img = el?.querySelector('.pose-img') ?? el?.querySelector('img');
     if (!img || isCalm()) return;
     const base = getComputedStyle(img).filter;
     const bright = base === 'none' ? 'brightness(2.4) saturate(0.4)' : `${base} brightness(2.4) saturate(0.4)`;
@@ -347,12 +407,19 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       const foe = shown.enemies.find((x) => x.uid === e.targetUid);
       foe.block -= e.blocked;
       foe.hp -= e.amount;
-      lunge($('hero'));
-      if (!isCalm()) await wait(150); // der Sprung trifft, dann sinken die Leben
+      // Die Heldin läuft bis an den Gegner, schlägt zu (Pose), dann sinken die Leben; danach läuft sie zurück
+      // Der Gegner zeigt beim Treffer sein Trefferbild und blitzt auf
+      const back = await dash($('heroArt'), foeEl(e.targetUid)?.querySelector('.foe-art'), 1, heroPose('attack')?.reach ?? 0);
+      const unpose = showPose(heroPose('attack'));
       render(shown);
       floatAt(foeEl(e.targetUid), `−${e.amount}`);
-      flash(foeEl(e.targetUid));
-      await wait(450);
+      const unposeFoe = showPose(foePose(e.targetUid, 'hit'));
+      flash(foeEl(e.targetUid)?.querySelector('.foe-art'));
+      if (isCalm()) { await wait(450); return; }
+      await wait(260);
+      unpose();
+      await back();
+      unposeFoe();
     },
     async blockGained(e) {
       shown.hero.block += e.amount;
@@ -388,7 +455,13 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       const foe = shown.enemies.find((x) => x.uid === e.enemyUid);
       foe.block = 0;
       // Angriff: der Gegner stürzt sich nach links auf den Helden
-      if (e.intent.type === 'attack') { lunge(foeEl(e.enemyUid), -1); if (!isCalm()) await wait(150); }
+      // Angriff: der Gegner läuft bis an den Helden und zeigt dort sein Angriffsbild
+      if (e.intent.type === 'attack') {
+        const art = foeEl(e.enemyUid)?.querySelector('.foe-art');
+        const back = await dash(art, $('heroArt'), -1, foePose(e.enemyUid, 'attack')?.reachLeft ?? 0);
+        const unpose = showPose(foePose(e.enemyUid, 'attack'));
+        wait(380).then(() => { unpose(); return back(); }); // zurück, während der Held den Treffer zeigt
+      }
       if (e.intent.type === 'block') {
         foe.block += e.intent.amount;
         render(shown);
@@ -399,10 +472,12 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     async heroDamaged(e) {
       shown.hero.block -= e.blocked;
       shown.hero.hp -= e.amount;
-      render(shown);
+      render(shown, { keepFoes: true }); // der Gegner steht noch beim Helden
       floatAt($('hero'), `−${e.amount}`);
-      flash($('hero'), -1);
+      const unpose = showPose(heroPose('hit'));
+      flash($('heroArt'), -1);
       await wait(650);
+      unpose();
     },
     cardDiscarded() {},
   };
@@ -578,6 +653,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     timerBar?.stop();
     timerBar = null;
     combat = game.combat;
+    for (const e of combatView(combat).enemies) for (const kind of ['attack', 'hit']) poseImg(`enemy.${e.typeId}.${kind}`); // Gegnerposen vorladen
     targetUid = null; mode = null; picked = new Set(); busy = false; pendingUid = null; task = null;
     $('banner').hidden = true;
     panel.close();

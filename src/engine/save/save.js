@@ -1,7 +1,7 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=e972392a';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=e972392a';
+import { generateMap } from '../dungeon/map.js?v=2c640ccc';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=2c640ccc';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.

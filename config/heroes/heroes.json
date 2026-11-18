@@ -2,24 +2,28 @@
   "figures": {
     "diver": {
       "asset": "hero.diver",
+      "poseAnchor": 0.367,
       "perk": {
         "maxHp": 6
       }
     },
     "researcher": {
       "asset": "hero.researcher",
+      "poseAnchor": 0.4,
       "perk": {
         "calmMs": 2000
       }
     },
     "tinkerer": {
       "asset": "hero.tinkerer",
+      "poseAnchor": 0.48,
       "perk": {
         "startBlock": 4
       }
     },
     "merfolk": {
       "asset": "hero.merfolk",
+      "poseAnchor": 0.415,
       "perk": {
         "healBonus": 2
       }

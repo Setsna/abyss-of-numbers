@@ -6,7 +6,7 @@
 // solution: zeigt die gesuchte Zahl in einer eigenen Zeile unter den Beschriftungen und hebt
 // die richtige Markierung hervor (eigene Zeile, damit sie keine Beschriftung überdeckt).
 
-import { formatNumber } from '../../engine/math/format.js?v=e972392a';
+import { formatNumber } from '../../engine/math/format.js?v=2c640ccc';
 
 const NS = 'http://www.w3.org/2000/svg';
 // Rand links und rechts so groß, dass eine vierstellige Beschriftung („1000“) ganz ins Bild passt.

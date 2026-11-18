@@ -9,21 +9,26 @@
 }
 
 /* ---------- Beute ---------- */
+/* Seit 18.11.2026 (Ingos Wunsch): „Geschafft!“ frei über dem Kasten, Blitzschnell-Treffer
+   in eigenem Feld darunter; so bleibt im Kasten Platz für hohe Karten. */
+.screen.reward { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(10 * var(--u)); }
+.screen.reward > .reward-head, .screen.reward > .reward-lightning { position: relative; flex: none; }
+.reward-head { padding: calc(4 * var(--u)) 0; } /* ohne Kasten direkt auf dem Gebietsbild (Ingos Wunsch); Gelb mit Tuschekontur trägt */
 .reward-panel {
   width: min(100%, calc(900 * var(--u)));
-  max-height: 100%;
+  flex: 0 1 auto; min-height: 0;
   background: var(--sea);
-  padding: calc(20 * var(--u)) calc(24 * var(--u));
+  padding: calc(14 * var(--u)) calc(24 * var(--u)) calc(18 * var(--u));
   display: flex; flex-direction: column; align-items: center;
   gap: calc(10 * var(--u));
   overflow: auto;
 }
-.reward-word { font-size: calc(76 * var(--u)); }
-.reward-gains { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(10 * var(--u)); }
+.reward-word { font-size: calc(68 * var(--u)); }
+.reward-gains { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(8 * var(--u)); }
 .gain {
   background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u));
-  padding: calc(4 * var(--u)) calc(16 * var(--u));
-  font-weight: 700; font-size: calc(26 * var(--u));
+  padding: calc(3 * var(--u)) calc(14 * var(--u));
+  font-weight: 700; font-size: calc(22 * var(--u));
 }
 .gain-level { background: var(--sun); }
 .reward-ask {
@@ -32,12 +37,13 @@
   font-weight: 700; font-size: calc(24 * var(--u));
 }
 .reward-cards {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: calc(18 * var(--u));
+  display: grid; grid-template-columns: repeat(3, minmax(0, calc(230 * var(--u))));
+  justify-content: center;
+  gap: calc(28 * var(--u));
   width: 100%;
   padding-top: calc(14 * var(--u));
 }
-.reward-cards .card { min-height: calc(180 * var(--u)); }
+.reward-cards .card { min-height: calc(320 * var(--u)); }
 .reward-cards .card:active { transform: scale(0.97); }
 .reward-skip { min-width: calc(220 * var(--u)); }
 .reward-practice {
@@ -52,8 +58,11 @@
 .reward-practice li + li { border-top: var(--line-thin) solid var(--disabled-fill); }
 .reward-lightning {
   display: inline-flex; align-items: center; gap: calc(8 * var(--u));
+  background: var(--sea-deep); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u));
+  padding: calc(4 * var(--u)) calc(18 * var(--u));
   color: var(--paper); font-weight: 700; font-size: calc(24 * var(--u));
 }
+.reward-lightning[hidden] { display: none; }
 .reward-lightning svg { width: calc(24 * var(--u)); height: calc(32 * var(--u)); }
 
 /* ---------- Kleine Anzeigen (Leben, Stufe, Perlen) ---------- */

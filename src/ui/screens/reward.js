@@ -1,16 +1,16 @@
 // Beute nach einem Sieg (Plan Etappe 5, Schritt 6): Erfahrung, Perlen, ggf. neue Stufe,
 // eine von drei Karten oder „Keine Karte“, darunter bis zu 5 Übungsaufgaben mit Lösung.
 // Keine Quote, keine Zeit, kein Vergleich (A7).
-import { wayText } from '../text.js?v=e972392a';
-import { ICON } from '../icons.js?v=e972392a';
-import { renderCard } from '../components/card.js?v=e972392a';
-import { addWorld } from '../components/world.js?v=e972392a';
+import { wayText } from '../text.js?v=2c640ccc';
+import { ICON } from '../icons.js?v=2c640ccc';
+import { renderCard } from '../components/card.js?v=2c640ccc';
+import { addWorld } from '../components/world.js?v=2c640ccc';
 
 export function mountReward(root, { config, t, reward, onPick, levels = {}, areaId = null }) {
   root.innerHTML = `
   <main class="screen reward">
+    <div class="reward-head"><p class="banner-word reward-word"></p></div>
     <section class="panel reward-panel">
-      <p class="banner-word reward-word"></p>
       <div class="reward-gains">
         <span class="gain" data-ref="xp"></span>
         <span class="gain" data-ref="pearls"></span>
@@ -27,8 +27,8 @@ export function mountReward(root, { config, t, reward, onPick, levels = {}, area
         <p class="reward-practice-title"></p>
         <ul data-ref="practiceList"></ul>
       </div>
-      <p class="reward-lightning" data-ref="lightning" hidden></p>
     </section>
+    <p class="reward-lightning" data-ref="lightning" hidden></p>
   </main>`;
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
   addWorld(root.querySelector('.screen'), `area.${areaId ?? config.areas.order[0]}`); // Spielwelt dahinter (D25)

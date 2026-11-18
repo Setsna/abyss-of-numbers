@@ -1,8 +1,8 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=e972392a';
-import { REJECT_REASONS } from '../combat/combat.js?v=e972392a';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=e972392a';
+import { CONFIG_FILES } from './files.js?v=2c640ccc';
+import { REJECT_REASONS } from '../combat/combat.js?v=2c640ccc';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=2c640ccc';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -277,6 +277,8 @@ function validateHeroes(file, h, errors) {
   else for (const [id, f] of Object.entries(h.figures)) {
     if (typeof f?.asset !== 'string') c.fail(`figures.${id}.asset`, 'fehlt');
     if (f.perk !== undefined) checkEffect(c, `figures.${id}.perk`, f.perk);
+    // Hüfte des Grundbilds (Anteil der Bildbreite), an der die Kampfposen ausgerichtet werden (D36, Weg 2)
+    if (f.poseAnchor !== undefined && !(typeof f.poseAnchor === 'number' && f.poseAnchor >= 0 && f.poseAnchor <= 1)) c.fail(`figures.${id}.poseAnchor`, 'Zahl von 0 bis 1');
   }
   for (const list of ['nameA', 'nameB']) {
     const l = h[list];

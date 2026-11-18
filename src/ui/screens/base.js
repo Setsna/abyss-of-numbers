@@ -4,9 +4,9 @@
 //   Logbuch   – mit dem Schild „freie Punkte“,
 //   Ausrüstung – öffnet die Logbuch-Seite „Ausrüstung“.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=e972392a';
-import { renderAsset, assetUrl } from '../assets.js?v=e972392a';
-import { homeAreaId, worldLayer } from '../components/world.js?v=e972392a';
+import { ICON } from '../icons.js?v=2c640ccc';
+import { renderAsset, assetUrl } from '../assets.js?v=2c640ccc';
+import { homeAreaId, worldLayer } from '../components/world.js?v=2c640ccc';
 
 export function mountBase(root, { t, config, game, onDive, onLogbook }) {
   const v = game.view();

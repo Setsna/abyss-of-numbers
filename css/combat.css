@@ -46,6 +46,10 @@
 }
 .hero-art { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
 .hero-art img { max-height: 100%; max-width: 100%; object-fit: contain; display: block; filter: var(--hero-glow); }
+/* Kampfposen von Helden und Gegnern (D36, Weg 2): liegen kurz über dem Grundbild, gleicher Maßstab, Füße unten bündig; Lage rechnet pose.js */
+.hero-art, .foe-art { position: relative; }
+.hero-art img.pose-img, .foe-art img.pose-img { position: absolute; max-width: none; max-height: none; object-fit: fill; pointer-events: none; }
+.hero-art.is-posing > img:not(.pose-img), .foe-art.is-posing > img:not(.pose-img) { visibility: hidden; }
 
 .plate {
   display: flex; gap: calc(8 * var(--u)); align-items: center; justify-content: center;
