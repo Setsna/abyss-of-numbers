@@ -29,5 +29,20 @@
   "enemy.snakeEel": "assets/images/enemies/schlangenaal.webp",
   "enemy.caveIsopod": "assets/images/enemies/hoehlenassel.webp",
   "enemy.stoneFish": "assets/images/enemies/steinfisch.webp",
-  "enemy.lanternFish": "assets/images/enemies/laternenfisch.webp"
+  "enemy.lanternFish": "assets/images/enemies/laternenfisch.webp",
+  "card.currentStrike": "assets/images/cards/currentStrike.webp",
+  "card.undertow": "assets/images/cards/undertow.webp",
+  "card.waveSlam": "assets/images/cards/waveSlam.webp",
+  "card.deepRift": "assets/images/cards/deepRift.webp",
+  "card.harpoon": "assets/images/cards/harpoon.webp",
+  "card.bubbleChain": "assets/images/cards/bubbleChain.webp",
+  "card.coralWall": "assets/images/cards/coralWall.webp",
+  "card.shieldBubble": "assets/images/cards/shieldBubble.webp",
+  "card.healingAlgae": "assets/images/cards/healingAlgae.webp",
+  "card.kelpPotion": "assets/images/cards/kelpPotion.webp",
+  "card.whirlpool": "assets/images/cards/whirlpool.webp",
+  "card.conchHorn": "assets/images/cards/conchHorn.webp",
+  "card.shellCracker": "assets/images/cards/shellCracker.webp",
+  "card.pearlFind": "assets/images/cards/pearlFind.webp",
+  "card.inkCloud": "assets/images/cards/inkCloud.webp"
 }

@@ -5,14 +5,17 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js';
-import { nextCurrent, answerCode } from './combat/current.js';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js';
-import { generateMap } from './dungeon/map.js';
-import { createSave } from './save/save.js';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js';
-import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js';
+import { createRng, deriveSeed } from './rng.js?v=ea296573';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=ea296573';
+import { wayForKey } from './math/ways.js?v=ea296573';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=ea296573';
+import { nextCurrent, answerCode } from './combat/current.js?v=ea296573';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=ea296573';
+import { generateMap } from './dungeon/map.js?v=ea296573';
+import { createSave } from './save/save.js?v=ea296573';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js?v=ea296573';
+import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=ea296573';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=ea296573';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -60,6 +63,7 @@ export function createGame({ config, save, seed }) {
 
   function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1 }) {
     const s = state.save;
+    const taskPlan = planFor({ areaId, level, boss, inDive: roomId !== null });
     const tutorial = untimedTasks > 0 && roomId !== null;
     state.combat = createCombat({
       config,
@@ -75,11 +79,61 @@ export function createGame({ config, save, seed }) {
       forgiving: tutorial, // D24: Fehler in der Erklärung kosten nichts
       cardLevels: cardLevels(s, config), // Kartenstufen (Etappe 8); Aufstieg gilt ab dem nächsten Kampf
       enemyPower, // Strömung (D33)
+      taskPlan,
     });
-    state.combatInfo = { areaId, roomId, boss, enemyTypeIds, openTask: null, mistakes: [], lightningHits: 0, tutorial, cardLevelUps: [] };
+    // stageChanged: Leitern, deren Stufe in diesem Kampf gewechselt hat (zählen bis zum Kampfende nicht mehr)
+    state.combatInfo = { areaId, roomId, boss, enemyTypeIds, openTask: null, mistakes: [], lightningHits: 0, tutorial, cardLevelUps: [], stageUps: [], stageChanged: [] };
     state.reward = null;
     state.screen = 'combat';
     return state.combat.startEvents;
+  }
+
+  // Aufgabenplan (Phase 6b, Regelwerk 7): im Tauchgang aus den Lernstufen des Kindes; der allererste
+  // Kampf in einem Gebiet nutzt die untersten Stufen und zählt nicht (7.1 Nr. 6). Ohne Lernstufen
+  // (Ausschalter, Testkampf) nach dem Raum: erster unten, sonst Mitte, Boss oben (7.6).
+  function planFor({ areaId, level, boss, inDive }) {
+    const s = state.save;
+    const cfg = config.game.learning;
+    const cur = curriculumOf(config, s.klasse);
+    const kind = boss ? 'boss' : level === 1 ? 'intro' : 'normal';
+    if (!inDive || !cfg.enabled) return { ...planWithoutLearning(cur, areaId, kind, s.klasse), countable: false };
+    if (!isIntroduced(s.lernen, s.klasse, areaId)) {
+      markIntroduced(s.lernen, s.klasse, areaId);
+      return { ...planWithoutLearning(cur, areaId, 'intro', s.klasse), countable: false };
+    }
+    const windows = { ...cur.windows[areaId] };
+    const stageOf = Object.fromEntries(Object.entries(windows).map(([ladder, win]) => [ladder, stageFor(s.lernen, s.klasse, areaId, ladder, win)]));
+    // Übungsaufgaben mit Stufe, älteste zuerst (Regelwerk 7.2)
+    const practice = Object.entries(s.uebung).filter(([, e]) => e.stufe).sort((x, y) => x[1].t - y[1].t).map(([key, e]) => ({ key, stufe: e.stufe }));
+    // Zähler der Mischregel aus dem Spielstand: er läuft über Kämpfe und Tauchgänge weiter (Review 7b, B1)
+    return { grade: s.klasse, stageOf, windows, countable: true, mixEvery: cfg.mixEvery, practice, mixCount: mixCounts(s.lernen, s.klasse, areaId) };
+  }
+
+  // Gezählte Antwort verbuchen (Regelwerk 7.1); neue höchste Stufe bringt Perlen (7.7)
+  function countAnswer(ladder, correct) {
+    const s = state.save;
+    const info = state.combatInfo;
+    const cfg = config.game.learning;
+    const win = state.combat.taskPlan.windows[ladder];
+    const from = stageFor(s.lernen, s.klasse, info.areaId, ladder, win);
+    const { stufe, change } = recordAnswer(s.lernen, s.klasse, info.areaId, ladder, correct, win, cfg);
+    if (!change) return [];
+    info.stageChanged.push(ladder);
+    const events = [{ type: 'stageChanged', ladder, from, to: stufe }];
+    if (change === 'up' && noteHighest(s.lernen, s.klasse, ladder, stufe)) {
+      s.perlen += cfg.newStagePearls;
+      info.stageUps.push({ ladder, pearls: cfg.newStagePearls });
+      events.push({ type: 'stageReached', ladder, stufe, pearls: cfg.newStagePearls });
+    }
+    return events;
+  }
+
+  // Übungsaufgabe richtig gelöst: nach practiceDoneAfter Mal verlässt sie die Liste (Regelwerk 7.2)
+  function practiceSolved(key) {
+    const e = state.save.uebung[key];
+    if (!e) return;
+    e.richtig = (e.richtig ?? 0) + 1;
+    if (e.richtig >= config.game.learning.practiceDoneAfter) delete state.save.uebung[key];
   }
 
   // Testkampf ohne Tauchgang (Entwicklerzugang ?dev=combat und ältere Tests).
@@ -261,7 +315,10 @@ export function createGame({ config, save, seed }) {
     const s = state.save;
     if (!lauf() || state.combatInfo.roomId === null) return []; // nur im Tauchgang, nicht im Testkampf
     const from = s.stroemung;
-    const to = nextCurrent(from, s.antworten, config.game.current);
+    const info = state.combatInfo;
+    const allowUp = !config.game.learning.enabled
+      || atTopEverywhere(s.lernen, s.klasse, info.areaId, curriculumOf(config, s.klasse).windows[info.areaId]);
+    const to = nextCurrent(from, s.antworten, config.game.current, { allowUp });
     s.stroemung = to;
     if (to !== from) state.combatInfo.currentChange = { from, to };
     return to === from ? [] : [{ type: 'currentChanged', from, to }];
@@ -289,10 +346,12 @@ export function createGame({ config, save, seed }) {
     addPractice(s, info.mistakes, state.now, config);
     const rewardArea = lauf()?.gebiet ?? info.areaId;
     const cards = rollRewardCards(s, rewardArea, state.loot, config);
-    const practice = info.mistakes.map((m) => m.text).slice(-config.game.practiceShownAfterCombat);
+    const shown = info.mistakes.slice(-config.game.practiceShownAfterCombat);
+    const practice = shown.map((m) => m.text);
+    const practiceWays = shown.map((m) => wayForKey(m.key)); // Rechenweg je Übungsaufgabe (Regelwerk 8.3)
     // Boss: sicher ein Gegenstand (Phase 5, Etappe 7)
     const item = info.boss ? rollItem(state.loot) : null;
-    state.reward = { cards, xp, pearls, levelUps, practice, lightningHits: info.lightningHits, item, cardLevelUps: info.cardLevelUps.slice(), current: info.currentChange ?? null };
+    state.reward = { cards, xp, pearls, levelUps, practice, lightningHits: info.lightningHits, item, cardLevelUps: info.cardLevelUps.slice(), current: info.currentChange ?? null, stageUps: info.stageUps.slice(), practiceWays };
     state.screen = 'reward';
     const events = [{ type: 'xpGained', amount: xp }];
     if (levelUps > 0) events.push({ type: 'levelUp', levels: levelUps, stufe: s.stufe });
@@ -329,6 +388,16 @@ export function createGame({ config, save, seed }) {
     const extra = [];
     for (const e of events) {
       if (e.type === 'taskOpened' || e.type === 'stepOpened') info.openTask = e.task;
+      // Mischregel (Regelwerk 7.2; Review 7b, B1): der Zähler je Leiter steht im Spielstand
+      if (e.type === 'taskOpened' && lauf() && info.roomId !== null && state.combat.taskPlan.mixEvery) {
+        saveMixCounts(state.save.lernen, state.save.klasse, info.areaId, state.combat.mixCount, state.combat.taskPlan.mixEvery);
+      }
+      // Lernstufen (Phase 6b): gezählte Antworten im Tauchgang, nicht in der Erklärung
+      const counting = lauf() && info.roomId !== null && !info.tutorial;
+      // Nach einem Stufenwechsel kommen bis zum Kampfende noch Aufgaben der alten Stufe; sie zählen nicht
+      // für die neue (Regelwerk 7.1 Nr. 7; Review 7b, B4)
+      if ((e.type === 'answerJudged' || e.type === 'stepJudged') && e.counts && counting && !info.stageChanged.includes(e.ladder)) extra.push(...countAnswer(e.ladder, e.outcome === 'correct'));
+      if (e.type === 'answerJudged' && e.practice && e.outcome === 'correct' && counting) practiceSolved(e.practiceKey);
       if (e.type === 'answerJudged') {
         if (e.outcome === 'correct' && e.tierId === 'lightning') info.lightningHits += 1;
         // Strömung (D33): Antworten im Tauchgang merken, außer in der Erklärung
@@ -344,7 +413,8 @@ export function createGame({ config, save, seed }) {
           }
         }
         if (e.outcome !== 'correct' && info.openTask && !info.openTask.forgiving) {
-          info.mistakes.push({ key: info.openTask.practiceKey, text: e.solutionText });
+          // Rechnung lösen: mit Stufe, damit sie später als Übungsaufgabe wiederkommt (Regelwerk 7.2)
+          info.mistakes.push({ key: info.openTask.practiceKey, text: e.solutionText, stufe: info.openTask.format === 'solve' ? info.openTask.stageId : undefined });
         }
       }
       if (e.type === 'combatWon') extra.push(...adjustCurrent(), ...onCombatWon());
@@ -390,7 +460,6 @@ export function createGame({ config, save, seed }) {
     state.grade = grade;
     state.screen = 'heroCreate';
     const events = [{ type: 'gradeChosen', grade }];
-    if (grade === 4) events.push({ type: 'gradeNotice', grade }); // „Klasse 4 folgt“: Inhalte wie Klasse 3
     return events;
   }
 
@@ -447,7 +516,9 @@ export function createGame({ config, save, seed }) {
   function profileView() {
     const s = state.save;
     if (!s) return null;
-    const practice = Object.values(s.uebung).sort((a, b) => b.t - a.t).map((e) => e.text);
+    const ordered = Object.entries(s.uebung).sort((a, b) => b[1].t - a[1].t);
+    const practice = ordered.map(([, e]) => e.text);
+    const practiceWays = ordered.map(([key]) => wayForKey(key)); // Rechenweg je Übungsaufgabe (Regelwerk 8.3)
     return {
       name: heroName(s, config),
       figure: s.held.figur,
@@ -463,6 +534,7 @@ export function createGame({ config, save, seed }) {
       perk: config.heroes.figures[s.held.figur].perk ? s.held.figur : null,
       deck: Object.entries(s.deck).filter(([, n]) => n > 0).map(([cardId, n]) => ({ cardId, n, level: cardLevel(s, cardId, config), toNext: toNextLevel(s, cardId, config) })),
       practice,
+      practiceWays,
       areas: config.areas.order.map((id) => ({
         id, open: Boolean(s.gebiete[id]?.offen), cleared: Boolean(s.gebiete[id]?.geschafft),
         comingSoon: Boolean(config.areas.areas[id].comingSoon),
@@ -552,9 +624,9 @@ export function createGame({ config, save, seed }) {
     setNow(now) { state.now = now; },
     dispatch(command) {
       if (state.screen === 'combat') {
-        if (command.type === 'pickReward') return reject('screen');
-        if (MENU_COMMANDS.has(command.type)) return reject('phase');
-        if (command.type === 'markExplained') return markExplained(command);
+        if (command?.type === 'pickReward') return reject('screen');
+        if (MENU_COMMANDS.has(command?.type)) return reject('phase');
+        if (command?.type === 'markExplained') return markExplained(command);
         return combatCommand(command);
       }
       if (command?.type === 'markExplained') return markExplained(command); // auf jedem Bildschirm erlaubt

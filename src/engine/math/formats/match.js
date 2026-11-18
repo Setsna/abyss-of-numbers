@@ -1,27 +1,33 @@
-// Zuordnen (Konzept 8.2, Perlenfund): vier Aufgaben, vier Ergebnisse. Je Schritt eine Aufgabe
-// („7 · 8 = ?“), als Antworten immer alle vier Ergebnisse (D12: vier Antwortfelder); schon
-// zugeordnete Ergebnisse zählen als falsch. Drei Schritte, das vierte Paar ergibt sich.
-// Aufgaben aus dem Generator für einfache Rechnungen (Stufe aus den Regeln). Vorläufig (D29).
-import { generateSolve } from '../generate.js';
-import { placeCorrect, MAX_TRIES } from './common.js';
+// Zuordnen (Konzept 8.2, Perlenfund; Regelwerk 5.7): vier Rechnungen der vier Rechenarten, jede
+// aus der Stufe ihrer Rechenart (stages), vier verschiedene Ergebnisse. Je Schritt eine Rechnung
+// („7 · 8 = ?“), als Antworten immer alle vier Ergebnisse (D12); schon zugeordnete Ergebnisse
+// zählen als falsch. Drei Schritte, das vierte Paar ergibt sich. Jeder Schritt trägt Leiter und
+// Stufe (für die Lernstufen, Etappe 4).
+import { generateFromStage } from '../generate.js?v=ea296573';
+import { placeCorrect, MAX_TRIES } from './common.js?v=ea296573';
+import { formatNumber } from '../format.js?v=ea296573';
 
-export function generate(level, area, rng) {
-  const r = area.match;
+const OPS = ['add', 'sub', 'mul', 'div'];
+
+export function generate(stages, area, rng) {
   for (let tries = 0; tries < MAX_TRIES; tries++) {
-    const items = r.operations.slice(0, 4).map((op) => {
-      const t = generateSolve(op, r.level, area, rng);
-      return { expr: t.prompt, result: t.result, operation: op, a: t.a, b: t.b };
+    const items = OPS.map((op) => {
+      const t = generateFromStage(op, stages[op], area, rng);
+      return { expr: t.prompt, result: t.result, operation: op, a: t.a, b: t.b, stageId: t.stageId, way: t.way };
     });
-    if (new Set(items.map((x) => x.result)).size < 4 || new Set(items.map((x) => x.expr)).size < 4) continue;
+    if (new Set(items.map((x) => x.result)).size < 4) continue;
     const ordered = rng.shuffle(items);
-    const { choices } = placeCorrect(String(ordered[0].result), ordered.slice(1).map((x) => String(x.result)), rng);
+    const { choices } = placeCorrect(formatNumber(ordered[0].result), ordered.slice(1).map((x) => formatNumber(x.result)), rng);
     const steps = ordered.slice(0, 3).map((item) => ({
       prompt: 'task.match',
       display: `${item.expr} = ?`,
       choices: choices.slice(),
-      correctIndex: choices.indexOf(String(item.result)),
-      solutionText: `${item.expr} = ${item.result}`,
+      correctIndex: choices.indexOf(formatNumber(item.result)),
+      solutionText: `${item.expr} = ${formatNumber(item.result)}`,
       practiceKey: `${item.operation}:${item.a}:${item.b}`,
+      ladder: item.operation,
+      stageId: item.stageId,
+      way: item.way,
     }));
     return {
       format: 'match',

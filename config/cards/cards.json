@@ -213,7 +213,8 @@
       }
     ],
     "task": {
-      "format": "pickTrue"
+      "format": "pickTrue",
+      "ifLadder": "teil"
     },
     "target": "enemy",
     "price": 8

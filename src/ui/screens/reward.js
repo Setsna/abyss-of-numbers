@@ -1,9 +1,10 @@
 // Beute nach einem Sieg (Plan Etappe 5, Schritt 6): Erfahrung, Perlen, ggf. neue Stufe,
 // eine von drei Karten oder „Keine Karte“, darunter bis zu 5 Übungsaufgaben mit Lösung.
 // Keine Quote, keine Zeit, kein Vergleich (A7).
-import { ICON } from '../icons.js';
-import { renderCard } from '../components/card.js';
-import { addWorld } from '../components/world.js';
+import { wayText } from '../text.js?v=ea296573';
+import { ICON } from '../icons.js?v=ea296573';
+import { renderCard } from '../components/card.js?v=ea296573';
+import { addWorld } from '../components/world.js?v=ea296573';
 
 export function mountReward(root, { config, t, reward, onPick, levels = {}, areaId = null }) {
   root.innerHTML = `
@@ -17,6 +18,7 @@ export function mountReward(root, { config, t, reward, onPick, levels = {}, area
         <span class="gain gain-item" data-ref="item" hidden></span>
         <span class="gain gain-current" data-ref="current" hidden></span>
         <span class="gain gain-cards" data-ref="cardUps" hidden></span>
+        <span class="gain gain-stage" data-ref="stageUps" hidden></span>
       </div>
       <p class="reward-ask"></p>
       <div class="reward-cards" data-ref="cards"></div>
@@ -46,6 +48,17 @@ export function mountReward(root, { config, t, reward, onPick, levels = {}, area
   if (reward.item) { // Ausrüstung gefunden (Phase 5, Etappe 7)
     ref.item.hidden = false;
     ref.item.textContent = t('gear.found', { name: t(`items.${reward.item}.name`) });
+  }
+  // Lernstufen (Phase 6b, Regelwerk 7.4): neue Aufgaben warten, dazu die Perlen; keine Stufenzahl, ein Abstieg zeigt nichts
+  const stageUps = reward.stageUps ?? [];
+  if (stageUps.length > 0) {
+    ref.stageUps.hidden = false;
+    ref.stageUps.replaceChildren(...stageUps.map(({ ladder, pearls }) => {
+      const line = document.createElement('span');
+      line.className = 'gain-stage-up';
+      line.textContent = `${t(`learning.up.${ladder}`)} ${t('learning.pearls', { n: pearls })}`;
+      return line;
+    }));
   }
   // Kartenstufen (Etappe 8): welche Kartenart in diesem Kampf stärker geworden ist
   const ups = reward.cardLevelUps ?? [];
@@ -80,9 +93,16 @@ export function mountReward(root, { config, t, reward, onPick, levels = {}, area
   if (reward.practice.length > 0) {
     ref.practice.hidden = false;
     root.querySelector('.reward-practice-title').textContent = t('reward.practice');
-    ref.practiceList.replaceChildren(...reward.practice.map((text) => {
+    ref.practiceList.replaceChildren(...reward.practice.map((text, i) => {
       const li = document.createElement('li');
       li.textContent = text;
+      const way = wayText(t, (reward.practiceWays ?? [])[i]); // Rechenweg darunter (Phase 6b, Regelwerk 8.3)
+      if (way) {
+        const small = document.createElement('span');
+        small.className = 'practice-way';
+        small.textContent = way;
+        li.append(small);
+      }
       return li;
     }));
   }

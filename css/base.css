@@ -21,6 +21,11 @@
   --muted: #5d6b78;
   --disabled-fill: #b9c6cf;  /* gesperrte Knöpfe */
   --disabled-text: #3e4c58;
+  /* Kartenarten (Kartenrand, Plakette; 18.11.2026, Ingos Wahl): pastellig, heben sich vom dunklen Kartenstreifen ab */
+  --kind-attack: #7fa8d6;  --kind-attack-soft: #dce8f5;
+  --kind-block: #ffc28a;   --kind-block-soft: #ffeedd;
+  --kind-heal: #9fdcb5;    --kind-heal-soft: #e3f6ea;
+  --kind-other: #c6aef0;   --kind-other-soft: #f0e9fc;
 
   /* Maßeinheit: 1u = ein Pixel im Bezugsformat (quer 1080 × 810) */
   --u: min(calc(100vw / 1080), calc(100dvh / 810));

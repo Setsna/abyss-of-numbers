@@ -35,7 +35,12 @@
     "twoStep": "Rechne Schritt für Schritt.",
     "pointBeforeLine": "Punkt vor Strich!",
     "compareTerms": "Welche Rechnung hat denselben Wert wie {expr}?",
-    "solveStep": "Gefunden! Jetzt rechne:"
+    "solveStep": "Gefunden! Jetzt rechne:",
+    "divisibility": {
+      "by": "Welche Zahl ist durch {n} teilbar?",
+      "divisor": "Welche Zahl ist ein Teiler von {n}?",
+      "multiple": "Welche Zahl ist ein Vielfaches von {n}?"
+    }
   },
   "cards": {
     "currentStrike": {
@@ -183,12 +188,14 @@
   },
   "ask": {
     "wrong": "Nicht ganz. So stimmt es:",
+    "solution": "So stimmt es:",
     "timeout": "Die Zeit ist um. So stimmt es:",
     "wrongTrue": "Nicht ganz. Diese Rechnung stimmt:",
     "wrongFalse": "Nicht ganz. Diese Rechnung ist falsch. Richtig ist:",
     "freeMistake": "Noch 1 Fehler frei.",
     "freeMistakes": "Noch {n} Fehler frei.",
-    "freeNone": "Kein Fehler mehr frei."
+    "freeNone": "Kein Fehler mehr frei.",
+    "yours": "Deine Antwort:"
   },
   "btn": {
     "next": "Weiter",
@@ -271,6 +278,76 @@
     "treasureWord": "Schatz!",
     "cardLevelUp": "{name} ist stärker geworden!"
   },
+  "learning": {
+    "up": {
+      "add": "Neue Plus-Aufgaben warten auf dich!",
+      "sub": "Neue Minus-Aufgaben warten auf dich!",
+      "mul": "Neue Mal-Aufgaben warten auf dich!",
+      "div": "Neue Geteilt-Aufgaben warten auf dich!",
+      "line": "Neue Aufgaben am Zahlenstrahl warten auf dich!",
+      "seq": "Neue Zahlenfolgen warten auf dich!",
+      "comp": "Neue Ergänzen-Aufgaben warten auf dich!",
+      "wall": "Neue Zahlenmauern warten auf dich!",
+      "chain": "Neue Rechenketten warten auf dich!",
+      "pvs": "Neue Punkt-vor-Strich-Aufgaben warten auf dich!",
+      "teil": "Neue Teiler-Aufgaben warten auf dich!"
+    },
+    "pearls": "+{n} Perlen"
+  },
+  "way": {
+    "steps": "Erst {0},\ndann {1}.",
+    "scaled": "{0},\nalso {1}.",
+    "core": "{0} und {1},\nzusammen {2}.",
+    "inverse": "{0},\nalso {1}.",
+    "complement": "{0}, {1},\nzusammen {2}.",
+    "neighborUp": "{0},\nund noch {1} dazu: {2}.",
+    "neighborDown": "{0},\nalso {1} weniger: {2}."
+  },
+  "mistake": {
+    "F-ADD-a": "Hier geht es über {stelle}.",
+    "F-ADD-b": "Hier gibt es keinen Übergang.",
+    "F-ADD-c": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-ADD-d": "Achte auf die Reihenfolge der Ziffern.",
+    "F-ADD-e": "Achte auf die Stelle jeder Ziffer.",
+    "F-SUB-a": "Hier geht es über {stelle} zurück.",
+    "F-SUB-b": "Hier geht es über {stelle} zurück.",
+    "F-SUB-c": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-SUB-d": "Hier wurde zu viel abgezogen.",
+    "F-SUB-e": "Achte auf die Stelle jeder Ziffer.",
+    "F-SUB-f": "Achte auf das Zeichen: Hier wird abgezogen.",
+    "F-MUL-a": "Das ist das Ergebnis der Nachbaraufgabe.",
+    "F-MUL-b": "Achte auf das Zeichen: Hier wird multipliziert.",
+    "F-MUL-c": "Schau auf die Nullen.",
+    "F-MUL-d": "Das ist das Ergebnis der Nachbaraufgabe.",
+    "F-DIV-a": "Die Umkehraufgabe zeigt es.",
+    "F-DIV-b": "Das ist die Zahl, durch die geteilt wird.",
+    "F-DIV-c": "Schau auf die Nullen.",
+    "F-DIV-d": "Die Umkehraufgabe zeigt es.",
+    "F-LINE-a": "Jeder Strich zählt gleich viel.",
+    "F-LINE-b": "Achte auf die Reihenfolge der Ziffern.",
+    "F-LINE-c": "Die kleinen Zahlen stehen links.",
+    "F-SEQ-a": "Das ist ein Schritt zu weit.",
+    "F-SEQ-b": "Schau, um wie viel sich die Zahlen ändern.",
+    "F-SEQ-c": "Schau, ob die Zahlen größer oder kleiner werden.",
+    "F-SEQ-d": "Die Folge geht noch einen Schritt weiter.",
+    "F-COMP-a": "Erst zum nächsten Zehner, dann weiter.",
+    "F-COMP-b": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-COMP-c": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-COMP-d": "Gesucht ist, wie viel noch fehlt.",
+    "F-COMP-e": "Das ist erst der Weg zum Zehner.",
+    "F-WALL-a": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-WALL-b": "Von oben nach unten wird abgezogen.",
+    "F-WALL-c": "Rechne mit beiden Steinen.",
+    "F-PVS-a": "Punkt vor Strich: erst mal oder geteilt.",
+    "F-PVS-b": "Die erste Zahl gehört auch dazu.",
+    "F-PVS-c": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-MUL-e": "Schau auf die Nullen: Eine ist zu viel.",
+    "F-KL-a": "Die Klammer rechnest du zuerst.",
+    "F-KL-b": "Die ganze Klammer gehört zusammen.",
+    "F-KL-c": "Fast! Das Ergebnis ist knapp daneben.",
+    "F-TEIL-a": "Schau nur auf die letzte Ziffer.",
+    "F-TEIL-b": "Das Einmaleins hilft hier."
+  },
   "save": {
     "unavailable": "Speichern geht gerade nicht. Du kannst trotzdem spielen."
   },
@@ -282,12 +359,14 @@
     "caves": {
       "name": "Unter­wasser­höhlen",
       "bossDefeated": "Die Höhlenmuräne ist besiegt.",
-      "intro": "Hier rechnest du mit Zahlen bis 1000: mit glatten Zehnern und Hundertern, zum Beispiel 450 + 300."
+      "intro": "Hier rechnest du mit Zahlen bis 1000: mit glatten Zehnern und Hundertern, zum Beispiel 450 + 300.",
+      "intro4": "Hier rechnest du mit Zahlen bis 1 000 000, zum Beispiel 323 000 + 600."
     },
     "city": {
       "name": "Versunkene Stadt",
       "bossDefeated": "Der Wächter der Stadt ist besiegt.",
-      "intro": "Hier rechnest du mal und geteilt mit Zehnerzahlen, zum Beispiel 3 · 60 oder 210 : 30."
+      "intro": "Hier rechnest du mal und geteilt mit Zehnerzahlen, zum Beispiel 3 · 60 oder 210 : 30.",
+      "intro4": "Hier rechnest du mal und geteilt mit großen Zahlen, zum Beispiel 9 · 4000 oder 28 000 : 7."
     },
     "trench": {
       "name": "Tiefsee­graben",
@@ -349,7 +428,6 @@
     "ask": "In welche Klasse gehst du?",
     "k3": "Klasse 3",
     "k4": "Klasse 4",
-    "notice4": "Klasse 4 folgt bald. Bis dahin bekommst du die Aufgaben von Klasse 3.",
     "ok": "Verstanden"
   },
   "heroCreate": {
@@ -562,5 +640,14 @@
     "down": "Die Strömung wird ruhiger.",
     "strongShort": "Strömung stark",
     "calmShort": "Strömung ruhig"
+  },
+  "place": {
+    "10": "den Zehner",
+    "100": "den Hunderter",
+    "1000": "den Tausender",
+    "10000": "den Zehntausender",
+    "100000": "den Hunderttausender",
+    "1000000": "die Million",
+    "next": "die nächste Stelle"
   }
 }

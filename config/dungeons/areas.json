@@ -216,7 +216,8 @@
             }
           ]
         }
-      ]
+      ],
+      "intro4": "areas.caves.intro4"
     },
     "city": {
       "curriculum": "city",
@@ -322,7 +323,8 @@
             }
           ]
         }
-      ]
+      ],
+      "intro4": "areas.city.intro4"
     },
     "trench": {
       "curriculum": "trench",

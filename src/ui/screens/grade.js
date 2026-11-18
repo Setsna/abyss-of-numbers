@@ -1,5 +1,5 @@
-// Klassenstufe (Plan Etappe 7): zwei große Felder. Bei Klasse 4 kurzer Hinweis „Klasse 4 folgt“.
-import { addWorld } from '../components/world.js';
+// Klassenstufe (Plan Etappe 7): zwei große Felder. Seit Phase 6b hat Klasse 4 eigene Aufgaben.
+import { addWorld } from '../components/world.js?v=ea296573';
 
 export function mountGrade(root, { t, config, onChoose }) {
   root.innerHTML = `
@@ -21,20 +21,4 @@ export function mountGrade(root, { t, config, onChoose }) {
       onChoose(Number(b.dataset.grade));
     }, { once: true });
   }
-}
-
-// Hinweis nach der Wahl von Klasse 4; „Verstanden“ führt weiter.
-export function mountGradeNotice(root, { t, onOk }) {
-  root.innerHTML = `
-  <main class="screen grade-screen">
-    <section class="panel menu-panel">
-      <p class="menu-text"></p>
-      <button class="btn btn-go" type="button"></button>
-    </section>
-  </main>`;
-  root.querySelector('.menu-text').textContent = t('grade.notice4');
-  const ok = root.querySelector('button');
-  ok.textContent = t('grade.ok');
-  ok.addEventListener('click', () => { ok.disabled = true; onOk(); }, { once: true });
-  ok.focus({ preventScroll: true });
 }

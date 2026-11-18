@@ -2,509 +2,1455 @@
   "grade": 3,
   "areas": {
     "reef": {
-      "maxNumber": 100,
-      "add": {
-        "aMin": 11,
-        "aMax": 89,
-        "bMin": 2,
-        "bMax": 89,
-        "sumMax": 100,
-        "levels": {
-          "1": {
-            "carry": false
-          },
-          "2": {
-            "carry": true
-          }
-        }
-      },
-      "sub": {
-        "aMin": 20,
-        "aMax": 100,
-        "bMin": 2,
-        "resultMin": 1,
-        "levels": {
-          "1": {
-            "borrow": false
-          },
-          "2": {
-            "borrow": true
-          }
-        }
-      },
-      "mul": {
-        "bMin": 2,
-        "bMax": 10,
-        "levels": {
-          "1": {
-            "a": [
-              2,
-              5,
-              10
-            ]
-          },
-          "2": {
-            "a": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10
-            ]
-          }
-        }
-      },
-      "div": {
-        "quotientMin": 2,
-        "quotientMax": 10,
-        "levels": {
-          "1": {
-            "divisor": [
-              2,
-              5,
-              10
-            ]
-          },
-          "2": {
-            "divisor": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10
-            ]
-          }
-        }
-      },
-      "numberLine": {
-        "min": 0,
-        "max": 100,
-        "step": 10,
-        "labelEvery": 50
-      },
-      "sequence": {
-        "startMin": 2,
-        "startMax": 50,
-        "stepMin": 2,
-        "stepMax": 10,
-        "min": 0,
-        "max": 100
-      },
-      "complement": {
-        "aMin": 11,
-        "aMax": 89,
-        "levels": {
-          "1": {
-            "to": "ten"
-          },
-          "2": {
-            "to": 100
-          }
-        }
-      },
-      "chain": {
-        "startMin": 5,
-        "startMax": 40,
-        "links": 3,
-        "addMax": 20,
-        "subMax": 20,
-        "mulFactors": [
-          2,
-          3,
-          4,
-          5
-        ],
-        "mulMaxStart": 20,
-        "resultMin": 1,
-        "max": 100
-      },
-      "wall": {
-        "baseMin": 1,
-        "baseMax": 30,
-        "topMax": 100,
-        "levels": {
-          "1": {
-            "patterns": [
-              "sum"
-            ]
-          },
-          "2": {
-            "patterns": [
-              "sum",
-              "oneBase",
-              "fromTop"
-            ]
-          }
-        }
-      },
-      "match": {
-        "operations": [
-          "add",
-          "sub",
-          "mul",
-          "div"
-        ],
-        "level": 1
-      }
+      "maxNumber": 100
     },
     "caves": {
-      "maxNumber": 1000,
-      "add": {
-        "aUnit": 10,
-        "aMin": 10,
-        "aMax": 90,
-        "sumMax": 1000,
-        "levels": {
-          "1": {
-            "bUnit": 100,
-            "bMin": 1,
-            "bMax": 9
-          },
-          "2": {
-            "bUnit": 10,
-            "bMin": 1,
-            "bMax": 9
-          }
-        }
-      },
-      "sub": {
-        "aUnit": 10,
-        "aMin": 11,
-        "aMax": 100,
-        "resultMin": 10,
-        "levels": {
-          "1": {
-            "bUnit": 100,
-            "bMin": 1,
-            "bMax": 9
-          },
-          "2": {
-            "bUnit": 10,
-            "bMin": 1,
-            "bMax": 9
-          }
-        }
-      },
-      "mul": {
-        "bMin": 2,
-        "bMax": 10,
-        "levels": {
-          "1": {
-            "a": [
-              2,
-              5,
-              10
-            ]
-          },
-          "2": {
-            "a": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10
-            ]
-          }
-        }
-      },
-      "div": {
-        "quotientMin": 2,
-        "quotientMax": 10,
-        "levels": {
-          "1": {
-            "divisor": [
-              2,
-              5,
-              10
-            ]
-          },
-          "2": {
-            "divisor": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10
-            ]
-          }
-        }
-      },
-      "numberLine": {
-        "min": 0,
-        "max": 1000,
-        "step": 100,
-        "labelEvery": 500,
-        "targetStep": 10
-      },
-      "sequence": {
-        "startMin": 100,
-        "startMax": 500,
-        "stepMin": 10,
-        "stepMax": 100,
-        "stepMultiple": 10,
-        "min": 0,
-        "max": 1000
-      },
-      "complement": {
-        "unit": 10,
-        "aMin": 11,
-        "aMax": 99,
-        "levels": {
-          "1": {
-            "to": "ten"
-          },
-          "2": {
-            "to": 1000
-          }
-        }
-      },
-      "chain": {
-        "unit": 10,
-        "startMin": 10,
-        "startMax": 50,
-        "links": 3,
-        "addMax": 9,
-        "subMax": 9,
-        "mulFactors": [],
-        "mulMaxStart": 0,
-        "resultMin": 1,
-        "max": 100
-      },
-      "wall": {
-        "unit": 10,
-        "baseMin": 1,
-        "baseMax": 30,
-        "topMax": 1000,
-        "levels": {
-          "1": {
-            "patterns": [
-              "sum"
-            ]
-          },
-          "2": {
-            "patterns": [
-              "sum",
-              "oneBase",
-              "fromTop"
-            ]
-          }
-        }
-      },
-      "match": {
-        "operations": [
-          "add",
-          "sub",
-          "mul",
-          "div"
-        ],
-        "level": 1
-      }
+      "maxNumber": 1000
     },
     "city": {
-      "maxNumber": 1000,
-      "add": {
-        "aUnit": 10,
-        "aMin": 10,
-        "aMax": 90,
-        "sumMax": 1000,
-        "levels": {
-          "1": {
-            "bUnit": 100,
-            "bMin": 1,
-            "bMax": 9
-          },
-          "2": {
-            "bUnit": 10,
-            "bMin": 1,
-            "bMax": 9
-          }
-        }
-      },
-      "sub": {
-        "aUnit": 10,
-        "aMin": 11,
-        "aMax": 100,
-        "resultMin": 10,
-        "levels": {
-          "1": {
-            "bUnit": 100,
-            "bMin": 1,
-            "bMax": 9
-          },
-          "2": {
-            "bUnit": 10,
-            "bMin": 1,
-            "bMax": 9
-          }
-        }
-      },
-      "mul": {
-        "bUnit": 10,
-        "bMin": 2,
-        "bMax": 9,
-        "levels": {
-          "1": {
-            "a": [
-              2,
-              3,
-              4,
-              5
-            ]
-          },
-          "2": {
-            "a": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9
-            ]
-          }
-        }
-      },
-      "div": {
-        "divisorUnit": 10,
-        "quotientMin": 2,
-        "quotientMax": 9,
-        "levels": {
-          "1": {
-            "divisor": [
-              2,
-              3,
-              4,
-              5
-            ]
-          },
-          "2": {
-            "divisor": [
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9
-            ]
-          }
-        }
-      },
-      "numberLine": {
-        "min": 0,
-        "max": 1000,
-        "step": 100,
-        "labelEvery": 500,
-        "targetStep": 10
-      },
-      "sequence": {
-        "startMin": 100,
-        "startMax": 500,
-        "stepMin": 10,
-        "stepMax": 100,
-        "stepMultiple": 10,
-        "min": 0,
-        "max": 1000
-      },
-      "complement": {
-        "unit": 10,
-        "aMin": 11,
-        "aMax": 99,
-        "levels": {
-          "1": {
-            "to": "ten"
-          },
-          "2": {
-            "to": 1000
-          }
-        }
-      },
-      "chain": {
-        "unit": 10,
-        "startMin": 10,
-        "startMax": 50,
-        "links": 3,
-        "addMax": 9,
-        "subMax": 9,
-        "mulFactors": [
-          2,
-          3,
-          4,
-          5
-        ],
-        "mulMaxStart": 9,
-        "resultMin": 1,
-        "max": 100
-      },
-      "wall": {
-        "unit": 10,
-        "baseMin": 1,
-        "baseMax": 30,
-        "topMax": 1000,
-        "levels": {
-          "1": {
-            "patterns": [
-              "sum"
-            ]
-          },
-          "2": {
-            "patterns": [
-              "sum",
-              "oneBase",
-              "fromTop"
-            ]
-          }
-        }
-      },
-      "match": {
-        "operations": [
-          "add",
-          "sub",
-          "mul",
-          "div"
-        ],
-        "level": 1
-      },
-      "twoStep": {
-        "unit": 10,
-        "cMin": 1,
-        "cMax": 9
-      }
+      "maxNumber": 1000
     },
     "trench": {
-      "maxNumber": 1000,
-      "mixOf": [
-        "reef",
-        "caves",
-        "city"
+      "maxNumber": 1000
+    }
+  },
+  "ladders": {
+    "add": {
+      "stages": [
+        {
+          "id": "K3-ADD-1",
+          "kind": "onePlace",
+          "time": "short",
+          "a": {
+            "min": 10,
+            "max": 89
+          },
+          "b": [
+            {
+              "min": 2,
+              "max": 9
+            },
+            {
+              "min": 10,
+              "max": 80,
+              "step": 10
+            }
+          ],
+          "checkPlaces": [
+            1
+          ],
+          "resultMax": 100,
+          "mistakes": [
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-d"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-ADD-2",
+          "kind": "pair",
+          "time": "short",
+          "a": {
+            "min": 11,
+            "max": 88,
+            "notMultipleOf": 10
+          },
+          "b": {
+            "min": 11,
+            "max": 88,
+            "notMultipleOf": 10
+          },
+          "carryAt": 1,
+          "carry": false,
+          "resultMax": 99,
+          "mistakes": [
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-d"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-ADD-3",
+          "kind": "pair",
+          "time": "medium",
+          "a": {
+            "min": 11,
+            "max": 89
+          },
+          "b": {
+            "min": 2,
+            "max": 88
+          },
+          "carryAt": 1,
+          "carry": true,
+          "resultMax": 100,
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-d"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-ADD-4",
+          "kind": "onePlace",
+          "time": "short",
+          "a": {
+            "min": 100,
+            "max": 900,
+            "step": 10
+          },
+          "b": [
+            {
+              "min": 100,
+              "max": 900,
+              "step": 100
+            }
+          ],
+          "checkPlaces": [],
+          "resultMax": 1000,
+          "mistakes": [
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-e"
+          ]
+        },
+        {
+          "id": "K3-ADD-5",
+          "kind": "onePlace",
+          "time": "medium",
+          "a": {
+            "min": 101,
+            "max": 897,
+            "notMultipleOf": 100
+          },
+          "b": [
+            {
+              "min": 2,
+              "max": 8
+            },
+            {
+              "min": 10,
+              "max": 80,
+              "step": 10
+            },
+            {
+              "min": 100,
+              "max": 800,
+              "step": 100
+            }
+          ],
+          "checkPlaces": [
+            1,
+            10,
+            100
+          ],
+          "resultMax": 999,
+          "mistakes": [
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-e"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-ADD-6",
+          "kind": "pair",
+          "time": "medium",
+          "a": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "b": {
+            "min": 20,
+            "max": 90,
+            "step": 10
+          },
+          "carryAt": 10,
+          "carry": true,
+          "resultMax": 980,
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c"
+          ]
+        },
+        {
+          "id": "K3-ADD-7",
+          "kind": "pair",
+          "time": "long",
+          "a": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "b": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "resultMax": 1000,
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c"
+          ]
+        }
+      ]
+    },
+    "sub": {
+      "stages": [
+        {
+          "id": "K3-SUB-1",
+          "kind": "onePlace",
+          "time": "short",
+          "a": {
+            "min": 12,
+            "max": 100
+          },
+          "b": [
+            {
+              "min": 2,
+              "max": 9
+            },
+            {
+              "min": 10,
+              "max": 80,
+              "step": 10
+            }
+          ],
+          "checkPlaces": [
+            1
+          ],
+          "resultMin": 1,
+          "mistakes": [
+            "F-SUB-c",
+            "F-SUB-d",
+            "F-SUB-f"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-SUB-2",
+          "kind": "pair",
+          "time": "short",
+          "a": {
+            "min": 22,
+            "max": 99,
+            "notMultipleOf": 10
+          },
+          "b": {
+            "min": 11,
+            "max": 88,
+            "notMultipleOf": 10
+          },
+          "carryAt": 1,
+          "carry": false,
+          "resultMin": 1,
+          "mistakes": [
+            "F-SUB-c",
+            "F-SUB-d"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-SUB-3",
+          "kind": "pair",
+          "time": "medium",
+          "a": {
+            "min": 20,
+            "max": 100
+          },
+          "b": {
+            "min": 2,
+            "max": 89
+          },
+          "carryAt": 1,
+          "carry": true,
+          "resultMin": 1,
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-b",
+            "F-SUB-c",
+            "F-SUB-d"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-SUB-4",
+          "kind": "onePlace",
+          "time": "short",
+          "a": {
+            "min": 200,
+            "max": 1000,
+            "step": 10
+          },
+          "b": [
+            {
+              "min": 100,
+              "max": 900,
+              "step": 100
+            }
+          ],
+          "checkPlaces": [],
+          "resultMin": 10,
+          "mistakes": [
+            "F-SUB-c",
+            "F-SUB-d",
+            "F-SUB-e",
+            "F-SUB-f"
+          ]
+        },
+        {
+          "id": "K3-SUB-5",
+          "kind": "onePlace",
+          "time": "medium",
+          "a": {
+            "min": 111,
+            "max": 999,
+            "notMultipleOf": 100
+          },
+          "b": [
+            {
+              "min": 2,
+              "max": 8
+            },
+            {
+              "min": 10,
+              "max": 80,
+              "step": 10
+            },
+            {
+              "min": 100,
+              "max": 800,
+              "step": 100
+            }
+          ],
+          "checkPlaces": [
+            1,
+            10,
+            100
+          ],
+          "resultMin": 11,
+          "mistakes": [
+            "F-SUB-c",
+            "F-SUB-d",
+            "F-SUB-e"
+          ],
+          "sameUnits": true
+        },
+        {
+          "id": "K3-SUB-6",
+          "kind": "either",
+          "time": "medium",
+          "resultMin": 10,
+          "weights": [
+            6,
+            1
+          ],
+          "variants": [
+            {
+              "kind": "pair",
+              "a": {
+                "min": 110,
+                "max": 990,
+                "step": 10
+              },
+              "b": {
+                "min": 20,
+                "max": 90,
+                "step": 10
+              },
+              "carryAt": 10,
+              "carry": true
+            },
+            {
+              "kind": "pair",
+              "a": {
+                "min": 200,
+                "max": 900,
+                "step": 100
+              },
+              "b": {
+                "min": 2,
+                "max": 9
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-c",
+            "F-SUB-d"
+          ]
+        },
+        {
+          "id": "K3-SUB-7",
+          "kind": "pair",
+          "time": "long",
+          "a": {
+            "min": 220,
+            "max": 1000,
+            "step": 10
+          },
+          "b": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "resultMin": 10,
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-b",
+            "F-SUB-c",
+            "F-SUB-d"
+          ]
+        }
+      ]
+    },
+    "mul": {
+      "stages": [
+        {
+          "id": "K3-MUL-1",
+          "kind": "facts",
+          "time": "short",
+          "rows": [
+            2,
+            5,
+            10
+          ],
+          "partners": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10
+          ],
+          "mistakes": [
+            "F-MUL-a",
+            "F-MUL-b"
+          ],
+          "prefer": [
+            "F-MUL-a",
+            2
+          ]
+        },
+        {
+          "id": "K3-MUL-2",
+          "kind": "facts",
+          "time": "short",
+          "rows": [
+            3,
+            4
+          ],
+          "partners": [
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "mistakes": [
+            "F-MUL-a",
+            "F-MUL-b"
+          ],
+          "prefer": [
+            "F-MUL-a",
+            2
+          ]
+        },
+        {
+          "id": "K3-MUL-3",
+          "kind": "facts",
+          "time": "short",
+          "rows": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "partners": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "mistakes": [
+            "F-MUL-a",
+            "F-MUL-b"
+          ],
+          "prefer": [
+            "F-MUL-a",
+            2
+          ]
+        },
+        {
+          "id": "K3-MUL-4",
+          "kind": "scaled",
+          "time": "medium",
+          "small": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "unit": 10,
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d"
+          ]
+        },
+        {
+          "id": "K3-MUL-5",
+          "kind": "scaled",
+          "time": "medium",
+          "small": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "unit": 100,
+          "productMax": 1000,
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d"
+          ]
+        },
+        {
+          "id": "K3-MUL-6",
+          "kind": "scaled",
+          "time": "medium",
+          "small": [
+            6,
+            7,
+            8,
+            9
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "unit": 10,
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d"
+          ]
+        }
+      ]
+    },
+    "div": {
+      "stages": [
+        {
+          "id": "K3-DIV-1",
+          "kind": "inverse",
+          "time": "short",
+          "from": "K3-MUL-1",
+          "mistakes": [
+            "F-DIV-a",
+            "F-DIV-b"
+          ]
+        },
+        {
+          "id": "K3-DIV-2",
+          "kind": "inverse",
+          "time": "short",
+          "from": "K3-MUL-2",
+          "mistakes": [
+            "F-DIV-a",
+            "F-DIV-b"
+          ]
+        },
+        {
+          "id": "K3-DIV-3",
+          "kind": "inverse",
+          "time": "short",
+          "from": "K3-MUL-3",
+          "mistakes": [
+            "F-DIV-a",
+            "F-DIV-b"
+          ]
+        },
+        {
+          "id": "K3-DIV-4",
+          "kind": "inverse",
+          "time": "medium",
+          "from": "K3-MUL-4",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ]
+        },
+        {
+          "id": "K3-DIV-5",
+          "kind": "inverse",
+          "time": "medium",
+          "from": "K3-MUL-5",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ]
+        },
+        {
+          "id": "K3-DIV-6",
+          "kind": "inverse",
+          "time": "medium",
+          "from": "K3-MUL-6",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ]
+        }
+      ]
+    },
+    "line": {
+      "stages": [
+        {
+          "id": "K3-LINE-1",
+          "kind": "line",
+          "max": 100,
+          "ticks": [
+            10,
+            5
+          ],
+          "labels": [
+            0,
+            50,
+            100
+          ],
+          "target": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "markGap": 10,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K3-LINE-2",
+          "kind": "line",
+          "max": 100,
+          "ticks": [
+            10,
+            5
+          ],
+          "labels": [
+            0,
+            50,
+            100
+          ],
+          "target": {
+            "min": 5,
+            "max": 95,
+            "step": 10
+          },
+          "markGap": 10,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K3-LINE-3",
+          "kind": "line",
+          "max": 1000,
+          "ticks": [
+            100,
+            50
+          ],
+          "labels": [
+            0,
+            500,
+            1000
+          ],
+          "target": {
+            "min": 50,
+            "max": 950,
+            "step": 50
+          },
+          "markGap": 100,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K3-LINE-4",
+          "kind": "line",
+          "max": 1000,
+          "ticks": [
+            100,
+            50,
+            10
+          ],
+          "labels": [
+            0,
+            500,
+            1000
+          ],
+          "target": {
+            "min": 10,
+            "max": 990,
+            "step": 10
+          },
+          "markGap": 100,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        }
+      ]
+    },
+    "seq": {
+      "stages": [
+        {
+          "id": "K3-SEQ-1",
+          "kind": "seq",
+          "min": 0,
+          "max": 100,
+          "variants": [
+            {
+              "dirs": [
+                "up"
+              ],
+              "steps": [
+                2,
+                5,
+                10
+              ],
+              "start": {
+                "min": 1,
+                "max": 50
+              },
+              "startMultipleOfStep": true
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K3-SEQ-2",
+          "kind": "seq",
+          "min": 0,
+          "max": 100,
+          "variants": [
+            {
+              "dirs": [
+                "up"
+              ],
+              "steps": [
+                3,
+                4,
+                6,
+                7,
+                8,
+                9
+              ],
+              "start": {
+                "min": 1,
+                "max": 50
+              },
+              "startMultipleOfStep": true
+            },
+            {
+              "dirs": [
+                "down"
+              ],
+              "steps": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10
+              ],
+              "start": {
+                "min": 20,
+                "max": 100
+              },
+              "startMultipleOfStep": true
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K3-SEQ-3",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                10,
+                20,
+                50,
+                100
+              ],
+              "start": {
+                "min": 10,
+                "max": 1000,
+                "step": 10
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K3-SEQ-4",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000,
+          "crossTen": true,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                2,
+                4,
+                5
+              ],
+              "start": {
+                "min": 1,
+                "max": 1000
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        }
+      ]
+    },
+    "comp": {
+      "stages": [
+        {
+          "id": "K3-COMP-1",
+          "kind": "comp",
+          "a": {
+            "min": 11,
+            "max": 89,
+            "notMultipleOf": 10
+          },
+          "toNext": 10,
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K3-COMP-2",
+          "kind": "comp",
+          "a": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "to": 100,
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K3-COMP-3",
+          "kind": "comp",
+          "time": "medium",
+          "a": {
+            "min": 11,
+            "max": 89,
+            "notMultipleOf": 10
+          },
+          "to": 100,
+          "mistakes": [
+            "F-COMP-a",
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-e"
+          ]
+        },
+        {
+          "id": "K3-COMP-4",
+          "kind": "comp",
+          "a": {
+            "min": 110,
+            "max": 990,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "toNext": 100,
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K3-COMP-5",
+          "kind": "comp",
+          "a": {
+            "min": 101,
+            "max": 999,
+            "notMultipleOf": 10
+          },
+          "toNext": 10,
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K3-COMP-6",
+          "kind": "comp",
+          "time": "medium",
+          "a": {
+            "min": 110,
+            "max": 990,
+            "step": 10
+          },
+          "to": 1000,
+          "mistakes": [
+            "F-COMP-a",
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-e"
+          ]
+        }
+      ]
+    },
+    "wall": {
+      "stages": [
+        {
+          "id": "K3-WALL-1",
+          "kind": "wall",
+          "pattern": "sum",
+          "unit": 1,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 100,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K3-WALL-2",
+          "kind": "wall",
+          "pattern": "oneBase",
+          "unit": 1,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 100,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K3-WALL-3",
+          "kind": "wall",
+          "pattern": "fromTop",
+          "unit": 1,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 100,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K3-WALL-4",
+          "kind": "wall",
+          "pattern": "sum",
+          "unit": 10,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K3-WALL-5",
+          "kind": "wall",
+          "pattern": "oneBase",
+          "unit": 10,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K3-WALL-6",
+          "kind": "wall",
+          "pattern": "fromTop",
+          "unit": 10,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        }
+      ]
+    },
+    "chain": {
+      "stages": [
+        {
+          "id": "K3-CHAIN-1",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 5,
+            "max": 40
+          },
+          "plusMinus": {
+            "min": 2,
+            "max": 20
+          },
+          "min": 1,
+          "max": 100,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-a",
+              "F-MUL-b"
+            ]
+          }
+        },
+        {
+          "id": "K3-CHAIN-2",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 2,
+            "max": 10
+          },
+          "mulFirst": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "plusMinus": {
+            "min": 2,
+            "max": 20
+          },
+          "min": 1,
+          "max": 100,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-a",
+              "F-MUL-b"
+            ]
+          }
+        },
+        {
+          "id": "K3-CHAIN-3",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 100,
+            "max": 500,
+            "step": 10
+          },
+          "plusMinus": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "min": 10,
+          "max": 1000,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-c",
+              "F-MUL-d"
+            ]
+          }
+        },
+        {
+          "id": "K3-CHAIN-4",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 20,
+            "max": 90,
+            "step": 10
+          },
+          "mulFirst": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "plusMinus": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "min": 10,
+          "max": 1000,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-c",
+              "F-MUL-d"
+            ]
+          }
+        }
+      ]
+    },
+    "pvs": {
+      "stages": [
+        {
+          "id": "K3-PVS-1",
+          "kind": "pvs",
+          "point": "mul",
+          "ops": [
+            "add"
+          ],
+          "factors": {
+            "min": 2,
+            "max": 10
+          },
+          "a": {
+            "min": 2,
+            "max": 40
+          },
+          "resultMin": 0,
+          "resultMax": 100,
+          "mistakes": [
+            "F-PVS-a",
+            "F-PVS-b",
+            "F-PVS-c"
+          ]
+        },
+        {
+          "id": "K3-PVS-2",
+          "kind": "pvs",
+          "point": "mul",
+          "ops": [
+            "sub"
+          ],
+          "factors": {
+            "min": 2,
+            "max": 10
+          },
+          "a": {
+            "min": 20,
+            "max": 100
+          },
+          "resultMin": 1,
+          "resultMax": 100,
+          "mistakes": [
+            "F-PVS-a",
+            "F-PVS-b",
+            "F-PVS-c"
+          ]
+        },
+        {
+          "id": "K3-PVS-3",
+          "kind": "pvs",
+          "point": "div",
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "factors": {
+            "min": 2,
+            "max": 10
+          },
+          "a": {
+            "min": 10,
+            "max": 100
+          },
+          "resultMin": 1,
+          "resultMax": 100,
+          "mistakes": [
+            "F-PVS-a",
+            "F-PVS-b",
+            "F-PVS-c"
+          ]
+        }
+      ]
+    }
+  },
+  "windows": {
+    "reef": {
+      "add": [
+        1,
+        3
       ],
-      "pointBeforeLine": {
-        "factorMin": 2,
-        "factorMax": 10,
-        "addMin": 2,
-        "addMax": 40,
-        "subMin": 20,
-        "subMax": 100,
-        "max": 100
-      }
+      "sub": [
+        1,
+        3
+      ],
+      "mul": [
+        1,
+        3
+      ],
+      "div": [
+        1,
+        3
+      ],
+      "line": [
+        1,
+        2
+      ],
+      "seq": [
+        1,
+        2
+      ],
+      "comp": [
+        1,
+        3
+      ],
+      "wall": [
+        1,
+        3
+      ],
+      "chain": [
+        1,
+        2
+      ]
+    },
+    "caves": {
+      "add": [
+        4,
+        7
+      ],
+      "sub": [
+        4,
+        7
+      ],
+      "mul": [
+        1,
+        3
+      ],
+      "div": [
+        1,
+        3
+      ],
+      "line": [
+        3,
+        4
+      ],
+      "seq": [
+        3,
+        4
+      ],
+      "comp": [
+        4,
+        6
+      ],
+      "wall": [
+        4,
+        6
+      ],
+      "chain": [
+        3,
+        3
+      ]
+    },
+    "city": {
+      "add": [
+        4,
+        7
+      ],
+      "sub": [
+        4,
+        7
+      ],
+      "mul": [
+        4,
+        6
+      ],
+      "div": [
+        4,
+        6
+      ],
+      "line": [
+        3,
+        4
+      ],
+      "seq": [
+        3,
+        4
+      ],
+      "comp": [
+        4,
+        6
+      ],
+      "wall": [
+        4,
+        6
+      ],
+      "chain": [
+        3,
+        4
+      ]
+    },
+    "trench": {
+      "add": [
+        3,
+        7
+      ],
+      "sub": [
+        3,
+        7
+      ],
+      "mul": [
+        3,
+        6
+      ],
+      "div": [
+        3,
+        6
+      ],
+      "line": [
+        3,
+        4
+      ],
+      "seq": [
+        2,
+        4
+      ],
+      "comp": [
+        3,
+        6
+      ],
+      "wall": [
+        3,
+        6
+      ],
+      "chain": [
+        2,
+        4
+      ],
+      "pvs": [
+        1,
+        3
+      ]
     }
   }
 }

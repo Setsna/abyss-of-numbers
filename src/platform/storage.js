@@ -1,6 +1,6 @@
 // Lokaler Speicher für den Spielstand. Einzige Stelle, die den Stand aus Text liest.
 // Ein ungültiger Stand wird nicht gelöscht, sondern unter "<Schlüssel>.defekt" aufbewahrt.
-import { validateSave, migrateSave } from '../engine/save/save.js';
+import { validateSave, migrateSave } from '../engine/save/save.js?v=ea296573';
 
 export const STORAGE_KEY = 'abyss-of-numbers-v1';
 const BROKEN_KEY = `${STORAGE_KEY}.defekt`;

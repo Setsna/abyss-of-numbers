@@ -3,9 +3,9 @@
 // zeigen kleine Bilder die Gegner, damit die Wahl des Wegs eine Entscheidung ist.
 // Oben: Leben, Stufe, Perlen und „Auftauchen“. Ruheplatz: kurze Meldung „+25 Leben“.
 // Seit Phase 5, Etappe 2 auch Schatz und Händler (eigene Bildschirme: Beute bzw. Laden).
-import { ICON } from '../icons.js';
-import { renderAsset } from '../assets.js';
-import { worldLayer, bossOfArea } from '../components/world.js';
+import { ICON } from '../icons.js?v=ea296573';
+import { renderAsset } from '../assets.js?v=ea296573';
+import { worldLayer, bossOfArea } from '../components/world.js?v=ea296573';
 
 const ROOM_ICON = { combat: ICON.attack, rest: ICON.rest, boss: ICON.boss, treasure: ICON.treasure, shop: ICON.shop };
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -150,7 +150,9 @@ export function mountMap(root, { t, config, game, onEnter, onSurface, onExplain 
 
   // Hinweis zum neuen Stoff beim ersten Tauchgang in ein Gebiet (Konzept 9; Phase 5, Etappe 5)
   const v0 = game.view();
-  const introKey = config?.areas.areas[v0.map.areaId]?.intro;
+  // Klasse 4 (Phase 6b): eigener Einführungstext, wenn das Gebiet einen hat (intro4)
+  const areaCfg = config?.areas.areas[v0.map.areaId];
+  const introKey = (v0.profile?.klasse === 4 && areaCfg?.intro4) || areaCfg?.intro;
   if (introKey && !v0.explained[`area.${v0.map.areaId}`]) {
     ref.introText.textContent = t(introKey);
     ref.introOk.textContent = t('areas.introOk');

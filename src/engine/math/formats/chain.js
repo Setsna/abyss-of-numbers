@@ -1,57 +1,71 @@
-// Kettenaufgabe (Konzept 8.2, Blasenkette): mit dem Ergebnis weiterrechnen, drei Glieder,
-// zum Beispiel 24 + 8 = ?, dann 32 − 5 = ?, dann 27 + 6 = ?. Plus und Minus mit Zahlen bis 20,
-// Mal nur, solange die Zahl höchstens `mulMaxStart` ist (kleines Einmaleins).
-// Jedes Glied ist ein Schritt mit vier Antworten. Vorläufige Regeln (D29).
-import { distractorsFor } from '../distractors.js';
-import { formatEquation, OPERATOR_SIGN } from '../format.js';
-import { placeCorrect, MAX_TRIES } from './common.js';
+// Kettenaufgabe (Konzept 8.2, Blasenkette; Regelwerk 5.6): mit dem Ergebnis weiterrechnen, drei Glieder,
+// zum Beispiel 24 + 8 = 32, 32 − 5 = 27, 27 + 6 = 33. Die Stufe nennt Start (Zahlbereich), die
+// Plus- und Minusglieder (plusMinus) und die Grenzen der Zwischenergebnisse (min, max).
+// Mit `mulFirst` ist das erste Glied „mal 2, 3, 4 oder 5“ (Einmaleins beziehungsweise Zehnereinmaleins);
+// sonst gibt es kein Malglied (D13: kein 18 · 3).
+// Falsche Antworten je Glied: die Fehlertypen der Rechenart (linkMistakes je Rechenart).
+// Jedes Glied ist ein Schritt mit vier Antworten.
+import { formatEquation, formatExpression } from '../format.js?v=ea296573';
+import { mistakesFor, pickChoices, commonRound } from '../mistakes.js?v=ea296573';
+import { calcPlace } from '../places.js?v=ea296573';
+import { MAX_TRIES } from './common.js?v=ea296573';
+import { wayFor } from '../ways.js?v=ea296573';
 
-// Gerechnet in Einheiten (unit 10 im Zahlenraum bis 1000: 34 steht für 340); beim Mal ist der
-// zweite Faktor nie skaliert (60 · 3).
-function drawLink(value, r, rng) {
-  for (let i = 0; i < MAX_TRIES; i++) {
-    const ops = value <= r.mulMaxStart && r.mulFactors.length > 0 ? ['add', 'sub', 'mul'] : ['add', 'sub'];
-    const op = rng.pick(ops);
-    if (op === 'mul') {
-      const b = rng.pick(r.mulFactors);
-      if (value * b <= r.max && value >= 2) return { op, b, result: value * b };
-    } else {
-      const b = rng.nextInt(2, op === 'add' ? r.addMax : r.subMax);
-      const result = op === 'add' ? value + b : value - b;
-      if (result >= r.resultMin && result <= r.max) return { op, b, result };
+const drawRange = (r, rng) => r.min + (r.step ?? 1) * rng.nextInt(0, Math.floor((r.max - r.min) / (r.step ?? 1)));
+
+function drawLinks(stage, rng) {
+  for (let tries = 0; tries < MAX_TRIES; tries++) {
+    const start = drawRange(stage.start, rng);
+    const links = [];
+    let v = start;
+    let ok = true;
+    for (let i = 0; i < stage.links && ok; i++) {
+      let link;
+      if (i === 0 && stage.mulFirst) {
+        const b = rng.pick(stage.mulFirst);
+        link = { op: 'mul', b, result: v * b };
+      } else {
+        const op = rng.nextUint32() % 2 === 0 ? 'add' : 'sub';
+        const b = drawRange(stage.plusMinus, rng);
+        link = { op, b, result: op === 'add' ? v + b : v - b };
+      }
+      ok = link.result >= stage.min && link.result <= stage.max;
+      links.push({ ...link, from: v });
+      v = link.result;
     }
+    if (ok) return { start, links };
   }
-  throw new Error('kein passendes Kettenglied gefunden');
+  throw new Error('keine passende Kette gefunden');
 }
 
-export function generate(level, area, rng) {
-  const r = area.chain;
-  const u = r.unit ?? 1;
-  const start = u * rng.nextInt(r.startMin, r.startMax);
-  const links = [];
-  const steps = [];
-  let value = start;
-  for (let i = 0; i < r.links; i++) {
-    const s = drawLink(value / u, r, rng);
-    const link = { op: s.op, b: s.op === 'mul' ? s.b : s.b * u, result: s.result * u };
-    const wrong = distractorsFor(link.op, value, link.b, link.result, r.max * u, rng);
-    const { choices, correctIndex } = placeCorrect(String(link.result), wrong.map(String), rng);
-    steps.push({
+export function generate(stage, area, rng) {
+  const { start, links } = drawLinks(stage, rng);
+  const steps = links.map((link, i) => {
+    const { op, b, result, from } = link;
+    const plusMinus = op !== 'mul';
+    const cands = mistakesFor(op, { mistakes: stage.linkMistakes[op] }, { a: from, b, result });
+    const k = plusMinus ? commonRound(from, b) : 1;
+    const { choices, correctIndex, choiceTypes } = pickChoices(result, cands, {
+      min: plusMinus ? 0 : 1, max: area.maxNumber, roundTo: k, fillStep: plusMinus ? k : Math.min(calcPlace(result), 10),
+    }, rng);
+    return {
       prompt: 'task.chain',
-      promptParams: { n: i + 1, of: r.links },
-      display: `${value} ${OPERATOR_SIGN[link.op]} ${link.b} = ?`,
-      choices, correctIndex,
-      solutionText: formatEquation(link.op, value, link.b, link.result),
-      practiceKey: `${link.op}:${value}:${link.b}`,
-    });
-    links.push(link);
-    value = link.result;
-  }
+      promptParams: { n: i + 1, of: links.length },
+      display: `${formatExpression(op, from, b)} = ?`,
+      choices, correctIndex, choiceTypes,
+      solutionText: formatEquation(op, from, b, result),
+      practiceKey: `${op}:${from}:${b}`,
+      ladder: 'chain', stageId: stage.id,
+      way: wayFor(op, { a: from, b }),
+    };
+  });
   return {
     format: 'chain',
-    chain: { start, links },
+    chain: { start, links: links.map(({ op, b, result }) => ({ op, b, result })) },
     steps,
     noTempo: true,
+    extraMs: stage.extraMs ?? 0,
     practiceKey: `chain:${start}:${links.map((l) => `${l.op}${l.b}`).join(':')}`,
+    ladder: 'chain', stageId: stage.id,
   };
 }

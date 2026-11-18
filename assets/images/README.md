@@ -24,7 +24,7 @@ Alle Bilder: Canva `generate-image`, erzeugt am 17.11.2026 für den Prototyp des
 | `enemies/muschelwaechter.webp` | Muschelwächter mit Balkenwaage (ChatGPT), freigestellt | 686 × 700 |
 | `enemies/panzerkrebs.webp` | Panzerkrebs mit Punktefeld für Malaufgaben (Gemini), freigestellt | 784 × 700 |
 | `bosses/hoehlenmuraene.webp` | Höhlenmuräne mit Zahlenstrahl-Strichen (Gemini), freigestellt | 711 × 700 |
-| `enemies/schlangenaal.webp` | Schlangenaal mit gelben Muggelsteinen auf dem Rücken (Gemini, zweite Fassung 18.11.2026; vorläufig, Fünfergruppen fehlen), freigestellt | 938 × 700 |
+| `enemies/schlangenaal.webp` | Schlangenaal mit einer Reihe gelber Muggelsteine auf dem Rücken (Gemini, dritte Fassung 18.11.2026; vorläufig, Fünfergruppen fehlen), freigestellt | 635 × 700 |
 | `enemies/hoehlenassel.webp` | Höhlenassel mit Wendeplättchen (Gemini), freigestellt | 670 × 700 |
 | `enemies/steinfisch.webp` | Steinfisch mit Stellenwertmaterial (Gemini), freigestellt | 888 × 700 |
 | `areas/caves.webp` | Hintergrund Unterwasserhöhlen mit Würfelkristallen (Gemini) | 1376 × 768 |
@@ -33,9 +33,11 @@ Alle Bilder: Canva `generate-image`, erzeugt am 17.11.2026 für den Prototyp des
 | `enemies/laternenfisch.webp` | Laternenfisch mit Hunderterplatte als Laterne (Gemini), freigestellt | 972 × 700 |
 | `bosses/kraken-arm.webp` | Krakenarm, kommt aus einer Tintenwolke aus der Tiefe, freigestellt; ein Bild für alle drei Arme | 481 × 700 |
 | `bosses/kraken-body.webp` | Riffkrake-Körper mit Korallenkrone, freigestellt | 803 × 600 |
+| `cards/<Karten-Id>.webp` | 15 Kartenbilder (Gemini, von Ingo erzeugt am 18.11.2026 nach `Bildauftraege/Gemini-Karten.md`), bildfüllend; Harpune gespiegelt und oben zugeschnitten, Tintenwolke oben zugeschnitten | 448 × 600 (Harpune 448 × 470, Tintenwolke 448 × 400) |
 
 - Gebiete 2 bis 4 (Gegner, Bosse, Hintergründe): mit Gemini von Ingo erzeugt am 17.11.2026 nach `Bildauftraege/Gemini-Gebiete-2-4.md`, Gegner lokal freigestellt; „vorläufig“ = wird ersetzt, wenn eine bessere Fassung kommt. Laternenfisch seit dem zweiten Versuch eingebaut.
 - Muschelwächter und Wächter der Stadt: zweite Fassung mit ChatGPT von Ingo erzeugt am 17.11.2026 (Gemini-Limit erreicht), lokal freigestellt.
+- Kartenbilder: Ingos Originaldateien lagen in `Downloads` und waren beim Einbau nicht mehr da; verwendet sind die Fassungen, die Ingo im Chat geschickt hat (gleiche Größe 896 × 1200), Zuordnung über Bildvergleich mit benannten Kopien geprüft. Ausgangsdateien unter `source/cards/`.
 - Anglerfisch: mit Gemini von Ingo erzeugt am 17.11.2026 nach `Bildauftraege/Gemini-Gebiete-2-4.md` (verbesserter Prompt mit Rechenkette), lokal freigestellt.
 - Forscher, Tüftlerin, Meereswesen, Kugelfisch, Seeigel: mit Gemini von Ingo erzeugt am 17.11.2026 nach `Bildauftraege/Gemini-Figuren.md` bzw. `Gemini-Gegner.md` (Canva war gesperrt), lokal freigestellt.
 - Heldin, Krabbe und Qualle: jeweils Variante A aus je drei Vorschlägen, von Ingo gewählt am 17.11.2026 (Übersicht: `.impeccable/mocks/varianten.png`).

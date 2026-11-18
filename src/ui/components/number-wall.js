@@ -1,4 +1,5 @@
 // Zahlenmauer in der Sprechblase (Phase 5, Etappe 4; Korallenmauer). Drei Reihen Steine:
+import { formatNumber } from '../../engine/math/format.js?v=ea296573';
 // oben die Spitze (Zelle 5), Mitte 3 und 4, unten die Grundsteine 0 bis 2. Gegebene und schon
 // gefüllte Steine zeigen ihre Zahl, der gesuchte Stein leuchtet mit „?“, spätere leere Steine
 // bleiben leer. solution: der gesuchte Stein zeigt die richtige Zahl.
@@ -23,9 +24,9 @@ export function renderNumberWall(task, { solution = false, t } = {}) {
       const known = !hidden.includes(cell) || filled.has(cell);
       if (cell === current) {
         stone.classList.add(solution ? 'is-solved' : 'is-current');
-        stone.textContent = solution ? String(cells[cell]) : '?';
+        stone.textContent = solution ? formatNumber(cells[cell]) : '?';
       } else if (known) {
-        stone.textContent = String(cells[cell]);
+        stone.textContent = formatNumber(cells[cell]);
       } else {
         stone.classList.add('is-empty');
       }

@@ -46,8 +46,10 @@
   padding: calc(10 * var(--u)) calc(16 * var(--u));
 }
 .reward-practice-title { font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); }
-.reward-practice ul { list-style: none; display: flex; flex-wrap: wrap; gap: calc(8 * var(--u)) calc(20 * var(--u)); margin-top: calc(6 * var(--u)); }
-.reward-practice li { font-weight: 700; font-size: calc(28 * var(--u)); }
+/* eine Aufgabe pro Zeile mit Trennlinie, wie im Logbuch */
+.reward-practice ul { list-style: none; margin-top: calc(6 * var(--u)); }
+.reward-practice li { font-weight: 700; font-size: calc(28 * var(--u)); padding: calc(4 * var(--u)) 0; }
+.reward-practice li + li { border-top: var(--line-thin) solid var(--disabled-fill); }
 .reward-lightning {
   display: inline-flex; align-items: center; gap: calc(8 * var(--u));
   color: var(--paper); font-weight: 700; font-size: calc(24 * var(--u));
@@ -266,13 +268,16 @@
 .lb-deck-cell { position: relative; }
 .lb-deck-cell .card { width: 100%; min-height: calc(250 * var(--u)); }
 .lb-next { margin-top: calc(6 * var(--u)); font-weight: 700; font-size: calc(22 * var(--u)); text-align: center; }
-.lb-count { position: absolute; top: calc(-10 * var(--u)); right: calc(-8 * var(--u)); background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(10 * var(--u)); font-weight: 700; font-size: calc(24 * var(--u)); }
+.lb-count { position: absolute; z-index: 3; bottom: calc(40 * var(--u)); right: calc(-8 * var(--u)); /* unten rechts: oben rechts sitzt das Rechenzeichen der Karte */ background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(10 * var(--u)); font-weight: 700; font-size: calc(24 * var(--u)); }
 .lb-rules { list-style: none; display: flex; flex-direction: column; gap: calc(12 * var(--u)); counter-reset: rule; }
 .lb-rules li { display: flex; align-items: center; gap: calc(16 * var(--u)); font-weight: 700; font-size: calc(30 * var(--u)); counter-increment: rule; }
 .lb-rules li::before { content: counter(rule); font-family: var(--font-loud); font-size: calc(40 * var(--u)); width: calc(36 * var(--u)); text-align: center; }
 .lb-rule-icon svg { width: calc(48 * var(--u)); height: calc(48 * var(--u)); display: block; }
-.lb-practice ul { list-style: none; display: flex; flex-wrap: wrap; gap: calc(10 * var(--u)) calc(28 * var(--u)); margin-top: calc(12 * var(--u)); }
-.lb-practice li { font-weight: 700; font-size: calc(32 * var(--u)); }
+/* Übungsliste: eine Aufgabe pro Zeile mit Trennlinie, sonst laufen die Rechnungen ineinander (Ingo, 18.11.2026) */
+.lb-practice ul { list-style: none; margin-top: calc(12 * var(--u)); border-top: var(--line-thin) solid var(--disabled-fill); }
+.lb-practice li { font-weight: 700; font-size: calc(32 * var(--u)); padding: calc(8 * var(--u)) 0; border-bottom: var(--line-thin) solid var(--disabled-fill); }
+/* Rechenweg unter einer Übungsaufgabe (Phase 6b) */
+.practice-way { display: block; font-size: 0.7em; color: var(--sea-deep); }
 @media (orientation: portrait) {
   .lb-hero { flex-direction: column; align-items: center; }
   .lb-hero-info { width: 100%; }
@@ -413,6 +418,9 @@
 .lb-item-btn { min-width: calc(150 * var(--u)); min-height: 48px; }
 .gain-item { background: var(--sun); }
 .gain-current { background: var(--sea-deep); color: var(--paper); }
+/* Lernstufen (Phase 6b): je neue Stufe eine Zeile, wie die Kartenstufen */
+.gain-stage { display: flex; flex-direction: column; gap: calc(6 * var(--u)); }
+.gain-stage-up { display: block; }
 .gain-cards { display: flex; flex-direction: column; gap: calc(6 * var(--u)); }
 .gain-card-up { display: inline-flex; align-items: center; gap: calc(8 * var(--u)); }
 .gain-card-up svg { width: 1.1em; height: 1.1em; flex: none; }

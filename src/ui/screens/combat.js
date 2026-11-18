@@ -1,16 +1,17 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { combatView } from '../../engine/combat/combat.js';
-import { ICON } from '../icons.js';
-import { renderAsset } from '../assets.js';
-import { playEvents, wait, isCalm } from '../app.js';
-import { bindKeys } from '../input.js';
-import { renderEnemy } from '../components/enemy.js';
-import { renderCard, emptySlot } from '../components/card.js';
-import { createTaskPanel } from '../components/task-panel.js';
-import { startTimerBar } from '../components/timer-bar.js';
-import { createTutorial } from '../tutorial.js';
+import { wayText, hintAsk } from '../text.js?v=ea296573';
+import { combatView } from '../../engine/combat/combat.js?v=ea296573';
+import { ICON } from '../icons.js?v=ea296573';
+import { renderAsset } from '../assets.js?v=ea296573';
+import { playEvents, wait, isCalm } from '../app.js?v=ea296573';
+import { bindKeys } from '../input.js?v=ea296573';
+import { renderEnemy } from '../components/enemy.js?v=ea296573';
+import { renderCard, emptySlot } from '../components/card.js?v=ea296573';
+import { createTaskPanel } from '../components/task-panel.js?v=ea296573';
+import { startTimerBar } from '../components/timer-bar.js?v=ea296573';
+import { createTutorial } from '../tutorial.js?v=ea296573';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -272,6 +273,9 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       } else {
         if (e.chosen >= 0) panel.markWrong(e.chosen);
         panel.markRight(task.correctIndex);
+        // Erklärung zuerst, dann erst −2 Leben (Phase 7a, Kritik P2): das Ende des Moments ist die Hilfe
+        await wait(600);
+        showFeedback(e);
       }
     },
     async damageDealt(e) {
@@ -372,12 +376,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       return;
     }
     if (combat.phase === 'feedback') {
-      await wait(400);
-      const judged = events.find((e) => e.type === 'answerJudged');
-      const ask = judged.outcome === 'timeout' ? t('ask.timeout')
-        : task.format === 'pickTrue' ? t('ask.wrongTrue')
-          : task.format === 'pickFalse' ? t('ask.wrongFalse') : t('ask.wrong');
-      panel.showSolution(ask, judged.solutionText);
+      // die Lösung zeigt schon der Handler answerJudged (showFeedback)
     } else {
       pendingUid = null;
       task = null;
@@ -388,6 +387,19 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     autoTarget();
     render();
     if (combat.phase === 'won' || combat.phase === 'lost') endBanner(combat.phase === 'won');
+  }
+
+  // Hilfe nach einem Fehler (Phase 6b, Regelwerk 8): Hinweis zum Fehlertyp, getippte Antwort (D47),
+  // richtige Rechnung, Rechenweg. judged: answerJudged mit chosen (−1 bei Zeitablauf)
+  function showFeedback(judged) {
+    const ask = judged.outcome === 'timeout' ? t('ask.timeout')
+      : task.format === 'pickTrue' ? t('ask.wrongTrue')
+        : task.format === 'pickFalse' ? t('ask.wrongFalse') : hintAsk(t, judged.mistakeType, 'ask.wrong', judged.hintPlace);
+    // nicht bei Zeitablauf, nicht bei Zahlenstrahl und Mauer (dort bleiben Zeichnung und Steine stehen)
+    const fmt = task.stepFormat ?? task.format;
+    const k = judged.chosen;
+    const chosen = judged.outcome === 'wrong' && k >= 0 && fmt !== 'numberLine' && fmt !== 'wall' ? task.choices?.[k] ?? null : null;
+    panel.showSolution(ask, judged.solutionText, wayText(t, judged.way), chosen);
   }
 
   async function next() {
@@ -497,6 +509,6 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
 
   return {
     get combat() { return combat; },
-    destroy() { timerBar?.stop(); timerBar = null; unbindKeys(); }, // Inhalt ersetzt der nächste Bildschirm
+    destroy() { timerBar?.stop(); timerBar = null; unbindKeys(); panel.destroy(); }, // Inhalt ersetzt der nächste Bildschirm
   };
 }

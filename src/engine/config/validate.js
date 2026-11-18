@@ -1,7 +1,8 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js';
-import { REJECT_REASONS } from '../combat/combat.js';
+import { CONFIG_FILES } from './files.js?v=ea296573';
+import { REJECT_REASONS } from '../combat/combat.js?v=ea296573';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=ea296573';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -72,6 +73,17 @@ function validateGame(file, g, errors) {
   if (c.object('baseTimeMs')) {
     for (const k of ['solve', 'pickTrue', 'pickFalse']) c.number(`baseTimeMs.${k}`, { min: 1000, integer: true });
   }
+  // Lernstufen (Phase 6b, Regelwerk 7)
+  if (c.object('learning')) {
+    const l = g.learning;
+    if (typeof l.enabled !== 'boolean') c.fail('learning.enabled', 'true oder false');
+    for (const k of ['listSize', 'upCorrect', 'downMin', 'downWrong', 'practiceDoneAfter']) c.number(`learning.${k}`, { min: 1, integer: true });
+    for (const k of ['mixEvery', 'newStagePearls']) c.number(`learning.${k}`, { min: 0, integer: true });
+    if (l.upCorrect > l.listSize) c.fail('learning.upCorrect', 'höchstens listSize');
+    if (l.downMin > l.listSize || l.downWrong > l.downMin) c.fail('learning.downMin', 'downWrong ≤ downMin ≤ listSize');
+  }
+  // Zeitklassen der Leiterstufen (Phase 6b, Regelwerk A-7)
+  if (c.object('timeClassMs')) for (const k of TIME_CLASSES) c.number(`timeClassMs.${k}`, { min: 1000, integer: true });
   if (c.object('moreTime')) {
     for (const k of ['off', 'plus50', 'plus100', 'noTimer']) c.number(`moreTime.${k}`, { min: 0 });
   }
@@ -106,66 +118,9 @@ function validateTexts(file, t, errors, config) {
   c.string('task.pickFalse');
 }
 
-const NUMBER_LIST = (v) => Array.isArray(v) && v.length > 0 && v.every((n) => Number.isInteger(n) && n >= 1);
-
-function validateArea(c, base, area, allAreas = {}) {
+// Gebiet im Lehrplan (Phase 6b): nur noch der Zahlenraum; Stufen und Fenster stehen unter ladders und windows
+function validateArea(c, base) {
   c.number(`${base}.maxNumber`, { min: 10, integer: true });
-  // Mischgebiet (Phase 5, Etappe 5): nur Verweise auf andere Gebiete
-  if (area.mixOf !== undefined) {
-    if (!Array.isArray(area.mixOf) || area.mixOf.length < 2) c.fail(`${base}.mixOf`, 'Liste von mindestens zwei Gebieten');
-    else for (const id of area.mixOf) if (!allAreas[id] || allAreas[id].mixOf) c.fail(`${base}.mixOf`, `unbekanntes oder selbst gemischtes Gebiet: ${id}`);
-    return;
-  }
-  const levels = (op) => {
-    const l = area[op]?.levels;
-    if (!l || typeof l !== 'object' || !l['1']) { c.fail(`${base}.${op}.levels`, 'fehlt oder hat keine Stufe 1'); return {}; }
-    return l;
-  };
-  // Plus und Minus mit glatten Zahlen (aUnit): Stufen geben bUnit, bMin, bMax vor
-  const roundLevels = (op) => {
-    for (const k of ['aUnit', 'aMin', 'aMax']) c.number(`${base}.${op}.${k}`, { min: 1, integer: true });
-    for (const [n, l] of Object.entries(levels(op))) {
-      for (const k of ['bUnit', 'bMin', 'bMax']) if (!Number.isInteger(l[k]) || l[k] < 1) c.fail(`${base}.${op}.levels.${n}.${k}`, 'ganze Zahl ab 1');
-    }
-  };
-  if (c.object(`${base}.add`)) {
-    if (area.add.aUnit !== undefined) { roundLevels('add'); c.number(`${base}.add.sumMax`, { min: 1, integer: true }); }
-    else {
-      for (const k of ['aMin', 'aMax', 'bMin', 'bMax', 'sumMax']) c.number(`${base}.add.${k}`, { min: 0, integer: true });
-      for (const [n, l] of Object.entries(levels('add'))) if (typeof l.carry !== 'boolean') c.fail(`${base}.add.levels.${n}.carry`, 'muss true oder false sein');
-    }
-  }
-  if (c.object(`${base}.sub`)) {
-    if (area.sub.aUnit !== undefined) { roundLevels('sub'); c.number(`${base}.sub.resultMin`, { min: 0, integer: true }); }
-    else {
-      for (const k of ['aMin', 'aMax', 'bMin', 'resultMin']) c.number(`${base}.sub.${k}`, { min: 0, integer: true });
-      for (const [n, l] of Object.entries(levels('sub'))) if (typeof l.borrow !== 'boolean') c.fail(`${base}.sub.levels.${n}.borrow`, 'muss true oder false sein');
-    }
-  }
-  if (c.object(`${base}.mul`)) {
-    c.number(`${base}.mul.bMin`, { min: 1, integer: true });
-    c.number(`${base}.mul.bMax`, { min: 1, integer: true });
-    for (const [n, l] of Object.entries(levels('mul'))) if (!NUMBER_LIST(l.a)) c.fail(`${base}.mul.levels.${n}.a`, 'muss eine Liste ganzer Zahlen sein');
-  }
-  if (area.numberLine !== undefined && c.object(`${base}.numberLine`)) {
-    for (const k of ['min', 'max', 'step', 'labelEvery']) c.number(`${base}.numberLine.${k}`, { min: 0, integer: true });
-    const n = area.numberLine;
-    if (n.max - n.min < 4 * n.step) c.fail(`${base}.numberLine`, 'Strahl zu kurz für vier Markierungen');
-  }
-  if (area.sequence !== undefined && c.object(`${base}.sequence`)) {
-    for (const k of ['startMin', 'startMax', 'stepMin', 'stepMax', 'min', 'max']) c.number(`${base}.sequence.${k}`, { min: 0, integer: true });
-  }
-  if (area.complement !== undefined && c.object(`${base}.complement`)) {
-    for (const k of ['aMin', 'aMax']) c.number(`${base}.complement.${k}`, { min: 1, integer: true });
-    for (const [n, l] of Object.entries(levels('complement'))) {
-      if (l.to !== 'ten' && !(Number.isInteger(l.to) && l.to > 0)) c.fail(`${base}.complement.levels.${n}.to`, '"ten" oder eine ganze Zahl');
-    }
-  }
-  if (c.object(`${base}.div`)) {
-    c.number(`${base}.div.quotientMin`, { min: 1, integer: true });
-    c.number(`${base}.div.quotientMax`, { min: 1, integer: true });
-    for (const [n, l] of Object.entries(levels('div'))) if (!NUMBER_LIST(l.divisor) || l.divisor.some((d) => d < 2)) c.fail(`${base}.div.levels.${n}.divisor`, 'muss eine Liste ganzer Zahlen ab 2 sein');
-  }
 }
 
 function validateCurriculum(file, cur, errors) {
@@ -174,7 +129,42 @@ function validateCurriculum(file, cur, errors) {
   if ('sameAs' in cur) { c.number('sameAs', { min: 1, max: 4, integer: true }); return; }
   if (c.object('areas')) {
     if (!cur.areas.reef) c.fail('areas.reef', 'fehlt (Gebiet 1)');
-    for (const [id, area] of Object.entries(cur.areas)) validateArea(c, `areas.${id}`, area, cur.areas);
+    for (const id of Object.keys(cur.areas)) validateArea(c, `areas.${id}`);
+  }
+  validateLadders(c, cur);
+}
+
+// Leitern und Gebietsfenster (Phase 6b, Regelwerk Abschnitt 3)
+const TIME_CLASSES = ['short', 'medium', 'long'];
+function validateLadders(c, cur) {
+  if (!c.object('ladders')) return;
+  const ids = new Set();
+  for (const [name, ladder] of Object.entries(cur.ladders)) {
+    const base = `ladders.${name}`;
+    const kinds = LADDERS[name]?.kinds ?? FORMAT_KINDS[name];
+    if (!kinds) { c.fail(base, 'unbekannte Leiter'); continue; }
+    if (!Array.isArray(ladder?.stages) || ladder.stages.length === 0) { c.fail(`${base}.stages`, 'fehlt oder ist leer'); continue; }
+    ladder.stages.forEach((st, i) => {
+      const p = `${base}.stages[${i}]`;
+      if (typeof st?.id !== 'string' || st.id === '') c.fail(`${p}.id`, 'Kennung aus dem Regelwerk fehlt');
+      else if (ids.has(st.id)) c.fail(`${p}.id`, `Kennung ${st.id} doppelt`);
+      else ids.add(st.id);
+      if (!kinds.includes(st?.kind)) c.fail(`${p}.kind`, `unbekannte Zugart ${st?.kind}`);
+      // Zeitklassen sind bei den vier Rechenarten Pflicht; Formate mit eigener Leiter haben ihre Grundzeit (A-7)
+      // und dürfen eine Zeitklasse nennen (Ergänzen Stufe 3 und 6, Regelwerk 5.5)
+      if (LADDERS[name] ? !TIME_CLASSES.includes(st?.time) : (st?.time !== undefined && !TIME_CLASSES.includes(st.time))) c.fail(`${p}.time`, `eine von ${TIME_CLASSES.join(', ')}`);
+    });
+  }
+  if (!c.object('windows')) return;
+  for (const [areaId, win] of Object.entries(cur.windows)) {
+    if (!cur.areas?.[areaId]) { c.fail(`windows.${areaId}`, 'unbekanntes Gebiet'); continue; }
+    for (const [name, range] of Object.entries(win ?? {})) {
+      const p = `windows.${areaId}.${name}`;
+      const n = cur.ladders[name]?.stages?.length;
+      if (!n) { c.fail(p, 'unbekannte Leiter'); continue; }
+      const ok = Array.isArray(range) && range.length === 2 && range.every((x) => Number.isInteger(x) && x >= 1 && x <= n) && range[0] <= range[1];
+      if (!ok) c.fail(p, `[von, bis] mit 1 ≤ von ≤ bis ≤ ${n}`);
+    }
   }
 }
 
@@ -183,7 +173,6 @@ const EFFECT_TYPES = ['damage', 'block', 'heal', 'cycle', 'buff', 'breakImmunity
 const BUFF_STATS = ['strength'];
 const TASK_FORMATS = ['solve', 'pickTrue', 'pickFalse', 'numberLine', 'sequence', 'complement', 'chain', 'wall', 'match', 'compareTerms'];
 const RULE_FORMATS = ['twoStep', 'pointBeforeLine']; // nur über Bossregeln
-const FORMAT_SECTIONS = ['numberLine', 'sequence', 'complement', 'chain', 'wall', 'match'];
 const MULTI_STEP = ['chain', 'wall', 'match'];
 const TARGETS = ['enemy', 'hero', 'enemies']; // enemies: ohne Zielwahl, trifft Gegner selbst (Blasenkette)
 const INTENT_TYPES = ['attack', 'block'];
@@ -208,6 +197,7 @@ function validateCards(file, cards, errors) {
     const format = card.task?.format;
     if (!TASK_FORMATS.includes(format)) { c.fail(`${id}.task.format`, `unbekannt: ${format}`); continue; }
     if (format === 'solve' && !OPERATIONS.includes(card.task.operation)) c.fail(`${id}.task.operation`, `muss ${OPERATIONS.join(', ')} sein`);
+    if (card.task.ifLadder !== undefined && !FORMAT_KINDS[card.task.ifLadder]) c.fail(`${id}.task.ifLadder`, 'unbekannte Leiter');
     const wanted = type === 'damage' || type === 'breakImmunity' || type === 'weaken' ? 'enemy' : type === 'damagePerStep' ? 'enemies' : 'hero';
     if (card.target !== wanted) c.fail(`${id}.target`, `muss ${wanted} sein (Wirkung ${type})`);
     if (type === 'damagePerStep' && !MULTI_STEP.includes(format)) c.fail(`${id}.task.format`, 'Schaden je Schritt braucht ein mehrschrittiges Format');
@@ -382,14 +372,14 @@ function validateAreas(file, a, errors, config) {
     const base = `areas.${areaId}`;
     if (area.comingSoon === true) continue;
     if (!config.decks?.rewardPools?.[areaId]) c.fail(base, 'kein Beutepool in decks.json');
-    // Formate mit eigenen Regeln (Phase 5, Etappe 3) brauchen ihren Abschnitt im Lehrplan des Gebiets
-    const rules = config.class3?.areas?.[area.curriculum];
-    // Mischgebiet: jedes beteiligte Gebiet braucht den Abschnitt
-    const ruleSets = rules?.mixOf ? rules.mixOf.map((id) => [id, config.class3.areas[id]]) : [[area.curriculum, rules]];
-    for (const cardId of new Set([...(config.decks?.rewardPools?.[areaId] ?? []), ...(config.decks?.starter ?? [])])) {
-      const format = config.cards?.[cardId]?.task?.format;
-      for (const [rid, r] of ruleSets) {
-        if (FORMAT_SECTIONS.includes(format) && r && !r[format]) c.fail(base, `Karte ${cardId} braucht ${format} im Lehrplan (class3.areas.${rid})`);
+    // Formate mit eigener Leiter (Phase 6b) brauchen ihre Leiter im Gebietsfenster
+    for (const grade of ['class3', 'class4']) {
+      if (!config[grade]?.windows) continue;
+      const win = config[grade].windows[area.curriculum] ?? {};
+      for (const cardId of new Set([...(config.decks?.rewardPools?.[areaId] ?? []), ...(config.decks?.starter ?? [])])) {
+        const task = config.cards?.[cardId]?.task;
+        const ladder = task?.format === 'solve' ? task.operation : FORMAT_LADDER[task?.format];
+        if (ladder && !win[ladder]) c.fail(base, `Karte ${cardId} braucht die Leiter ${ladder} im Fenster (${grade}.windows.${area.curriculum})`);
       }
     }
     const layers = area.layers;

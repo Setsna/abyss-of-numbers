@@ -1,13 +1,18 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js';
+import { generateMap } from '../dungeon/map.js?v=ea296573';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=ea296573';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
 // Version 4 (Phase 5, Etappe 8): karten { <Karten-Id>: { richtig } } für die Kartenstufen.
 // Version 5 (Phase 5, Etappe 9): einstellung.lautstaerke (0 bis 1).
 // Version 6 (D34): stroemung und antworten (mitwachsende Gegner) im Stand des Kindes, über Tauchgänge hinweg.
-export const SAVE_VERSION = 6;
+// Version 7 (Phase 6b, Etappe 4): lernen (Lernstufen je Klasse, Gebiet und Leiter, Regelwerk 7.5);
+// Übungseinträge können stufe (Kennung) und richtig (Zähler) tragen. Seit dem Review 7b kann jede Leiter in
+// lernen zusätzlich misch tragen (Zähler der Mischregel, Regelwerk 7.2); das Feld ist freiwillig, die Version bleibt 7.
+export const SAVE_VERSION = 7;
+const MIX_COUNT_MAX = 100; // Obergrenze für den Zähler der Mischregel (gespeichert wird der Rest beim Teilen durch mixEvery)
 const SLOTS = ['kopf', 'koerper', 'hand'];
 const STATS = ['kraft', 'ruhe', 'leben'];
 
@@ -37,6 +42,7 @@ export function createSave(now, grade, config, hero = null) {
     karten: {},
     stroemung: 1, // Strömung (D33/D34)
     antworten: [], // letzte Antworten: s schnell richtig, r richtig, f falsch
+    lernen: {}, // Lernstufen (Phase 6b, Regelwerk 7)
   };
 }
 
@@ -89,6 +95,9 @@ export function validateSave(s, config) {
     const entries = Object.values(s.uebung);
     if (entries.length > config.game.practiceListMax) fail('uebung', `höchstens ${config.game.practiceListMax} Einträge`);
     if (!entries.every((e) => isObj(e) && typeof e.text === 'string' && isCount(e.t))) fail('uebung', 'Einträge brauchen text und t');
+    // Version 7: optional stufe (Kennung aus dem Regelwerk) und richtig (Zähler)
+    if (!entries.every((e) => e.stufe === undefined || (typeof e.stufe === 'string' && [3, 4].some((g) => stageById(curriculumOf(config, g), e.stufe))))) fail('uebung', 'stufe muss eine bekannte Kennung sein');
+    if (!entries.every((e) => e.richtig === undefined || isCount(e.richtig))) fail('uebung', 'richtig als ganze Zahl ≥ 0');
   }
 
   if (!isObj(s.erklaert) || !Object.values(s.erklaert).every((v) => v === true)) fail('erklaert', 'nur true-Werte');
@@ -112,6 +121,7 @@ export function validateSave(s, config) {
     else if (!isObj(k) || !isCount(k.richtig)) fail(`karten.${id}`, 'richtig als ganze Zahl ≥ 0');
   }
 
+  validateLearning(s.lernen, config, fail);
   const e = s.einstellung;
   if (!isObj(e)) fail('einstellung', 'fehlt');
   else {
@@ -120,6 +130,34 @@ export function validateSave(s, config) {
     if (typeof e.lautstaerke !== 'number' || e.lautstaerke < 0 || e.lautstaerke > 1) fail('einstellung.lautstaerke', 'Zahl von 0 bis 1');
   }
   return errors;
+}
+
+// Lernstufen (Regelwerk 7.5): nur bekannte Klassen, Gebiete und Leitern, Stufen innerhalb der Leiter,
+// Liste aus 0 und 1 mit höchstens listSize Zeichen.
+function validateLearning(lernen, config, fail) {
+  if (!isObj(lernen)) { fail('lernen', 'fehlt'); return; }
+  const max = config.game.learning.listSize;
+  for (const [grade, g] of Object.entries(lernen)) {
+    const p = `lernen.${grade}`;
+    const cur = (grade === '3' || grade === '4') ? curriculumOf(config, Number(grade)) : null;
+    if (!cur) { fail(p, 'unbekannte Klasse'); continue; }
+    if (!isObj(g) || !isObj(g.gebiete) || !isObj(g.hoechste) || !Array.isArray(g.eingefuehrt)) { fail(p, 'gebiete, hoechste, eingefuehrt'); continue; }
+    const size = (ladder) => cur.ladders[ladder]?.stages?.length ?? 0;
+    for (const [areaId, area] of Object.entries(g.gebiete)) {
+      const win = cur.windows[areaId];
+      if (!win || !isObj(area)) { fail(`${p}.gebiete.${areaId}`, 'unbekanntes Gebiet'); continue; }
+      for (const [ladder, e] of Object.entries(area)) {
+        const q = `${p}.gebiete.${areaId}.${ladder}`;
+        if (!win[ladder]) { fail(q, 'Leiter nicht im Gebiet'); continue; }
+        if (!isObj(e) || !Number.isInteger(e.stufe) || e.stufe < 1 || e.stufe > size(ladder)) fail(q, 'stufe außerhalb der Leiter');
+        if (typeof e?.liste !== 'string' || !/^[01]*$/.test(e.liste) || e.liste.length > max) fail(q, `liste aus 0 und 1, höchstens ${max}`);
+        // Zähler der Mischregel (Review 7b, B1); fehlt bei älteren Ständen und zählt dann ab 0
+        if (isObj(e) && e.misch !== undefined && !(isCount(e.misch) && e.misch < MIX_COUNT_MAX)) fail(q, `misch als ganze Zahl von 0 bis ${MIX_COUNT_MAX - 1}`);
+      }
+    }
+    for (const [ladder, n] of Object.entries(g.hoechste)) if (!(Number.isInteger(n) && n >= 1 && n <= size(ladder))) fail(`${p}.hoechste.${ladder}`, 'Stufe der Leiter');
+    if (!g.eingefuehrt.every((id) => cur.windows[id])) fail(`${p}.eingefuehrt`, 'nur bekannte Gebiete');
+  }
 }
 
 // Laufender Tauchgang: Raumkennungen müssen auf der Seekarte aus seed vorkommen.
@@ -178,6 +216,14 @@ export function migrateSave(raw, config) {
     if (s.lauf) { delete s.lauf.stroemung; delete s.lauf.antworten; }
     s.version = 6;
     notes.push('version: 5 → 6 (Strömung)');
+  }
+  if (s.version === 6) {
+    // Lernstufen (Phase 6b): ohne Vorgeschichte; schon freigeschaltete Gebiete gelten als betreten,
+    // dort entfällt der Einführungskampf (Regelwerk 7.5)
+    const open = Object.entries(isObj(s.gebiete) ? s.gebiete : {}).filter(([, g]) => g?.offen).map(([id]) => id);
+    s.lernen = (s.klasse === 3 || s.klasse === 4) ? { [s.klasse]: { gebiete: {}, hoechste: {}, eingefuehrt: open } } : {};
+    s.version = 7;
+    notes.push('version: 6 → 7 (Lernstufen)');
   }
   return { save: s, notes };
 }

@@ -12,12 +12,14 @@ export function answerCode({ outcome, tierId }) {
 
 const round2 = (x) => Math.round(x * 100) / 100;
 
-export function nextCurrent(level, answers, cfg) {
+// allowUp (Phase 6b, Regelwerk 7.3): die Strömung steigt nur, wenn das Spiel es erlaubt (alle vier
+// Rechenarten am oberen Rand des Gebietsfensters); sinken kann sie immer.
+export function nextCurrent(level, answers, cfg, { allowUp = true } = {}) {
   const recent = answers.slice(-cfg.recentAnswers);
   if (recent.length < cfg.minAnswers) return level;
   const correct = recent.filter((a) => a !== 'f').length / recent.length;
   const fast = recent.filter((a) => a === 's').length / recent.length;
-  if (correct >= cfg.upAccuracy && fast > cfg.upFastShare) return round2(Math.min(cfg.max, level + cfg.step));
+  if (correct >= cfg.upAccuracy && fast > cfg.upFastShare) return allowUp ? round2(Math.min(cfg.max, level + cfg.step)) : level;
   if (correct < cfg.downAccuracy) return round2(Math.max(cfg.min, level - cfg.step));
   return level;
 }

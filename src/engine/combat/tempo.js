@@ -19,11 +19,13 @@ export function applyMultiplier(base, multiplier) {
 }
 
 // 0 heißt: ohne Zeitleiste.
-export function timeLimitFor(format, calm, moreTime, gameConfig) {
+// timeClass: Zeitklasse der Leiterstufe (Phase 6b, Regelwerk A-7); ohne sie die Grundzeit des Formats
+// extraMs: Zusatzzeit der Stufe (Klasse 4, Zahlen über 10 000: 5 Sekunden mehr)
+export function timeLimitFor(format, calm, moreTime, gameConfig, timeClass = null, extraMs = 0) {
   const factor = gameConfig.moreTime[moreTime];
   if (factor === undefined) throw new Error(`unbekannte Einstellung Mehr Zeit: ${moreTime}`);
   if (factor === 0) return 0;
-  const base = gameConfig.baseTimeMs[format];
-  if (base === undefined) throw new Error(`keine Grundzeit für ${format}`);
-  return Math.round((base + calm * gameConfig.stats.calmMsPerPoint) * factor);
+  const base = timeClass ? gameConfig.timeClassMs[timeClass] : gameConfig.baseTimeMs[format];
+  if (base === undefined) throw new Error(`keine Grundzeit für ${timeClass ?? format}`);
+  return Math.round((base + extraMs + calm * gameConfig.stats.calmMsPerPoint) * factor);
 }

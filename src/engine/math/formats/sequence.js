@@ -1,40 +1,50 @@
-// Zahlenfolge fortsetzen (Konzept 8.2, Muschelhorn; Lehrplan „Zahlenfolgen“, PDF S. 16).
-// Vier Glieder mit gleichem Schritt, gesucht ist das fünfte. Falsche Antworten: Schritt einmal
-// zu viel, Schritt um 1 falsch, letztes Glied wiederholt. Vorläufige Regeln (D29).
-import { pickWrong, placeCorrect, MAX_TRIES } from './common.js';
+// Zahlenfolge fortsetzen (Konzept 8.2, Muschelhorn; Lehrplan „Zahlenfolgen“, PDF S. 16; Regelwerk 5.5).
+// Vier Glieder mit gleichem Schritt, gesucht ist das fünfte. Die Stufe nennt Varianten
+// ({ dirs, steps, start, startMultipleOfStep }), den Zahlenraum (min, max) und ob die fünf Glieder
+// einen Zehner überschreiten müssen (crossTen).
+// Falsche Antworten: F-SEQ-a ein Schritt zu viel, F-SEQ-b an der Rechenstelle des Schritts um 1
+// daneben (A-9), F-SEQ-c falsche Richtung, F-SEQ-d letztes Glied wiederholt.
+import { drawUntil } from './common.js?v=ea296573';
+import { pickChoices } from '../mistakes.js?v=ea296573';
+import { calcPlace } from '../places.js?v=ea296573';
+import { formatNumber } from '../format.js?v=ea296573';
 
-function drawTerms(r, rng) {
-  for (let i = 0; i < MAX_TRIES; i++) {
-    const m = r.stepMultiple ?? 1; // bis 1000: Schritte und Start als glatte Zehner
-    const size = m * rng.nextInt(Math.ceil(r.stepMin / m), Math.floor(r.stepMax / m));
-    const down = rng.nextUint32() % 2 === 1;
-    // fallend gespiegelt: Start zwischen max − startMax und max − startMin
-    const start = m * (down
-      ? rng.nextInt(Math.ceil((r.max - r.startMax) / m), Math.floor((r.max - r.startMin) / m))
-      : rng.nextInt(Math.ceil(r.startMin / m), Math.floor(r.startMax / m)));
-    const step = down ? -size : size;
-    const terms = Array.from({ length: 5 }, (_, k) => start + k * step);
-    if (terms.every((n) => n >= r.min && n <= r.max)) return terms;
-  }
-  throw new Error('keine passende Zahlenfolge gefunden');
+function drawStart(v, st, rng) {
+  const r = v.start;
+  if (v.startMultipleOfStep) return st * rng.nextInt(Math.ceil(r.min / st), Math.floor(r.max / st));
+  // Klasse 4: Start ein Vielfaches derselben Stelle wie der Schritt (Schritt 2000 → Start ein Vielfaches von 1000)
+  if (v.startMultipleOfPlace) { const p = calcPlace(st); return p * rng.nextInt(Math.ceil(r.min / p), Math.floor(r.max / p)); }
+  const step = r.step ?? 1;
+  return r.min + step * rng.nextInt(0, Math.floor((r.max - r.min) / step));
 }
 
-export function generate(level, area, rng) {
-  const r = area.sequence;
-  const terms = drawTerms(r, rng);
+export function generate(stage, area, rng) {
+  const terms = drawUntil(() => {
+    const v = rng.pick(stage.variants);
+    const st = rng.pick(v.steps);
+    const s = rng.pick(v.dirs) === 'down' ? -st : st;
+    const start = drawStart(v, st, rng);
+    return Array.from({ length: 5 }, (_, k) => start + k * s);
+  }, (t) => t.every((n) => n >= stage.min && n <= stage.max)
+    && (!stage.crossTen || Math.floor(t[0] / 10) !== Math.floor(t[4] / 10)));
   const shown = terms.slice(0, 4);
   const answer = terms[4];
-  const step = terms[1] - terms[0];
-  const m = r.stepMultiple ?? 1;
-  const wrong = pickWrong(answer, [answer + step, answer + m, answer - m, shown[3]], { min: r.min, max: r.max, step: m }, rng);
-  const { choices, correctIndex } = placeCorrect(String(answer), wrong.map(String), rng);
+  const s = terms[1] - terms[0];
+  const p = calcPlace(Math.abs(s));
+  const all = {
+    'F-SEQ-a': [answer + s], 'F-SEQ-b': [answer - p, answer + p], 'F-SEQ-c': [shown[3] - s], 'F-SEQ-d': [shown[3]],
+  };
+  const cands = stage.mistakes.flatMap((type) => all[type].map((value) => ({ value, type })));
+  const { choices, correctIndex, choiceTypes } = pickChoices(answer, cands, { min: Math.max(0, stage.min), max: Math.min(stage.max, area.maxNumber), fillStep: p }, rng);
   return {
     format: 'sequence',
     shown,
     prompt: 'task.sequence',
-    display: `${shown.join(', ')}, ?`,
-    choices, correctIndex,
-    solutionText: terms.join(', '),
-    practiceKey: `sequence:${terms[0]}:${step}`,
+    display: `${shown.map(formatNumber).join(', ')}, ?`,
+    choices, correctIndex, choiceTypes,
+    solutionText: terms.map(formatNumber).join(', '),
+    extraMs: stage.extraMs ?? 0,
+    practiceKey: `sequence:${terms[0]}:${s}`,
+    ladder: 'seq', stageId: stage.id,
   };
 }

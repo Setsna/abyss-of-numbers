@@ -1,1 +1,1775 @@
-{ "grade": 4, "sameAs": 3 }
+{
+  "grade": 4,
+  "areas": {
+    "reef": {
+      "maxNumber": 1000
+    },
+    "caves": {
+      "maxNumber": 1000000
+    },
+    "city": {
+      "maxNumber": 1000000
+    },
+    "trench": {
+      "maxNumber": 1000000
+    }
+  },
+  "ladders": {
+    "add": {
+      "stages": [
+        {
+          "id": "K4-ADD-1",
+          "kind": "onePlace",
+          "time": "short",
+          "a": {
+            "min": 100,
+            "max": 900,
+            "step": 10
+          },
+          "b": [
+            {
+              "min": 100,
+              "max": 900,
+              "step": 100
+            }
+          ],
+          "checkPlaces": [],
+          "resultMax": 1000,
+          "mistakes": [
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-e"
+          ]
+        },
+        {
+          "id": "K4-ADD-2",
+          "kind": "pair",
+          "time": "medium",
+          "a": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "b": {
+            "min": 20,
+            "max": 90,
+            "step": 10
+          },
+          "carryAt": 10,
+          "carry": true,
+          "resultMax": 980,
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c"
+          ]
+        },
+        {
+          "id": "K4-ADD-3",
+          "kind": "pair",
+          "time": "long",
+          "a": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "b": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "resultMax": 1000,
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c"
+          ]
+        },
+        {
+          "id": "K4-ADD-4",
+          "kind": "onePlace",
+          "time": "medium",
+          "a": {
+            "min": 11000,
+            "max": 989000,
+            "step": 1000
+          },
+          "b": [
+            {
+              "min": 2,
+              "max": 9
+            },
+            {
+              "min": 20,
+              "max": 90,
+              "step": 10
+            },
+            {
+              "min": 200,
+              "max": 900,
+              "step": 100
+            },
+            {
+              "min": 2000,
+              "max": 9000,
+              "step": 1000
+            },
+            {
+              "min": 20000,
+              "max": 90000,
+              "step": 10000
+            },
+            {
+              "min": 200000,
+              "max": 900000,
+              "step": 100000
+            }
+          ],
+          "checkPlaces": [
+            1,
+            10,
+            100,
+            1000,
+            10000,
+            100000
+          ],
+          "resultMax": 1000000,
+          "mistakes": [
+            "F-ADD-b",
+            "F-ADD-c",
+            "F-ADD-e"
+          ]
+        },
+        {
+          "id": "K4-ADD-5",
+          "kind": "either",
+          "time": "long",
+          "resultMax": 1000000,
+          "variants": [
+            {
+              "kind": "pair",
+              "a": {
+                "min": 11000,
+                "max": 989000,
+                "step": 1000
+              },
+              "b": {
+                "min": 2000,
+                "max": 9000,
+                "step": 1000
+              },
+              "carryAt": 1000,
+              "carry": true
+            },
+            {
+              "kind": "pair",
+              "a": {
+                "min": 11000,
+                "max": 989000,
+                "step": 1000
+              },
+              "b": {
+                "min": 20000,
+                "max": 90000,
+                "step": 10000
+              },
+              "carryAt": 10000,
+              "carry": true
+            }
+          ],
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c"
+          ]
+        },
+        {
+          "id": "K4-ADD-6",
+          "kind": "either",
+          "time": "long",
+          "resultMax": 1000000,
+          "variants": [
+            {
+              "kind": "pair",
+              "a": {
+                "min": 11000,
+                "max": 89000,
+                "step": 1000,
+                "notMultipleOf": 10000
+              },
+              "b": {
+                "min": 11000,
+                "max": 89000,
+                "step": 1000,
+                "notMultipleOf": 10000
+              }
+            },
+            {
+              "kind": "pair",
+              "a": {
+                "min": 110000,
+                "max": 890000,
+                "step": 10000,
+                "notMultipleOf": 100000
+              },
+              "b": {
+                "min": 110000,
+                "max": 890000,
+                "step": 10000,
+                "notMultipleOf": 100000
+              }
+            }
+          ],
+          "mistakes": [
+            "F-ADD-a",
+            "F-ADD-b",
+            "F-ADD-c"
+          ]
+        }
+      ]
+    },
+    "sub": {
+      "stages": [
+        {
+          "id": "K4-SUB-1",
+          "kind": "onePlace",
+          "time": "short",
+          "a": {
+            "min": 200,
+            "max": 1000,
+            "step": 10
+          },
+          "b": [
+            {
+              "min": 100,
+              "max": 900,
+              "step": 100
+            }
+          ],
+          "checkPlaces": [],
+          "resultMin": 10,
+          "mistakes": [
+            "F-SUB-c",
+            "F-SUB-d",
+            "F-SUB-e",
+            "F-SUB-f"
+          ]
+        },
+        {
+          "id": "K4-SUB-2",
+          "kind": "either",
+          "time": "medium",
+          "resultMin": 10,
+          "weights": [
+            6,
+            1
+          ],
+          "variants": [
+            {
+              "kind": "pair",
+              "a": {
+                "min": 110,
+                "max": 990,
+                "step": 10
+              },
+              "b": {
+                "min": 20,
+                "max": 90,
+                "step": 10
+              },
+              "carryAt": 10,
+              "carry": true
+            },
+            {
+              "kind": "pair",
+              "a": {
+                "min": 200,
+                "max": 900,
+                "step": 100
+              },
+              "b": {
+                "min": 2,
+                "max": 9
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-c",
+            "F-SUB-d"
+          ]
+        },
+        {
+          "id": "K4-SUB-3",
+          "kind": "pair",
+          "time": "long",
+          "a": {
+            "min": 220,
+            "max": 1000,
+            "step": 10
+          },
+          "b": {
+            "min": 110,
+            "max": 890,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "resultMin": 10,
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-b",
+            "F-SUB-c",
+            "F-SUB-d"
+          ]
+        },
+        {
+          "id": "K4-SUB-4",
+          "kind": "either",
+          "time": "long",
+          "resultMin": 1000,
+          "variants": [
+            {
+              "kind": "onePlace",
+              "a": {
+                "min": 111111,
+                "max": 999999,
+                "noZeroDigit": true
+              },
+              "b": [
+                {
+                  "min": 2,
+                  "max": 9
+                },
+                {
+                  "min": 20,
+                  "max": 90,
+                  "step": 10
+                },
+                {
+                  "min": 200,
+                  "max": 900,
+                  "step": 100
+                },
+                {
+                  "min": 2000,
+                  "max": 9000,
+                  "step": 1000
+                },
+                {
+                  "min": 20000,
+                  "max": 90000,
+                  "step": 10000
+                },
+                {
+                  "min": 200000,
+                  "max": 900000,
+                  "step": 100000
+                }
+              ],
+              "checkPlaces": [
+                1,
+                10,
+                100,
+                1000,
+                10000,
+                100000
+              ]
+            },
+            {
+              "kind": "onePlace",
+              "a": {
+                "min": 22000,
+                "max": 999000,
+                "step": 1000
+              },
+              "b": [
+                {
+                  "min": 2,
+                  "max": 9
+                },
+                {
+                  "min": 20,
+                  "max": 90,
+                  "step": 10
+                },
+                {
+                  "min": 200,
+                  "max": 900,
+                  "step": 100
+                },
+                {
+                  "min": 2000,
+                  "max": 9000,
+                  "step": 1000
+                },
+                {
+                  "min": 20000,
+                  "max": 90000,
+                  "step": 10000
+                },
+                {
+                  "min": 200000,
+                  "max": 900000,
+                  "step": 100000
+                }
+              ],
+              "checkPlaces": [
+                1,
+                10,
+                100,
+                1000,
+                10000,
+                100000
+              ]
+            }
+          ],
+          "mistakes": [
+            "F-SUB-c",
+            "F-SUB-d",
+            "F-SUB-e"
+          ]
+        },
+        {
+          "id": "K4-SUB-5",
+          "kind": "either",
+          "time": "long",
+          "resultMin": 1000,
+          "variants": [
+            {
+              "kind": "pair",
+              "a": {
+                "min": 11000,
+                "max": 1000000,
+                "step": 1000
+              },
+              "b": {
+                "min": 2000,
+                "max": 9000,
+                "step": 1000
+              },
+              "carryAt": 1000,
+              "carry": true
+            },
+            {
+              "kind": "pair",
+              "a": {
+                "min": 11000,
+                "max": 1000000,
+                "step": 1000
+              },
+              "b": {
+                "min": 20000,
+                "max": 90000,
+                "step": 10000
+              },
+              "carryAt": 10000,
+              "carry": true
+            }
+          ],
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-c",
+            "F-SUB-d"
+          ]
+        },
+        {
+          "id": "K4-SUB-6",
+          "kind": "either",
+          "time": "long",
+          "resultMin": 1000,
+          "variants": [
+            {
+              "kind": "pair",
+              "a": {
+                "min": 22000,
+                "max": 100000,
+                "step": 1000
+              },
+              "b": {
+                "min": 11000,
+                "max": 89000,
+                "step": 1000,
+                "notMultipleOf": 10000
+              }
+            },
+            {
+              "kind": "pair",
+              "a": {
+                "min": 220000,
+                "max": 1000000,
+                "step": 10000
+              },
+              "b": {
+                "min": 110000,
+                "max": 890000,
+                "step": 10000,
+                "notMultipleOf": 100000
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SUB-a",
+            "F-SUB-b",
+            "F-SUB-c",
+            "F-SUB-d"
+          ]
+        }
+      ]
+    },
+    "mul": {
+      "stages": [
+        {
+          "id": "K4-MUL-1",
+          "kind": "facts",
+          "time": "short",
+          "rows": [
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "partners": [
+            3,
+            4,
+            6,
+            7,
+            8,
+            9
+          ],
+          "mistakes": [
+            "F-MUL-a",
+            "F-MUL-b"
+          ],
+          "prefer": [
+            "F-MUL-a",
+            2
+          ]
+        },
+        {
+          "id": "K4-MUL-2",
+          "kind": "scaled",
+          "time": "medium",
+          "small": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "unit": 10,
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d"
+          ]
+        },
+        {
+          "id": "K4-MUL-3",
+          "kind": "scaled",
+          "time": "medium",
+          "small": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "unit": 100,
+          "productMax": 1000,
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d"
+          ]
+        },
+        {
+          "id": "K4-MUL-4",
+          "kind": "scaled",
+          "time": "medium",
+          "small": [
+            10,
+            100
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "units": [
+            1,
+            10,
+            100,
+            1000
+          ],
+          "productMax": 1000000,
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-e"
+          ]
+        },
+        {
+          "id": "K4-MUL-5",
+          "kind": "scaled",
+          "time": "long",
+          "small": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "big": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "units": [
+            100,
+            1000,
+            10000
+          ],
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d",
+            "F-MUL-e"
+          ]
+        },
+        {
+          "id": "K4-MUL-6",
+          "kind": "roundPair",
+          "time": "long",
+          "digits": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "units": [
+            10,
+            100
+          ],
+          "mistakes": [
+            "F-MUL-c",
+            "F-MUL-d",
+            "F-MUL-e"
+          ]
+        }
+      ]
+    },
+    "div": {
+      "stages": [
+        {
+          "id": "K4-DIV-1",
+          "kind": "inverse",
+          "time": "short",
+          "from": "K4-MUL-1",
+          "mistakes": [
+            "F-DIV-a",
+            "F-DIV-b"
+          ]
+        },
+        {
+          "id": "K4-DIV-2",
+          "kind": "inverse",
+          "time": "medium",
+          "from": "K4-MUL-2",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ]
+        },
+        {
+          "id": "K4-DIV-3",
+          "kind": "inverse",
+          "time": "medium",
+          "from": "K4-MUL-3",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ]
+        },
+        {
+          "id": "K4-DIV-4",
+          "kind": "inverse",
+          "time": "medium",
+          "from": "K4-MUL-4",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ],
+          "divisor": "pow10"
+        },
+        {
+          "id": "K4-DIV-5",
+          "kind": "inverse",
+          "time": "long",
+          "from": "K4-MUL-5",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ],
+          "divisor": "small"
+        },
+        {
+          "id": "K4-DIV-6",
+          "kind": "inverse",
+          "time": "long",
+          "from": "K4-MUL-6",
+          "mistakes": [
+            "F-DIV-c",
+            "F-DIV-d"
+          ]
+        }
+      ]
+    },
+    "line": {
+      "stages": [
+        {
+          "id": "K4-LINE-1",
+          "kind": "line",
+          "max": 1000,
+          "ticks": [
+            100,
+            50,
+            10
+          ],
+          "labels": [
+            0,
+            500,
+            1000
+          ],
+          "target": {
+            "min": 10,
+            "max": 990,
+            "step": 10
+          },
+          "markGap": 100,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K4-LINE-2",
+          "kind": "line",
+          "max": 10000,
+          "ticks": [
+            1000,
+            500
+          ],
+          "labels": [
+            0,
+            5000,
+            10000
+          ],
+          "target": {
+            "min": 500,
+            "max": 9500,
+            "step": 500
+          },
+          "markGap": 1000,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K4-LINE-3",
+          "kind": "line",
+          "max": 100000,
+          "ticks": [
+            10000,
+            5000
+          ],
+          "labels": [
+            0,
+            50000,
+            100000
+          ],
+          "target": {
+            "min": 5000,
+            "max": 95000,
+            "step": 5000
+          },
+          "markGap": 10000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K4-LINE-4",
+          "kind": "line",
+          "max": 1000000,
+          "ticks": [
+            100000,
+            50000
+          ],
+          "labels": [
+            0,
+            500000,
+            1000000
+          ],
+          "target": {
+            "min": 50000,
+            "max": 950000,
+            "step": 50000
+          },
+          "markGap": 100000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        },
+        {
+          "id": "K4-LINE-5",
+          "kind": "line",
+          "max": 1000000,
+          "ticks": [
+            100000,
+            50000,
+            10000
+          ],
+          "labels": [
+            0,
+            500000,
+            1000000
+          ],
+          "target": {
+            "min": 10000,
+            "max": 990000,
+            "step": 10000
+          },
+          "markGap": 100000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-LINE-a",
+            "F-LINE-b",
+            "F-LINE-c"
+          ]
+        }
+      ]
+    },
+    "seq": {
+      "stages": [
+        {
+          "id": "K4-SEQ-1",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                10,
+                20,
+                50,
+                100
+              ],
+              "start": {
+                "min": 10,
+                "max": 1000,
+                "step": 10
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K4-SEQ-2",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000,
+          "crossTen": true,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                2,
+                4,
+                5
+              ],
+              "start": {
+                "min": 1,
+                "max": 1000
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K4-SEQ-3",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000000,
+          "extraMs": 5000,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                10,
+                100,
+                1000
+              ],
+              "start": {
+                "min": 1000,
+                "max": 990000,
+                "step": 100
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K4-SEQ-4",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000000,
+          "extraMs": 5000,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                5000,
+                10000,
+                50000,
+                100000
+              ],
+              "start": {
+                "min": 5000,
+                "max": 1000000,
+                "step": 5000
+              }
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        },
+        {
+          "id": "K4-SEQ-5",
+          "kind": "seq",
+          "min": 0,
+          "max": 1000000,
+          "extraMs": 5000,
+          "variants": [
+            {
+              "dirs": [
+                "up",
+                "down"
+              ],
+              "steps": [
+                20,
+                30,
+                50,
+                200,
+                300,
+                500,
+                2000,
+                3000,
+                5000,
+                20000,
+                30000,
+                50000
+              ],
+              "start": {
+                "min": 10,
+                "max": 1000000
+              },
+              "startMultipleOfPlace": true
+            }
+          ],
+          "mistakes": [
+            "F-SEQ-a",
+            "F-SEQ-b",
+            "F-SEQ-c",
+            "F-SEQ-d"
+          ]
+        }
+      ]
+    },
+    "comp": {
+      "stages": [
+        {
+          "id": "K4-COMP-1",
+          "kind": "comp",
+          "a": {
+            "min": 110,
+            "max": 990,
+            "step": 10,
+            "notMultipleOf": 100
+          },
+          "toNext": 100,
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K4-COMP-2",
+          "kind": "comp",
+          "time": "medium",
+          "a": {
+            "min": 110,
+            "max": 990,
+            "step": 10
+          },
+          "to": 1000,
+          "mistakes": [
+            "F-COMP-a",
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-e"
+          ]
+        },
+        {
+          "id": "K4-COMP-3",
+          "kind": "comp",
+          "a": {
+            "min": 1100,
+            "max": 99900,
+            "step": 100,
+            "notMultipleOf": 1000
+          },
+          "toNext": 1000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K4-COMP-4",
+          "kind": "comp",
+          "extraMs": 5000,
+          "variants": [
+            {
+              "a": {
+                "min": 1000,
+                "max": 999000,
+                "step": 1000,
+                "notMultipleOf": 10000
+              },
+              "toNext": 10000
+            },
+            {
+              "a": {
+                "min": 10000,
+                "max": 990000,
+                "step": 10000,
+                "notMultipleOf": 100000
+              },
+              "toNext": 100000
+            }
+          ],
+          "mistakes": [
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-d"
+          ]
+        },
+        {
+          "id": "K4-COMP-5",
+          "kind": "comp",
+          "time": "medium",
+          "a": {
+            "min": 110000,
+            "max": 990000,
+            "step": 10000
+          },
+          "to": 1000000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-COMP-a",
+            "F-COMP-b",
+            "F-COMP-c",
+            "F-COMP-e"
+          ]
+        }
+      ]
+    },
+    "wall": {
+      "stages": [
+        {
+          "id": "K4-WALL-1",
+          "kind": "wall",
+          "pattern": "sum",
+          "unit": 10,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K4-WALL-2",
+          "kind": "wall",
+          "pattern": "oneBase",
+          "unit": 10,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K4-WALL-3",
+          "kind": "wall",
+          "pattern": "fromTop",
+          "unit": 10,
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K4-WALL-4",
+          "kind": "wall",
+          "pattern": "sum",
+          "units": [
+            1000,
+            10000
+          ],
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K4-WALL-5",
+          "kind": "wall",
+          "pattern": "oneBase",
+          "units": [
+            1000,
+            10000
+          ],
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        },
+        {
+          "id": "K4-WALL-6",
+          "kind": "wall",
+          "pattern": "fromTop",
+          "units": [
+            1000,
+            10000
+          ],
+          "baseMin": 1,
+          "baseMax": 30,
+          "topMax": 1000000,
+          "extraMs": 5000,
+          "mistakes": [
+            "F-WALL-a",
+            "F-WALL-b",
+            "F-WALL-c"
+          ]
+        }
+      ]
+    },
+    "chain": {
+      "stages": [
+        {
+          "id": "K4-CHAIN-1",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 100,
+            "max": 500,
+            "step": 10
+          },
+          "plusMinus": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "min": 10,
+          "max": 1000,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-c",
+              "F-MUL-d"
+            ]
+          }
+        },
+        {
+          "id": "K4-CHAIN-2",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 20,
+            "max": 90,
+            "step": 10
+          },
+          "mulFirst": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "plusMinus": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "min": 10,
+          "max": 1000,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-c",
+              "F-MUL-d"
+            ]
+          }
+        },
+        {
+          "id": "K4-CHAIN-3",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 10000,
+            "max": 50000,
+            "step": 1000
+          },
+          "plusMinus": {
+            "min": 1000,
+            "max": 9000,
+            "step": 1000
+          },
+          "min": 1000,
+          "max": 1000000,
+          "extraMs": 5000,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-c",
+              "F-MUL-d"
+            ]
+          }
+        },
+        {
+          "id": "K4-CHAIN-4",
+          "kind": "chain",
+          "links": 3,
+          "start": {
+            "min": 2000,
+            "max": 9000,
+            "step": 1000
+          },
+          "mulFirst": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "plusMinus": {
+            "min": 1000,
+            "max": 9000,
+            "step": 1000
+          },
+          "min": 1000,
+          "max": 1000000,
+          "extraMs": 5000,
+          "linkMistakes": {
+            "add": [
+              "F-ADD-a",
+              "F-ADD-b",
+              "F-ADD-c"
+            ],
+            "sub": [
+              "F-SUB-a",
+              "F-SUB-c",
+              "F-SUB-d"
+            ],
+            "mul": [
+              "F-MUL-c",
+              "F-MUL-d"
+            ]
+          }
+        }
+      ]
+    },
+    "pvs": {
+      "stages": [
+        {
+          "id": "K4-PVS-1",
+          "kind": "pvs",
+          "point": "mul",
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "factors": {
+            "min": 2,
+            "max": 10
+          },
+          "a": {
+            "min": 20,
+            "max": 200,
+            "step": 10
+          },
+          "resultMin": 1,
+          "resultMax": 1000000,
+          "mistakes": [
+            "F-PVS-a",
+            "F-PVS-b",
+            "F-PVS-c"
+          ]
+        },
+        {
+          "id": "K4-PVS-2",
+          "kind": "pvs",
+          "point": "div",
+          "divFrom": [
+            "facts",
+            "tens"
+          ],
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "factors": {
+            "min": 2,
+            "max": 10
+          },
+          "a": {
+            "min": 20,
+            "max": 200,
+            "step": 10
+          },
+          "resultMin": 1,
+          "resultMax": 1000000,
+          "mistakes": [
+            "F-PVS-a",
+            "F-PVS-b",
+            "F-PVS-c"
+          ]
+        },
+        {
+          "id": "K4-PVS-3",
+          "kind": "pvs",
+          "form": "bracketMul",
+          "point": "mul",
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "a": {
+            "min": 2,
+            "max": 9
+          },
+          "inner": {
+            "min": 10,
+            "max": 90,
+            "step": 10
+          },
+          "innerMin": 10,
+          "innerMax": 100,
+          "resultMax": 1000,
+          "mistakes": [
+            "F-KL-a",
+            "F-KL-b",
+            "F-KL-c"
+          ]
+        },
+        {
+          "id": "K4-PVS-4",
+          "kind": "pvs",
+          "form": "bracketDiv",
+          "point": "div",
+          "ops": [
+            "add",
+            "sub"
+          ],
+          "a": {
+            "min": 2,
+            "max": 9
+          },
+          "quotient": {
+            "min": 20,
+            "max": 90,
+            "step": 10
+          },
+          "inner": {
+            "min": 20,
+            "max": 900,
+            "step": 10
+          },
+          "mistakes": [
+            "F-KL-a",
+            "F-KL-b",
+            "F-KL-c"
+          ]
+        }
+      ]
+    },
+    "teil": {
+      "stages": [
+        {
+          "id": "K4-TEIL-1",
+          "kind": "teil",
+          "question": "by",
+          "divisors": [
+            2,
+            5,
+            10
+          ],
+          "numbers": {
+            "min": 100,
+            "max": 999
+          },
+          "mistakes": [
+            "F-TEIL-a"
+          ]
+        },
+        {
+          "id": "K4-TEIL-2",
+          "kind": "teil",
+          "question": "by",
+          "divisors": [
+            2,
+            5,
+            10
+          ],
+          "numbers": {
+            "min": 1000,
+            "max": 99999
+          },
+          "extraMs": 5000,
+          "mistakes": [
+            "F-TEIL-a"
+          ]
+        },
+        {
+          "id": "K4-TEIL-3",
+          "kind": "teil",
+          "question": "divisor",
+          "factors": {
+            "min": 2,
+            "max": 10
+          },
+          "valueMin": 12,
+          "valueMax": 100,
+          "numbers": {
+            "min": 2,
+            "max": 10
+          },
+          "mistakes": [
+            "F-TEIL-b"
+          ]
+        },
+        {
+          "id": "K4-TEIL-4",
+          "kind": "teil",
+          "question": "multiple",
+          "base": {
+            "min": 3,
+            "max": 9
+          },
+          "numbers": {
+            "min": 20,
+            "max": 100
+          },
+          "mistakes": [
+            "F-TEIL-b"
+          ]
+        }
+      ]
+    }
+  },
+  "windows": {
+    "reef": {
+      "add": [
+        1,
+        3
+      ],
+      "sub": [
+        1,
+        3
+      ],
+      "mul": [
+        1,
+        3
+      ],
+      "div": [
+        1,
+        3
+      ],
+      "line": [
+        1,
+        1
+      ],
+      "seq": [
+        1,
+        2
+      ],
+      "comp": [
+        1,
+        2
+      ],
+      "wall": [
+        1,
+        3
+      ],
+      "chain": [
+        1,
+        2
+      ]
+    },
+    "caves": {
+      "add": [
+        4,
+        6
+      ],
+      "sub": [
+        4,
+        6
+      ],
+      "mul": [
+        2,
+        4
+      ],
+      "div": [
+        2,
+        4
+      ],
+      "line": [
+        2,
+        5
+      ],
+      "seq": [
+        3,
+        5
+      ],
+      "comp": [
+        3,
+        5
+      ],
+      "wall": [
+        4,
+        6
+      ],
+      "chain": [
+        3,
+        3
+      ],
+      "teil": [
+        1,
+        2
+      ]
+    },
+    "city": {
+      "add": [
+        4,
+        6
+      ],
+      "sub": [
+        4,
+        6
+      ],
+      "mul": [
+        4,
+        6
+      ],
+      "div": [
+        4,
+        6
+      ],
+      "line": [
+        2,
+        5
+      ],
+      "seq": [
+        3,
+        5
+      ],
+      "comp": [
+        3,
+        5
+      ],
+      "wall": [
+        4,
+        6
+      ],
+      "chain": [
+        3,
+        4
+      ],
+      "teil": [
+        1,
+        4
+      ]
+    },
+    "trench": {
+      "add": [
+        3,
+        6
+      ],
+      "sub": [
+        3,
+        6
+      ],
+      "mul": [
+        3,
+        6
+      ],
+      "div": [
+        3,
+        6
+      ],
+      "line": [
+        2,
+        5
+      ],
+      "seq": [
+        2,
+        5
+      ],
+      "comp": [
+        2,
+        5
+      ],
+      "wall": [
+        3,
+        6
+      ],
+      "chain": [
+        2,
+        4
+      ],
+      "pvs": [
+        1,
+        4
+      ],
+      "teil": [
+        1,
+        4
+      ]
+    }
+  }
+}

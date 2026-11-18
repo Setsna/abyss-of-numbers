@@ -3,9 +3,10 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { ICON } from '../icons.js';
-import { renderAsset } from '../assets.js';
-import { renderCard } from '../components/card.js';
+import { wayText } from '../text.js?v=ea296573';
+import { ICON } from '../icons.js?v=ea296573';
+import { renderAsset } from '../assets.js?v=ea296573';
+import { renderCard } from '../components/card.js?v=ea296573';
 
 const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
 const SLOTS = ['kopf', 'koerper', 'hand'];
@@ -178,9 +179,16 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
     head.className = 'lb-quiet';
     head.textContent = p.practice.length ? t('logbook.practiceText') : t('logbook.practiceEmpty');
     const ul = document.createElement('ul');
-    ul.replaceChildren(...p.practice.map((text) => {
+    ul.replaceChildren(...p.practice.map((text, i) => {
       const li = document.createElement('li');
       li.textContent = text;
+      const way = wayText(t, (p.practiceWays ?? [])[i]); // Rechenweg darunter (Phase 6b, Regelwerk 8.3)
+      if (way) {
+        const small = document.createElement('span');
+        small.className = 'practice-way';
+        small.textContent = way;
+        li.append(small);
+      }
       return li;
     }));
     wrap.append(head, ul);

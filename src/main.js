@@ -1,32 +1,32 @@
 // Einstieg: Konfiguration und Bildliste laden, prüfen, Spielstand laden, dann Titel oder (nur lokal) Testkämpfe.
-// Testkampf: index.html?dev=combat&enemies=crab,jelly&seed=1  (dazu &zeit=plus50|plus100|noTimer, &calm=1, &stufe=2, &stroemung=1.2, &area=caves)
+// Testkampf: index.html?dev=combat&enemies=crab,jelly&seed=1  (dazu &zeit=plus50|plus100|noTimer, &calm=1, &stufe=2, &stroemung=1.2, &area=caves, &klasse=4)
 // Ohne ?dev=…: Spielablauf über Station und Seekarte.
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js';
-import { createStorage, STORAGE_KEY } from './platform/storage.js';
-import { createAccount, accountBackend } from './platform/account.js';
-import { FIREBASE } from './platform/firebase-config.js';
-import { createAudio } from './platform/audio.js';
-import { validateConfig } from './engine/config/validate.js';
-import { createSave } from './engine/save/save.js';
-import { createGame } from './engine/game.js';
-import { setTexts, t } from './ui/text.js';
-import { setManifest } from './ui/assets.js';
-import { isLocalHost } from './ui/app.js';
-import { mountCombat } from './ui/screens/combat.js';
-import { mountReward } from './ui/screens/reward.js';
-import { mountShop } from './ui/screens/shop.js';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js';
-import { mountBase } from './ui/screens/base.js';
-import { mountTitle } from './ui/screens/title.js';
-import { mountLogin } from './ui/screens/login.js';
-import { mountGrade, mountGradeNotice } from './ui/screens/grade.js';
-import { mountHeroCreate } from './ui/screens/hero-create.js';
-import { mountLogbook } from './ui/screens/logbook.js';
-import { mountAdult } from './ui/screens/adult.js';
-import { createRng } from './engine/rng.js';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=ea296573';
+import { createStorage, STORAGE_KEY } from './platform/storage.js?v=ea296573';
+import { createAccount, accountBackend } from './platform/account.js?v=ea296573';
+import { FIREBASE } from './platform/firebase-config.js?v=ea296573';
+import { createAudio } from './platform/audio.js?v=ea296573';
+import { validateConfig } from './engine/config/validate.js?v=ea296573';
+import { createSave } from './engine/save/save.js?v=ea296573';
+import { createGame } from './engine/game.js?v=ea296573';
+import { setTexts, t } from './ui/text.js?v=ea296573';
+import { setManifest } from './ui/assets.js?v=ea296573';
+import { isLocalHost } from './ui/app.js?v=ea296573';
+import { mountCombat } from './ui/screens/combat.js?v=ea296573';
+import { mountReward } from './ui/screens/reward.js?v=ea296573';
+import { mountShop } from './ui/screens/shop.js?v=ea296573';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=ea296573';
+import { mountBase } from './ui/screens/base.js?v=ea296573';
+import { mountTitle } from './ui/screens/title.js?v=ea296573';
+import { mountLogin } from './ui/screens/login.js?v=ea296573';
+import { mountGrade } from './ui/screens/grade.js?v=ea296573';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=ea296573';
+import { mountLogbook } from './ui/screens/logbook.js?v=ea296573';
+import { mountAdult } from './ui/screens/adult.js?v=ea296573';
+import { createRng } from './engine/rng.js?v=ea296573';
 
 const app = document.getElementById('app');
 
@@ -98,6 +98,7 @@ function runDevCombats(config, params) {
   const { storage, save } = openSave(config);
   const zeit = params.get('zeit');
   if (zeit && config.game.moreTime[zeit] !== undefined) save.einstellung.mehrZeit = zeit;
+  if (params.get('klasse') === '4') save.klasse = 4; // Testkampf mit den Aufgaben von Klasse 4 (Phase 6b)
   const game = createGame({ config, save, seed: Number(params.get('seed') || Date.now() % 100000) });
   const audio = setupAudio(config, save.einstellung);
   audio.setScene(params.get('area') || 'reef'); // Testkampf: &area=caves usw. für den Hintergrundklang
@@ -112,7 +113,9 @@ function runDevCombats(config, params) {
 
   function fight() {
     game.setNow(Date.now());
-    game.startCombat(enemies.length ? enemies : ['crab'], level, { enemyPower: Number(params.get('stroemung') || 1) });
+    // &area=caves usw. wählt auch die Aufgaben des Gebiets (Phase 6b, Gebietsfenster)
+    const area = config.class3.areas[params.get('area')] ? params.get('area') : 'reef';
+    game.startCombat(enemies.length ? enemies : ['crab'], level, { enemyPower: Number(params.get('stroemung') || 1), areaId: area });
     show(mountCombat(app, {
       config, t, game, audio,
       onWon: () => {
@@ -191,9 +194,8 @@ function runGame(config, session = null) {
       show(mountGrade(app, {
         t, config,
         onChoose: (grade) => {
-          const events = act({ type: 'chooseGrade', grade });
-          if (events.some((e) => e.type === 'gradeNotice')) show(mountGradeNotice(app, { t, onOk: route }));
-          else route();
+          act({ type: 'chooseGrade', grade });
+          route();
         },
       }));
     } else if (v.screen === 'heroCreate') {

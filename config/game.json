@@ -48,7 +48,23 @@
     "match": 10000,
     "twoStep": 15000,
     "pointBeforeLine": 15000,
-    "compareTerms": 20000
+    "compareTerms": 20000,
+    "divisibility": 15000
+  },
+  "learning": {
+    "enabled": true,
+    "listSize": 8,
+    "upCorrect": 7,
+    "downMin": 6,
+    "downWrong": 4,
+    "mixEvery": 4,
+    "practiceDoneAfter": 2,
+    "newStagePearls": 3
+  },
+  "timeClassMs": {
+    "short": 10000,
+    "medium": 15000,
+    "long": 20000
   },
   "moreTime": {
     "off": 1,

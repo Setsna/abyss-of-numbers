@@ -34,11 +34,13 @@ export function deckList(save) {
   return Object.entries(save.deck).flatMap(([id, n]) => Array(n).fill(id));
 }
 
-// entries: [{ key, text }]; gleicher Schlüssel wird erneuert, es bleiben die neuesten.
+// entries: [{ key, text, stufe? }]; gleicher Schlüssel wird erneuert (Zähler wieder 0), es bleiben die neuesten.
 export function addPractice(save, entries, now, config) {
-  for (const { key, text } of entries) {
+  for (const { key, text, stufe: given } of entries) {
+    // Stufe bleibt, wenn derselbe Fehler aus einem Format ohne Stufe kommt (Phase 7a)
+    const stufe = given ?? save.uebung[key]?.stufe;
     delete save.uebung[key]; // neu einfügen, damit die Reihenfolge stimmt
-    save.uebung[key] = { text, t: now };
+    save.uebung[key] = stufe ? { text, t: now, stufe, richtig: 0 } : { text, t: now };
   }
   const keys = Object.keys(save.uebung);
   const max = config.game.practiceListMax;

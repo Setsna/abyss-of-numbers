@@ -1,27 +1,27 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js';
-import { generateTask } from '../math/generate.js';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js';
-import { intentFor, advancePattern } from '../enemies/intents.js';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js';
-import { cardEffect } from '../cards/effect.js';
+import { createRng, deriveSeed } from '../rng.js?v=ea296573';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=ea296573';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=ea296573';
+import { chooseSource } from '../learning/learning.js?v=ea296573';
+import { crossPlace } from '../math/places.js?v=ea296573';
+import { neighborWay } from '../math/ways.js?v=ea296573';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=ea296573';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=ea296573';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=ea296573';
+import { cardEffect } from '../cards/effect.js?v=ea296573';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
-// Gebiet aus dem Lehrplan der Klassenstufe; "sameAs" verweist auf eine andere Stufe.
-// "mixOf" (Phase 5, Etappe 5, Tiefseegraben): Mischung aus anderen Gebieten; generateTask
-// zieht je Aufgabe eines davon.
+// Gebiet aus dem Lehrplan der Klassenstufe ("sameAs" verweist auf eine andere Stufe). Seit Phase 6b
+// steht dort nur der Zahlenraum; was gerechnet wird, bestimmen Leiterstufen und Gebietsfenster.
 export function resolveCurriculum(config, grade, areaId) {
-  let cur = config[`class${grade}`];
-  if (cur && cur.sameAs) cur = config[`class${cur.sameAs}`];
-  const area = cur?.areas?.[areaId];
+  const area = curriculumOf(config, grade)?.areas?.[areaId];
   if (!area) throw new Error(`Gebiet ${areaId} fehlt im Lehrplan Klasse ${grade}`);
-  if (!area.mixOf) return area;
-  return { ...area, mixOf: area.mixOf.map((id) => resolveCurriculum(config, grade, id)) };
+  return area;
 }
 
 function enemyType(config, typeId) {
@@ -30,7 +30,8 @@ function enemyType(config, typeId) {
   return t;
 }
 
-export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off', areaId, level = 1, seed, untimedTasks = 0, grade = 3, forgiving = false, cardLevels = {}, enemyPower = 1 }) {
+export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off', areaId, level = 1, seed, untimedTasks = 0, grade = 3, forgiving = false, cardLevels = {}, enemyPower = 1, taskPlan = null }) {
+  // taskPlan (Phase 6b): { grade, stageOf: { <leiter>: n }, windows: { <leiter>: [von, bis] } }; ohne Plan Regelwerk 7.6 nach level
   // enemyPower: Strömung (D33), Leben und Angriff der Gegner × enemyPower
   // cardLevels: Stufe je Kartenart (Etappe 8), gilt für den ganzen Kampf
   // forgiving: Erklärungskampf (D24), Fehler kosten keine Leben und kommen nicht auf die Übungsliste.
@@ -40,6 +41,14 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
     config,
     rng: { shuffle: shuffleRng, tasks: taskRng },
     area: resolveCurriculum(config, grade, areaId),
+    curriculum: curriculumOf(config, grade),
+    taskPlan: taskPlan ?? planWithoutLearning(curriculumOf(config, grade), areaId, level === 1 ? 'intro' : 'normal', grade),
+    asked: new Set(), // A-3: schon gestellte Rechnungen dieses Kampfs
+    // Mischregel (Regelwerk 7.2): Aufgaben je Leiter. Der Zähler läuft über Kämpfe und Tauchgänge weiter
+    // (Review 7b, B1: ein Kampf allein hat selten vier Aufgaben einer Leiter); das Spiel reicht den Stand
+    // im Aufgabenplan herein und schreibt ihn nach jeder Aufgabe in den Spielstand.
+    mixCount: { ...(taskPlan?.mixCount ?? {}) },
+    usedPractice: new Set(), // Übungsaufgaben, die in diesem Kampf schon dran waren
     level,
     moreTime,
     untimedLeft: untimedTasks,
@@ -164,6 +173,10 @@ function asStep(task) {
     choices: task.choices, correctIndex: task.correctIndex,
     solutionText: task.solutionText, practiceKey: task.practiceKey,
     line: task.line, marks: task.marks,
+    // eigene Zeit des Schritts (A-7): Zeitklasse und Zusatzzeit der Stufe, aus der er stammt
+    timeClass: task.timeClass ?? null, extraMs: task.extraMs ?? 0,
+    // Hilfe nach einem Fehler auch im Schritt (Review 7b, B6): Fehlertypen der Antworten und Rechenweg
+    choiceTypes: task.choiceTypes ?? null, way: task.way ?? null,
   };
 }
 
@@ -172,6 +185,9 @@ function setStep(task, i) {
   const st = task.steps[i];
   task.stepIndex = i;
   task.stepFormat = st.format ?? task.format;
+  // Zeit des Schritts: seine eigene Zeitklasse und Zusatzzeit, sonst die der ganzen Aufgabe
+  task.stepTimeClass = 'timeClass' in st ? st.timeClass : (task.timeClass ?? null);
+  task.stepExtraMs = st.extraMs ?? task.extraMs ?? 0;
   if (st.line) { task.line = st.line; task.marks = st.marks; }
   task.prompt = st.prompt;
   task.promptParams = st.promptParams ?? null;
@@ -180,6 +196,8 @@ function setStep(task, i) {
   task.correctIndex = st.correctIndex;
   task.solutionText = st.solutionText;
   task.practiceKey = st.practiceKey ?? task.practiceKey;
+  task.choiceTypes = st.choiceTypes ?? null; // Fehlertypen und Rechenweg des Schritts (Phase 6b)
+  task.way = st.way ?? null;
   task.wrongChoices = [];
   // Zuordnen: schon zugeordnete Ergebnisse sind gesperrt (die vier Felder bleiben, D12)
   task.usedChoices = task.format === 'match' ? task.steps.slice(0, i).map((x) => x.correctIndex) : [];
@@ -222,7 +240,9 @@ function answerStep(c, outcome, choiceIndex) {
   const pending = c.pending;
   const task = pending.task;
   const def = c.config.cards[pending.cardId];
-  const events = [{ type: 'stepJudged', stepIndex: task.stepIndex, outcome }];
+  const st = task.steps[task.stepIndex];
+  const events = [{ type: 'stepJudged', stepIndex: task.stepIndex, outcome, ladder: st.ladder ?? null, stageId: st.stageId ?? null, counts: Boolean(st.counts && !st.tried) }];
+  st.tried = true;
   if (outcome === 'correct') {
     if (def.effect.type === 'damagePerStep') {
       const fx = effectOf(c, pending.cardId);
@@ -236,7 +256,7 @@ function answerStep(c, outcome, choiceIndex) {
     }
     if (task.stepIndex + 1 < task.steps.length) {
       setStep(task, task.stepIndex + 1);
-      if (!task.untimed) task.timeLimitMs = timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game);
+      if (!task.untimed) task.timeLimitMs = timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game, task.stepTimeClass, task.stepExtraMs);
       events.push({ type: 'stepOpened', stepIndex: task.stepIndex, task: clone(task) });
       return events;
     }
@@ -251,7 +271,83 @@ function answerStep(c, outcome, choiceIndex) {
     events.push({ type: 'freeMistakeUsed', left: task.freeLeft });
     return events;
   }
-  return [...events, ...resolveTask(c, outcome, null, 0)];
+  return [...events, ...resolveTask(c, outcome, null, 0, choiceIndex)];
+}
+
+// Stufen des Aufgabenplans je Leiter (für die zusammengesetzten Formate, Regelwerk 5.7)
+function planStages(c) {
+  return Object.fromEntries(Object.entries(c.taskPlan.stageOf).map(([ladder, n]) => [ladder, stageAt(c.curriculum, ladder, n)]));
+}
+
+// „Rechnung lösen“ aus der Leiterstufe des Aufgabenplans (Phase 6b); null, wenn das Format
+// (noch) keine Leiter hat
+function ladderTask(c, spec) {
+  if (spec.format !== 'solve' || !LADDERS[spec.operation]) return null;
+  const op = spec.operation;
+  const n = c.taskPlan.stageOf[op];
+  if (!n) return null;
+  const win = c.taskPlan.windows[op];
+  const src = mixSource(c, op, n, (c.taskPlan.practice ?? []).filter((p) => fitsPractice(c, op, win, p)));
+  let task;
+  if (src.source === 'practice') {
+    c.usedPractice.add(src.entry.key);
+    const [, a, b] = src.entry.key.split(':').map(Number);
+    task = taskFromNumbers(op, stageById(c.curriculum, src.entry.stufe), { a, b }, c.area, c.rng.tasks);
+    task.practice = true;
+    task.review = true;
+  } else {
+    task = generateFromStage(op, stageAt(c.curriculum, op, src.stufe), c.area, c.rng.tasks, c.asked);
+    if (src.source === 'lower') task.review = true;
+  }
+  task.stageRank = rankOf(c, op, task.stageId, win); // Stufe der gestellten Aufgabe (Wiederholung, Übung)
+  c.asked.add(taskKey(task.operation, task.a, task.b));
+  return task;
+}
+
+// Stufe einer Aufgabe über dem unteren Rand des Fensters (0 = Rand); Testspieler und Balance-Messung
+function rankOf(c, ladder, stageId, win) {
+  const n = c.curriculum.ladders[ladder].stages.findIndex((s) => s.id === stageId) + 1;
+  return n > 0 ? n - win[0] : c.taskPlan.stageOf[ladder] - win[0];
+}
+
+// Mischregel (Regelwerk 7.2): zählt die Aufgaben je Leiter und wählt die Quelle der nächsten
+function mixSource(c, ladder, n, practice = []) {
+  c.mixCount[ladder] = (c.mixCount[ladder] ?? 0) + 1;
+  return chooseSource({ stufe: n, win: c.taskPlan.windows[ladder], count: c.mixCount[ladder], mixEvery: c.taskPlan.mixEvery ?? 0, practice }, c.rng.tasks);
+}
+
+// A-3 (Durchsicht 6b): Kennung einer Rechnung für „schon gestellt“, in allen Formaten. Rechnungen
+// „op:a:b“ wie bei taskKey (Tauschaufgaben gleich), sonst die Übungskennung des Formats.
+const CALC_KEY = /^(add|sub|mul|div):(\d+):(\d+)$/;
+function repeatKey(key) {
+  const m = CALC_KEY.exec(key ?? '');
+  return m ? taskKey(m[1], Number(m[2]), Number(m[3])) : key;
+}
+function repeatKeys(task) {
+  return [task.practiceKey, ...(task.steps ?? []).map((st) => st.practiceKey)].filter(Boolean).map(repeatKey);
+}
+const isRepeat = (c, task) => repeatKeys(task).some((k) => c.asked.has(k));
+const REPEAT_TRIES = 20; // danach darf wiederholt werden (Vorrat erschöpft, A-3)
+function freshTask(c, make) {
+  let task = make();
+  for (let i = 0; i < REPEAT_TRIES && isRepeat(c, task); i++) task = make();
+  return task;
+}
+
+// Übungsaufgabe passt: gleiche Rechenart, Stufe im Fenster, in diesem Kampf noch nicht gestellt
+function fitsPractice(c, op, win, p) {
+  if (!p.key.startsWith(`${op}:`) || c.usedPractice.has(p.key) || c.asked.has(repeatKey(p.key))) return false;
+  const i = c.curriculum.ladders[op].stages.findIndex((s) => s.id === p.stufe);
+  return i + 1 >= win[0] && i + 1 <= win[1];
+}
+
+// Was zählt (Regelwerk 7.1 Nr. 7): nur Aufgaben aus der aktuellen Stufe des Kindes mit genau einer Rechnung
+const COUNTED_FORMATS = new Set(['solve', ...Object.keys(FORMAT_LADDER), 'match']);
+function markCounts(c, task) {
+  const current = (ladder) => (c.taskPlan.stageOf[ladder] ? stageAt(c.curriculum, ladder, c.taskPlan.stageOf[ladder]).id : null);
+  const ok = (x) => Boolean(c.taskPlan.countable && !task.review && !task.hiddenFind && COUNTED_FORMATS.has(task.format) && x.ladder && x.stageId === current(x.ladder));
+  if (task.steps) for (const st of task.steps) st.counts = ok(st);
+  else task.counts = ok(task);
 }
 
 function playCard(c, { cardUid, targetUid }) {
@@ -277,17 +373,31 @@ function playCard(c, { cardUid, targetUid }) {
     return events;
   }
 
-  const spec = { format: def.task.format, operation: def.task.operation, level: c.level };
+  const spec = { format: def.task.format, operation: def.task.operation, level: c.level, stages: planStages(c) };
+  // ifLadder (Klasse 4, Panzerknacker): hat das Gebietsfenster diese Leiter, gilt ihr Format (Teilbarkeit)
+  const alt = def.task.ifLadder;
+  if (alt && c.taskPlan.stageOf[alt]) spec.format = Object.keys(FORMAT_LADDER).find((f) => FORMAT_LADDER[f] === alt);
   const rule = target?.rule;
   // Wächter, Herr des Grabens: Rechenkarten gegen sie bekommen ein anderes Format
   if (rule?.type === 'taskModifier' && spec.format === 'solve') spec.format = rule.format;
-  let task = generateTask(spec, c.area, c.rng.tasks);
+  const ownLadder = FORMAT_LADDER[spec.format];
+  let review = false;
+  if (ownLadder && c.taskPlan.stageOf[ownLadder] && !(rule?.type === 'taskModifier')) {
+    const src = mixSource(c, ownLadder, c.taskPlan.stageOf[ownLadder]);
+    if (src.source === 'lower') { spec.stages = { ...spec.stages, [ownLadder]: stageAt(c.curriculum, ownLadder, src.stufe) }; review = true; }
+  }
+  // „Rechnung lösen“ meidet Wiederholungen schon beim Ziehen (ladderTask); die anderen Formate hier (A-3)
+  let task = ladderTask(c, spec) ?? freshTask(c, () => generateTask(spec, c.area, c.rng.tasks));
+  if (review) task.review = true;
+  if (task.ladder && task.stageRank === undefined && c.taskPlan.windows[task.ladder]) task.stageRank = rankOf(c, task.ladder, task.stageId, c.taskPlan.windows[task.ladder]);
   // Muräne: vor jedem Angriff erst am Zahlenstrahl finden; gefunden wirkt die Karte mehrfach
   if (rule?.type === 'hidden' && def.effect.type === 'damage') {
-    const find = generateTask({ format: rule.find, level: c.level }, c.area, c.rng.tasks);
-    const rest = task.steps ? task.steps.map((st) => ({ format: task.format, ...st })) : [asStep(task)];
+    const find = freshTask(c, () => generateTask({ format: rule.find, stages: spec.stages }, c.area, c.rng.tasks));
+    const rest = task.steps ? task.steps.map((st) => ({ format: task.format, timeClass: task.timeClass ?? null, extraMs: task.extraMs ?? 0, ...st })) : [asStep(task)];
     task = { ...task, steps: [asStep(find), ...rest], noTempo: true, multiplier: rule.multiplier, hiddenFind: true, stepOffset: 1 };
   }
+  for (const k of repeatKeys(task)) c.asked.add(k);
+  markCounts(c, task);
   if (task.steps) {
     // Mehrschrittig (Phase 5, Etappe 4): freie Fehlversuche aus der Karte, Zeit je Schritt
     task.freeMistakes = def.task.freeMistakes ?? 0;
@@ -299,7 +409,9 @@ function playCard(c, { cardUid, targetUid }) {
     task.untimed = true;
     c.untimedLeft -= 1;
   } else {
-    task.timeLimitMs = timeLimitFor(task.stepFormat ?? task.format, c.hero.calm, c.moreTime, c.config.game);
+    task.timeLimitMs = task.steps
+      ? timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game, task.stepTimeClass, task.stepExtraMs)
+      : timeLimitFor(task.format, c.hero.calm, c.moreTime, c.config.game, task.timeClass ?? null, task.extraMs ?? 0);
   }
   if (c.forgiving) task.forgiving = true;
   c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? null, task };
@@ -353,11 +465,32 @@ function applyCorrect(c, def, pending, multiplier) {
   return events;
 }
 
-function resolveTask(c, outcome, tierId, multiplier) {
+// Felder für die Lernstufen (Regelwerk 7.1): Leiter, Stufe, ob die Antwort zählt, Übungsaufgabe
+function judgedFields(t) {
+  return { ladder: t.ladder ?? null, stageId: t.stageId ?? null, counts: Boolean(t.counts && !t.steps), practiceKey: t.practiceKey ?? null, practice: Boolean(t.practice), review: Boolean(t.review) };
+}
+
+// chosen: gewählte Antwort (für den Fehlertyp); -1 oder null bei abgelaufener Zeit
+function resolveTask(c, outcome, tierId, multiplier, chosen = null) {
   const pending = c.pending;
   const def = c.config.cards[pending.cardId];
   c.pending = null;
-  const events = [{ type: 'answerJudged', outcome, tierId, solutionText: pending.task.solutionText, cardId: pending.cardId }];
+  const t = pending.task;
+  const events = [{ type: 'answerJudged', outcome, tierId, solutionText: t.solutionText, cardId: pending.cardId, ...judgedFields(t) }];
+  if (outcome !== 'correct') {
+    // Hilfe nach einem Fehler (Regelwerk 8.1, 8.2): Fehlertyp der gewählten Antwort und Rechenweg
+    events[0].mistakeType = (chosen !== null && chosen >= 0 ? t.choiceTypes?.[chosen] : null) ?? null;
+    events[0].way = t.way ?? null;
+    // Nachbaraufgabe getippt: Weg von dieser Aufgabe aus, passend zum Hinweis (Phase 7a, Kritik P2)
+    if ((events[0].mistakeType === 'F-MUL-a' || events[0].mistakeType === 'F-MUL-d') && Number.isInteger(t.a) && Number.isInteger(t.b)) {
+      const nw = neighborWay(t.a, t.b, Number(String(t.choices[chosen]).replace(/\D/g, '')));
+      if (nw) events[0].way = nw;
+    }
+    // Stelle des Übergangs für den Hinweis (Phase 7a, D47); nur bei Plus und Minus mit Fehlertyp
+    // (bei der Muräne trägt die Aufgabe a und b der Rechnung auch im Suchschritt, deshalb die Prüfung des Typs)
+    const plusMinusMistake = /^F-(ADD|SUB)-/.test(events[0].mistakeType ?? '');
+    events[0].hintPlace = plusMinusMistake && Number.isInteger(t.a) && Number.isInteger(t.b) ? crossPlace(t.operation, t.a, t.b) : null;
+  }
   if (outcome === 'correct') {
     events.push(...applyCorrect(c, def, pending, multiplier));
     setStreak(c, c.streak + 1, events);
@@ -386,6 +519,11 @@ function resolveTask(c, outcome, tierId, multiplier) {
 function answer(c, { choiceIndex, elapsedMs }) {
   if (c.phase !== 'task') return reject('phase');
   const task = c.pending.task;
+  // Phase 7a: nur ein vorhandener Knopf und eine Zeit als Zahl (die Oberfläche schickt nichts anderes);
+  // eine negative Zeit (Aufgabe ohne Zeitlimit: Grenze 0 − 1) zählt als 0
+  if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || choiceIndex >= task.choices.length) return reject('command');
+  if (typeof elapsedMs !== 'number' || !Number.isFinite(elapsedMs)) return reject('command');
+  elapsedMs = Math.max(0, elapsedMs);
   const tempo = judgeTempo(elapsedMs, task.timeLimitMs, c.config.game.tempo);
   if (task.steps) {
     if ((task.usedChoices ?? []).includes(choiceIndex) || task.wrongChoices.includes(choiceIndex)) return reject('card');
@@ -393,7 +531,7 @@ function answer(c, { choiceIndex, elapsedMs }) {
     return answerStep(c, outcome, outcome === 'timeout' ? -1 : choiceIndex);
   }
   if (tempo.result === 'timeout') return resolveTask(c, 'timeout', null, 0);
-  if (choiceIndex !== task.correctIndex) return resolveTask(c, 'wrong', null, 0);
+  if (choiceIndex !== task.correctIndex) return resolveTask(c, 'wrong', null, 0, choiceIndex);
   return resolveTask(c, 'correct', tempo.tierId, tempo.multiplier);
 }
 
