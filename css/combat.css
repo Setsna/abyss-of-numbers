@@ -70,14 +70,17 @@
 .current { font-weight: 700; font-size: calc(17 * var(--u)); background: var(--sea-deep); color: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: calc(2 * var(--u)) calc(10 * var(--u)); white-space: nowrap; }
 .current[hidden] { display: none; }
 .current.is-low { background: var(--paper); color: var(--ink); }
+/* Lebensbalken (deutlicher seit 18.11.2026, Ingos Wunsch): dicker, heller Grund für den leeren Teil und
+   ein papierweißer Ring außen, damit er sich auch vor bunten Hintergründen abhebt */
 .hpbar {
-  width: 86%; height: calc(14 * var(--u));
-  background: var(--sea-night);
+  width: 86%; height: calc(24 * var(--u));
+  background: var(--disabled-fill);
   border: var(--line-thin) solid var(--ink);
   border-radius: calc(999 * var(--u));
+  box-shadow: 0 0 0 calc(3 * var(--u)) var(--paper);
   overflow: hidden;
 }
-.hpbar i { display: block; height: 100%; background: var(--heal); transition: width var(--t-mid) var(--ease-out); }
+.hpbar i { display: block; height: 100%; background: var(--heal); border-right: var(--line-thin) solid var(--ink); transition: width var(--t-mid) var(--ease-out); }
 .foe .hpbar i { background: var(--coral); }
 
 /* Gegner */

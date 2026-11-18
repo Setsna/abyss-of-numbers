@@ -4,29 +4,29 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=2c640ccc';
-import { createStorage, STORAGE_KEY } from './platform/storage.js?v=2c640ccc';
-import { createAccount, accountBackend } from './platform/account.js?v=2c640ccc';
-import { FIREBASE } from './platform/firebase-config.js?v=2c640ccc';
-import { createAudio } from './platform/audio.js?v=2c640ccc';
-import { validateConfig } from './engine/config/validate.js?v=2c640ccc';
-import { createSave } from './engine/save/save.js?v=2c640ccc';
-import { createGame } from './engine/game.js?v=2c640ccc';
-import { setTexts, t } from './ui/text.js?v=2c640ccc';
-import { setManifest } from './ui/assets.js?v=2c640ccc';
-import { isLocalHost } from './ui/app.js?v=2c640ccc';
-import { mountCombat } from './ui/screens/combat.js?v=2c640ccc';
-import { mountReward } from './ui/screens/reward.js?v=2c640ccc';
-import { mountShop } from './ui/screens/shop.js?v=2c640ccc';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=2c640ccc';
-import { mountBase } from './ui/screens/base.js?v=2c640ccc';
-import { mountTitle } from './ui/screens/title.js?v=2c640ccc';
-import { mountLogin } from './ui/screens/login.js?v=2c640ccc';
-import { mountGrade } from './ui/screens/grade.js?v=2c640ccc';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=2c640ccc';
-import { mountLogbook } from './ui/screens/logbook.js?v=2c640ccc';
-import { mountAdult } from './ui/screens/adult.js?v=2c640ccc';
-import { createRng } from './engine/rng.js?v=2c640ccc';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=7aea6f1b';
+import { createStorage, STORAGE_KEY } from './platform/storage.js?v=7aea6f1b';
+import { createAccount, accountBackend } from './platform/account.js?v=7aea6f1b';
+import { FIREBASE } from './platform/firebase-config.js?v=7aea6f1b';
+import { createAudio } from './platform/audio.js?v=7aea6f1b';
+import { validateConfig } from './engine/config/validate.js?v=7aea6f1b';
+import { createSave } from './engine/save/save.js?v=7aea6f1b';
+import { createGame } from './engine/game.js?v=7aea6f1b';
+import { setTexts, t } from './ui/text.js?v=7aea6f1b';
+import { setManifest } from './ui/assets.js?v=7aea6f1b';
+import { isLocalHost } from './ui/app.js?v=7aea6f1b';
+import { mountCombat } from './ui/screens/combat.js?v=7aea6f1b';
+import { mountReward } from './ui/screens/reward.js?v=7aea6f1b';
+import { mountShop } from './ui/screens/shop.js?v=7aea6f1b';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=7aea6f1b';
+import { mountBase } from './ui/screens/base.js?v=7aea6f1b';
+import { mountTitle } from './ui/screens/title.js?v=7aea6f1b';
+import { mountLogin } from './ui/screens/login.js?v=7aea6f1b';
+import { mountGrade } from './ui/screens/grade.js?v=7aea6f1b';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=7aea6f1b';
+import { mountLogbook } from './ui/screens/logbook.js?v=7aea6f1b';
+import { mountAdult } from './ui/screens/adult.js?v=7aea6f1b';
+import { createRng } from './engine/rng.js?v=7aea6f1b';
 
 const app = document.getElementById('app');
 
@@ -41,6 +41,7 @@ function setupAudio(config, settings) {
     music: settings?.musik ?? true,
     volume: settings?.lautstaerke ?? config.sounds.defaultVolume,
     context: Ctx ? () => new Ctx() : null,
+    loadTrack: (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(url); return r.arrayBuffer(); }), // Musikstücke (D35)
   });
   document.addEventListener('pointerdown', () => audio.unlock(), { capture: true });
   document.addEventListener('click', (ev) => {
@@ -169,8 +170,9 @@ function runGame(config, session = null) {
 
   function route() {
     const v = game.view();
-    // Hintergrundklang: im Tauchgang das Gebiet, sonst die Station
-    audio.setScene(v.run?.areaId ?? v.cleared?.areaId ?? 'base');
+    // Hintergrundklang: im Bosskampf das Boss-Stück, im Tauchgang das Gebiet, sonst die Station
+    const bossFight = v.screen === 'combat' && v.combat?.enemies.some((e) => config.bosses.bosses[e.typeId]);
+    audio.setScene(bossFight ? 'boss' : v.run?.areaId ?? v.cleared?.areaId ?? 'base');
     if (v.screen === 'title') {
       show(mountTitle(app, {
         t, hasSave: Boolean(v.profile),

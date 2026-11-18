@@ -23,7 +23,28 @@ export function soundKeyFor(event, map) {
 // Hintergrundklang je Ort (setScene, nach Ingos Probespiel 17.11.2026): Meeresrauschen (gefiltertes
 // Rauschen, das langsam an- und abschwillt), tiefes Brummen und ab und zu Blubberblasen.
 // Werte je Station und Gebiet in sounds.json → ambience. Hängt am Schalter „Musik“.
-export function createAudio({ sounds, enabled = true, music = false, volume = 1, context = null, timers = globalThis, random = Math.random } = {}) {
+//
+// Musikstücke (D35, 18.11.2026): Gibt es für den Ort ein Stück (sounds.json → tracks) und kann das Spiel
+// Dateien laden (loadTrack: url → ArrayBuffer), läuft statt des erzeugten Klangs das Stück in Schleife.
+// Die Stücke sind als nahtlose Schleife geschnitten; der stille Vorlauf, den der AAC-Kodierer vorn anhängt,
+// wird beim Abspielen übersprungen (loopStart), die Schleife ist genau loopSeconds lang.
+// Lässt sich ein Stück nicht laden, klingt der erzeugte Hintergrund wie bisher.
+// Ort 'boss' gibt es nur als Stück; ohne Stück klingt dort der Hintergrund der Station.
+const FADE_IN = 1.2;
+const FADE_OUT = 0.6;
+
+// Beginn der Musik in einem dekodierten Stück (Sekunden): erste Stelle, an der ein Kanal hörbar wird
+export function musicStart(buffer, threshold = 0.003) {
+  const n = buffer.numberOfChannels ?? 1;
+  let first = buffer.length;
+  for (let c = 0; c < n; c++) {
+    const d = buffer.getChannelData(c);
+    for (let i = 0; i < Math.min(first, d.length); i++) if (Math.abs(d[i]) > threshold) { first = i; break; }
+  }
+  return first >= buffer.length ? 0 : first / buffer.sampleRate;
+}
+
+export function createAudio({ sounds, enabled = true, music = false, volume = 1, context = null, timers = globalThis, random = Math.random, loadTrack = null } = {}) {
   let on = Boolean(enabled);
   let musicOn = Boolean(music);
   let vol = clamp01(volume);
@@ -33,7 +54,44 @@ export function createAudio({ sounds, enabled = true, music = false, volume = 1,
   let noiseBuffer = null;
   let scene = 'base';
 
-  const sceneOf = (id) => (sounds?.ambience?.[id] ? id : 'base');
+  const sceneOf = (id) => (sounds?.ambience?.[id] || sounds?.tracks?.[id] ? id : 'base');
+  const trackCache = new Map(); // Ort → Versprechen auf den dekodierten Puffer (null, wenn es nicht klappt)
+
+  function loadBuffer(id) {
+    if (!trackCache.has(id)) {
+      const tr = sounds.tracks[id];
+      trackCache.set(id, Promise.resolve()
+        .then(() => loadTrack(tr.file))
+        .then((data) => ctx.decodeAudioData(data))
+        .catch(() => null));
+    }
+    return trackCache.get(id);
+  }
+
+  // Stück für den Ort starten; bis es geladen ist, bleibt es still. Klappt das Laden nicht, Ersatzklang.
+  function startTrack(id) {
+    const tr = sounds.tracks[id];
+    const bus = ctx.createGain();
+    bus.gain.setValueAtTime(0, ctx.currentTime);
+    bus.connect(master);
+    const nodes = { bus, oscillators: [], sources: [], timer: null, track: id };
+    musicNodes = nodes;
+    loadBuffer(id).then((buffer) => {
+      if (musicNodes !== nodes) return; // inzwischen anderer Ort oder Musik aus
+      if (!buffer) { musicNodes = null; bus.disconnect?.(); startSynth(); return; }
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.loop = true;
+      const start = musicStart(buffer);
+      src.loopStart = start;
+      src.loopEnd = Math.min(buffer.duration, start + tr.loopSeconds);
+      src.connect(bus);
+      src.start(0, start);
+      nodes.sources.push(src);
+      bus.gain.setValueAtTime(0, ctx.currentTime);
+      bus.gain.linearRampToValueAtTime(tr.gain ?? 0.45, ctx.currentTime + FADE_IN);
+    });
+  }
   const between = ([a, b]) => a + (b - a) * random();
 
   // braunes Rauschen (weich, wie Brandung), 4 Sekunden, läuft in Schleife
@@ -93,9 +151,15 @@ export function createAudio({ sounds, enabled = true, music = false, volume = 1,
   }
 
   function startMusic() {
+    if (!ctx || musicNodes) return;
+    if (loadTrack && sounds?.tracks?.[scene] && ctx.decodeAudioData) { startTrack(scene); return; }
+    startSynth();
+  }
+
+  function startSynth() {
     if (!ctx || musicNodes || !sounds?.music) return;
     const m = sounds.music;
-    const amb = sounds.ambience?.[scene] ?? null;
+    const amb = sounds.ambience?.[scene] ?? sounds.ambience?.base ?? null;
     const bus = ctx.createGain();
     bus.gain.value = 1;
     bus.connect(master);
@@ -139,11 +203,21 @@ export function createAudio({ sounds, enabled = true, music = false, volume = 1,
 
   function stopMusic() {
     if (!musicNodes) return;
-    timers.clearTimeout(musicNodes.timer);
-    for (const o of musicNodes.oscillators) o.stop();
-    for (const src of musicNodes.sources) src.stop();
-    musicNodes.bus.disconnect?.();
+    const nodes = musicNodes;
     musicNodes = null;
+    timers.clearTimeout(nodes.timer);
+    for (const o of nodes.oscillators) o.stop();
+    if (nodes.track) {
+      // Stück weich ausblenden
+      const t = ctx.currentTime;
+      nodes.bus.gain.cancelScheduledValues?.(t);
+      nodes.bus.gain.setValueAtTime(nodes.bus.gain.value, t);
+      nodes.bus.gain.linearRampToValueAtTime(0, t + FADE_OUT);
+      for (const src of nodes.sources) src.stop(t + FADE_OUT);
+      return;
+    }
+    for (const src of nodes.sources) src.stop();
+    nodes.bus.disconnect?.();
   }
 
   function play(key) {

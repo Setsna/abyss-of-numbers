@@ -9,9 +9,9 @@
 //   inverse     Umkehraufgabe (8 · 7 = 56, also 56 : 7 = 8)
 //   complement  erst zum Zehner (Hunderter), dann zum Ziel (37 + 3 = 40, 40 + 60 = 100, zusammen 63)
 // null: ohne Übergang, Kernaufgaben und einschrittiges Ergänzen bekommen nur die richtige Rechnung.
-import { calcPlace, digitAt } from './places.js?v=2c640ccc';
-import { commonRound } from './mistakes.js?v=2c640ccc';
-import { formatEquation, formatNumber } from './format.js?v=2c640ccc';
+import { calcPlace, digitAt } from './places.js?v=7aea6f1b';
+import { commonRound } from './mistakes.js?v=7aea6f1b';
+import { formatEquation, formatNumber } from './format.js?v=7aea6f1b';
 
 const SIGN = { add: '+', sub: '−', mul: '·', div: ':' };
 const APPLY = { add: (x, y) => x + y, sub: (x, y) => x - y, mul: (x, y) => x * y, div: (x, y) => x / y };

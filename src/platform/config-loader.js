@@ -1,5 +1,5 @@
 // Lädt alle Konfigurationsdateien. fetchJson(pfad) bekommt den Pfad relativ zu game/config/.
-import { CONFIG_FILES } from '../engine/config/files.js?v=2c640ccc';
+import { CONFIG_FILES } from '../engine/config/files.js?v=7aea6f1b';
 
 export async function loadConfig(fetchJson) {
   const entries = await Promise.all(

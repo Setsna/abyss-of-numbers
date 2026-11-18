@@ -1,8 +1,8 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=2c640ccc';
-import { REJECT_REASONS } from '../combat/combat.js?v=2c640ccc';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=2c640ccc';
+import { CONFIG_FILES } from './files.js?v=7aea6f1b';
+import { REJECT_REASONS } from '../combat/combat.js?v=7aea6f1b';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=7aea6f1b';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -453,6 +453,14 @@ function validateSounds(file, s, errors) {
     c.number('music.gain', { min: 0, max: 0.2 });
     c.number('music.lfoHz', { min: 0, max: 5 });
     c.number('music.lfoDepth', { min: 0, max: 0.2 });
+  }
+  // Musikstücke je Ort (D35): Datei, Länge der Schleife, Lautstärke
+  if (s.tracks !== undefined && c.object('tracks')) {
+    for (const [id, tr] of Object.entries(s.tracks)) {
+      if (typeof tr?.file !== 'string' || !tr.file.startsWith('assets/audio/')) c.fail(`tracks.${id}.file`, 'Pfad unter assets/audio/');
+      c.number(`tracks.${id}.loopSeconds`, { min: 5, max: 600 });
+      c.number(`tracks.${id}.gain`, { min: 0, max: 1 });
+    }
   }
   // Hintergrundklang je Station und Gebiet (Meeresrauschen, Brummen, Blasen)
   if (s.ambience !== undefined && c.object('ambience')) {
