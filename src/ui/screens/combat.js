@@ -1,17 +1,17 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=a0977361';
-import { combatView } from '../../engine/combat/combat.js?v=a0977361';
-import { ICON } from '../icons.js?v=a0977361';
-import { renderAsset } from '../assets.js?v=a0977361';
-import { playEvents, wait, isCalm } from '../app.js?v=a0977361';
-import { bindKeys } from '../input.js?v=a0977361';
-import { renderEnemy } from '../components/enemy.js?v=a0977361';
-import { renderCard, emptySlot } from '../components/card.js?v=a0977361';
-import { createTaskPanel } from '../components/task-panel.js?v=a0977361';
-import { startTimerBar } from '../components/timer-bar.js?v=a0977361';
-import { createTutorial } from '../tutorial.js?v=a0977361';
+import { wayText, hintAsk } from '../text.js?v=e972392a';
+import { combatView } from '../../engine/combat/combat.js?v=e972392a';
+import { ICON } from '../icons.js?v=e972392a';
+import { renderAsset } from '../assets.js?v=e972392a';
+import { playEvents, wait, isCalm } from '../app.js?v=e972392a';
+import { bindKeys } from '../input.js?v=e972392a';
+import { renderEnemy } from '../components/enemy.js?v=e972392a';
+import { renderCard, emptySlot } from '../components/card.js?v=e972392a';
+import { createTaskPanel } from '../components/task-panel.js?v=e972392a';
+import { startTimerBar } from '../components/timer-bar.js?v=e972392a';
+import { createTutorial } from '../tutorial.js?v=e972392a';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -214,6 +214,71 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(0)' }], { duration: 360, easing: 'cubic-bezier(0.16,1,0.3,1)' });
   };
 
+  // ---------- Animationen im Kampf (D36, Weg 1; 18.11.2026) ----------
+  // Nur mit den vorhandenen Bildern; alles erst nach der Antwort, nie über der Aufgabe.
+  // „Weniger Bewegung“ (isCalm) schaltet alles ab, die Zahlen erscheinen dann wie bisher.
+  const EASE = 'cubic-bezier(0.16,1,0.3,1)';
+  // Angriff: die Figur springt nach vorn und wieder zurück (dir 1 nach rechts, -1 nach links)
+  function lunge(el, dir = 1) {
+    if (!el || isCalm()) return;
+    const d = el.getBoundingClientRect().width * 0.35 * dir;
+    el.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${d}px)`, offset: 0.35 }, { transform: 'translateX(0)' }], { duration: 420, easing: EASE });
+  }
+  // Treffer: das Bild des Getroffenen blitzt hell auf und federt zurück
+  function flash(el, dir = 1) {
+    const img = el?.querySelector('img');
+    if (!img || isCalm()) return;
+    const base = getComputedStyle(img).filter;
+    const bright = base === 'none' ? 'brightness(2.4) saturate(0.4)' : `${base} brightness(2.4) saturate(0.4)`;
+    const normal = base === 'none' ? 'brightness(1) saturate(1)' : `${base} brightness(1) saturate(1)`;
+    img.animate([{ filter: normal }, { filter: bright, offset: 0.2 }, { filter: normal }], { duration: 380 });
+    const d = el.getBoundingClientRect().width * 0.08 * dir;
+    img.animate([{ transform: 'translateX(0) rotate(0deg)' }, { transform: `translateX(${d}px) rotate(${3 * dir}deg)`, offset: 0.3 }, { transform: 'translateX(0) rotate(0deg)' }], { duration: 420, easing: EASE });
+  }
+  // Blasen steigen aus einer Figur auf (besiegter Gegner)
+  function bubbles(el, n = 9) {
+    if (!el || isCalm()) return;
+    const scene = $('scene').getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    for (let i = 0; i < n; i++) {
+      const b = document.createElement('span');
+      b.className = 'fx-bubble';
+      const size = 10 + ((i * 7) % 16);
+      b.style.width = `${size}px`;
+      b.style.height = `${size}px`;
+      b.style.left = `${r.left - scene.left + r.width * (0.2 + (0.6 * ((i * 37) % 100)) / 100)}px`;
+      b.style.top = `${r.top - scene.top + r.height * (0.45 + (0.3 * ((i * 53) % 100)) / 100)}px`;
+      $('scene').append(b);
+      const rise = r.height * (0.5 + ((i * 29) % 40) / 100);
+      b.animate([{ transform: 'translateY(0) scale(0.4)', opacity: 0 }, { transform: `translateY(${-rise * 0.3}px) scale(1)`, opacity: 1, offset: 0.25 }, { transform: `translateY(${-rise}px) scale(1.1)`, opacity: 0 }],
+        { duration: 900 + (i % 4) * 120, delay: (i % 5) * 60, easing: 'ease-out', fill: 'backwards' }).finished.then(() => b.remove(), () => b.remove());
+    }
+  }
+  // Schutz: eine Blasenkuppel über dem Helden
+  function dome(el) {
+    if (!el || isCalm()) return;
+    const scene = $('scene').getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const d = document.createElement('span');
+    d.className = 'fx-dome';
+    const size = Math.max(r.width, r.height * 0.75);
+    d.style.width = `${size}px`;
+    d.style.height = `${size}px`;
+    d.style.left = `${r.left - scene.left + r.width / 2 - size / 2}px`;
+    d.style.top = `${r.top - scene.top + r.height * 0.55 - size / 2}px`;
+    $('scene').append(d);
+    d.animate([{ transform: 'scale(0.5)', opacity: 0 }, { transform: 'scale(1.06)', opacity: 1, offset: 0.25 }, { transform: 'scale(1)', opacity: 1, offset: 0.4 }, { transform: 'scale(1)', opacity: 0 }],
+      { duration: 1100, easing: EASE }).finished.then(() => d.remove(), () => d.remove());
+  }
+  // Heilung: grünes Leuchten um den Helden
+  function healGlow(el) {
+    const img = el?.querySelector('img');
+    if (!img || isCalm()) return;
+    const base = getComputedStyle(img).filter;
+    const glow = 'drop-shadow(0 0 4px rgba(214, 255, 228, 1)) drop-shadow(0 0 28px rgba(63, 191, 127, 0.95))';
+    img.animate([{ filter: base }, { filter: glow, offset: 0.35 }, { filter: glow, offset: 0.6 }, { filter: base }], { duration: 1000, easing: 'ease-in-out' });
+  }
+
   // Klang je Ereignis aus sounds.json (Etappe 9); stumm, wenn kein Ton übergeben ist
   const sound = (e) => audio?.event(e);
 
@@ -282,22 +347,35 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       const foe = shown.enemies.find((x) => x.uid === e.targetUid);
       foe.block -= e.blocked;
       foe.hp -= e.amount;
+      lunge($('hero'));
+      if (!isCalm()) await wait(150); // der Sprung trifft, dann sinken die Leben
       render(shown);
       floatAt(foeEl(e.targetUid), `−${e.amount}`);
-      hitAnim(foeEl(e.targetUid));
+      flash(foeEl(e.targetUid));
       await wait(450);
     },
     async blockGained(e) {
       shown.hero.block += e.amount;
       render(shown);
+      dome($('hero'));
       floatAt($('hero'), `+${e.amount}`, 'is-block');
       await wait(450);
     },
     async healed(e) {
       shown.hero.hp += e.amount;
       render(shown);
+      healGlow($('hero'));
       floatAt($('hero'), `+${e.amount}`, 'is-heal');
       await wait(450);
+    },
+    // Besiegter Gegner zerfällt in Blasen (D36)
+    async enemyDefeated(e) {
+      const el = foeEl(e.enemyUid);
+      if (!el || isCalm()) return;
+      const art = el.querySelector('.foe-art') ?? el;
+      bubbles(art);
+      art.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.85) translateY(-6%)', opacity: 0.2 }], { duration: 520, easing: 'ease-in', fill: 'forwards' });
+      await wait(520);
     },
     async selfDamage(e) {
       shown.hero.block -= e.blocked;
@@ -309,6 +387,8 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     async enemyActed(e) {
       const foe = shown.enemies.find((x) => x.uid === e.enemyUid);
       foe.block = 0;
+      // Angriff: der Gegner stürzt sich nach links auf den Helden
+      if (e.intent.type === 'attack') { lunge(foeEl(e.enemyUid), -1); if (!isCalm()) await wait(150); }
       if (e.intent.type === 'block') {
         foe.block += e.intent.amount;
         render(shown);
@@ -321,7 +401,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       shown.hero.hp -= e.amount;
       render(shown);
       floatAt($('hero'), `−${e.amount}`);
-      hitAnim($('hero'));
+      flash($('hero'), -1);
       await wait(650);
     },
     cardDiscarded() {},

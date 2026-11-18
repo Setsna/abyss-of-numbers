@@ -1,9 +1,9 @@
 // Heldenwahl (Plan Etappe 7): vier Figuren zum Antippen, Name aus zwei Wortlisten mit je einem Knopf
 // „anderes Wort“ und einem Würfel für beide. Keine Texteingabe (Konzept 10, Datenschutz).
 // Der Würfel nutzt Math.random: nur Oberfläche, der Spielstand bekommt ohnehin nur die zwei Nummern.
-import { ICON } from '../icons.js?v=a0977361';
-import { renderAsset } from '../assets.js?v=a0977361';
-import { addWorld } from '../components/world.js?v=a0977361';
+import { ICON } from '../icons.js?v=e972392a';
+import { renderAsset } from '../assets.js?v=e972392a';
+import { addWorld } from '../components/world.js?v=e972392a';
 
 export function mountHeroCreate(root, { t, config, onDone }) {
   const figures = Object.keys(config.heroes.figures);

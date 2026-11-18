@@ -1,7 +1,7 @@
 // Spielwelt hinter den Menüs (Phase 5, Etappe 9, D25): das gemalte Gebietsbild füllt den
 // Bildschirm, das Menüpanel liegt darauf. Fehlt ein Bild, bleibt der Grund papierweiß
 // (ein gestreifter Platzhalter über den ganzen Bildschirm wäre zu unruhig).
-import { renderAsset, assetUrl } from '../assets.js?v=a0977361';
+import { renderAsset, assetUrl } from '../assets.js?v=e972392a';
 
 // Gebiet, das hinter Station und Menüs steht: der laufende Tauchgang, sonst das tiefste
 // offene, spielbare Gebiet, sonst das erste Gebiet.

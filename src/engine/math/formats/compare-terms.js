@@ -5,10 +5,10 @@
 // letzten Ziffer ≠ 0; 40 → 10 bis 90, 320 000 → 10 000 bis 90 000). Die anderen Werte liegen an der
 // Rechenstelle um 1 oder 2 oder an der nächsthöheren Stelle um 1 daneben (±p, ±2p, ±10p). So ist keine
 // Rechnung glatter als die anderen, und keine braucht Entbündeln über mehrere Stellen (Durchsicht 6b).
-import { LADDERS } from '../ladders/index.js?v=a0977361';
-import { formatExpression } from '../format.js?v=a0977361';
-import { placeCorrect, MAX_TRIES } from './common.js?v=a0977361';
-import { calcPlace } from '../places.js?v=a0977361';
+import { LADDERS } from '../ladders/index.js?v=e972392a';
+import { formatExpression } from '../format.js?v=e972392a';
+import { placeCorrect, MAX_TRIES } from './common.js?v=e972392a';
+import { calcPlace } from '../places.js?v=e972392a';
 
 // Eine Plus- oder Minusrechnung mit dem Wert v; null, wenn keine passt
 function termFor(v, p, max, rng, avoid) {

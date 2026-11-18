@@ -591,3 +591,20 @@
 /* Passen die Antworten auch klein nicht nebeneinander (Klasse 4, große Zahlen): untereinander (Durchsicht 6b) */
 .bubble .answers.is-stacked { grid-template-columns: minmax(0, 1fr); }
 .bubble.is-line .answers.is-stacked { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* ---------- Animationen im Kampf (D36, Weg 1; 18.11.2026) ---------- */
+/* Blasen eines besiegten Gegners und die Schutzkuppel; die Oberfläche legt sie bei „Weniger Bewegung“ gar nicht
+   erst an. Hell gefüllt mit papierweißer Kante, wie die Blasen der Spielwelt. */
+.fx-bubble {
+  position: absolute; z-index: 6; pointer-events: none;
+  border-radius: 50%; border: calc(2 * var(--u)) solid var(--paper);
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9) 0 18%, rgba(143, 211, 255, 0.35) 22% 100%);
+  translate: -50% -50%;
+}
+.fx-dome {
+  position: absolute; z-index: 3; pointer-events: none;
+  border-radius: 50% 50% 46% 46%;
+  border: var(--line-thin) solid var(--paper);
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.65) 0 9%, rgba(143, 211, 255, 0.28) 14% 70%, rgba(143, 211, 255, 0.5) 100%);
+  box-shadow: 0 0 calc(18 * var(--u)) rgba(143, 211, 255, 0.7);
+}

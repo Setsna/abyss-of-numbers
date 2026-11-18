@@ -3,11 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=a0977361';
-import { ICON } from '../icons.js?v=a0977361';
-import { renderAsset } from '../assets.js?v=a0977361';
-import { renderCard } from '../components/card.js?v=a0977361';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=a0977361';
+import { wayText } from '../text.js?v=e972392a';
+import { ICON } from '../icons.js?v=e972392a';
+import { renderAsset } from '../assets.js?v=e972392a';
+import { renderCard } from '../components/card.js?v=e972392a';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=e972392a';
 
 const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
 const SLOTS = ['kopf', 'koerper', 'hand'];
