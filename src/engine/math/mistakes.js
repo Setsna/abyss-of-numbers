@@ -2,9 +2,9 @@
 // mistakesFor liefert die Kandidaten in der Reihenfolge der Tabelle; welche Typen eine Stufe
 // zeigt, steht in der Stufe (`mistakes`). pickChoices wählt drei falsche Antworten nach A-2,
 // A-4, A-5 und der Zusatzregel „gleiche Einerziffer“; aufgefüllte Nachbarwerte haben den Typ null.
-import { calcPlace, digitAt } from './places.js?v=a8133bc4';
-import { swapDigits } from './formats/common.js?v=a8133bc4';
-import { formatNumber } from './format.js?v=a8133bc4';
+import { calcPlace, digitAt } from './places.js?v=650280d9';
+import { swapDigits } from './formats/common.js?v=650280d9';
+import { formatNumber } from './format.js?v=650280d9';
 
 const crossesAdd = (a, b, p) => digitAt(a, p) + digitAt(b, p) >= 10;
 const crossesSub = (a, b, p) => digitAt(a, p) < digitAt(b, p);
@@ -79,10 +79,11 @@ export function commonRound(a, b) {
   return k;
 }
 
-// correct: Zahl; candidates: [{ value, type }]; opts: { min, max, roundTo = 1, sameUnits = false, prefer = null, fillStep }
+// correct: Zahl; candidates: [{ value, type }]; opts: { min, max, roundTo = 1, sameUnits = false, prefer = null, fillStep, exclude = [] }
+// exclude: Zahlen, die nie als Antwort erscheinen (gegebene Zahlen der Aufgabe; Review 7b, B9)
 // prefer: [Fehlertyp, Anzahl] – so viele falsche Antworten dieses Typs zuerst (Mal: „zwei aus derselben Reihe“)
-export function pickChoices(correct, candidates, { min, max, roundTo = 1, sameUnits = false, prefer = null, fillStep = roundTo }, rng) {
-  const seen = new Set([correct]);
+export function pickChoices(correct, candidates, { min, max, roundTo = 1, sameUnits = false, prefer = null, fillStep = roundTo, exclude = [] }, rng) {
+  const seen = new Set([correct, ...exclude.filter((n) => n !== correct)]);
   const ok = (n) => Number.isInteger(n) && n >= min && n <= max && n % roundTo === 0 && !seen.has(n);
   const pool = [];
   for (const m of candidates) if (ok(m.value)) { seen.add(m.value); pool.push(m); }

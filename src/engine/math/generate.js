@@ -2,22 +2,22 @@
 // Jede Aufgabe kommt aus einer Leiterstufe (config/curricula/class<N>.json → ladders); der Kampf
 // reicht die Stufen des Aufgabenplans als spec.stages herein. Formate: solve (Rechnung lösen),
 // pickTrue, pickFalse, dazu die Formate unter formats/.
-import { mistakesFor, pickChoices, commonRound } from './mistakes.js?v=a8133bc4';
-import { LADDERS, FORMAT_LADDER } from './ladders/index.js?v=a8133bc4';
-import { calcPlace } from './places.js?v=a8133bc4';
-import { formatExpression, formatEquation } from './format.js?v=a8133bc4';
-import { wayFor } from './ways.js?v=a8133bc4';
-import { placeCorrect, MAX_TRIES } from './formats/common.js?v=a8133bc4';
-import * as numberLine from './formats/number-line.js?v=a8133bc4';
-import * as sequence from './formats/sequence.js?v=a8133bc4';
-import * as complement from './formats/complement.js?v=a8133bc4';
-import * as chain from './formats/chain.js?v=a8133bc4';
-import * as wall from './formats/wall.js?v=a8133bc4';
-import * as match from './formats/match.js?v=a8133bc4';
-import * as twoStep from './formats/two-step.js?v=a8133bc4';
-import * as pointBeforeLine from './formats/point-before-line.js?v=a8133bc4';
-import * as compareTerms from './formats/compare-terms.js?v=a8133bc4';
-import * as divisibility from './formats/divisibility.js?v=a8133bc4';
+import { mistakesFor, pickChoices, commonRound } from './mistakes.js?v=650280d9';
+import { LADDERS, FORMAT_LADDER } from './ladders/index.js?v=650280d9';
+import { calcPlace } from './places.js?v=650280d9';
+import { formatExpression, formatEquation } from './format.js?v=650280d9';
+import { wayFor } from './ways.js?v=650280d9';
+import { placeCorrect, MAX_TRIES } from './formats/common.js?v=650280d9';
+import * as numberLine from './formats/number-line.js?v=650280d9';
+import * as sequence from './formats/sequence.js?v=650280d9';
+import * as complement from './formats/complement.js?v=650280d9';
+import * as chain from './formats/chain.js?v=650280d9';
+import * as wall from './formats/wall.js?v=650280d9';
+import * as match from './formats/match.js?v=650280d9';
+import * as twoStep from './formats/two-step.js?v=650280d9';
+import * as pointBeforeLine from './formats/point-before-line.js?v=650280d9';
+import * as compareTerms from './formats/compare-terms.js?v=650280d9';
+import * as divisibility from './formats/divisibility.js?v=650280d9';
 
 const FORMATS = { numberLine, sequence, complement, chain, wall, match, twoStep, pointBeforeLine, compareTerms, divisibility };
 const OPERATIONS = ['add', 'sub', 'mul', 'div'];
@@ -49,7 +49,8 @@ function buildPick(format, stages, area, rng) {
       return { operation, ...LADDERS[operation].drawStage(stages[operation], rng) };
     });
     const lhs = items.map((it) => formatExpression(it.operation, it.a, it.b));
-    if (new Set(lhs).size < 4) continue;
+    // vier verschiedene Rechnungen; Tauschaufgaben zählen als dieselbe (A-3; Review 7b, B10)
+    if (new Set(lhs).size < 4 || new Set(items.map((it) => taskKey(it.operation, it.a, it.b))).size < 4) continue;
     const shown = items.map((it, i) => ((i === 0) === wantTrue ? it.result : wrongShown(it.operation, stages[it.operation], it, area, rng)));
     if (shown.includes(null)) continue;
     const texts = items.map((it, i) => formatEquation(it.operation, it.a, it.b, shown[i]));
@@ -92,9 +93,11 @@ export function taskFromNumbers(ladder, stage, { a, b }, area, rng) {
   const plusMinus = ladder === 'add' || ladder === 'sub';
   const { choices, correctIndex, choiceTypes } = pickChoices(result, mistakesFor(ladder, stage, n), {
     min: plusMinus ? 0 : 1, max: area.maxNumber, roundTo: plusMinus ? commonRound(a, b) : 1,
-    // Auffüllen bei Mal und Geteilt: an der Stelle des Ergebnisses (Klasse 4 ab 10 000), sonst höchstens Zehner
-    fillStep: plusMinus ? commonRound(a, b) : result >= 10000 ? calcPlace(result) : Math.min(calcPlace(result), 10),
+    // Auffüllen bei Mal und Geteilt: an der Stelle des Ergebnisses (8000 → 7000, 9000, nicht 8010; Review 7b, B8)
+    fillStep: plusMinus ? commonRound(a, b) : calcPlace(result),
     sameUnits: stage.sameUnits === true, prefer: stage.prefer ?? null,
+    // Plus und Minus: keine der beiden Zahlen als Antwort (23 + 10 → nicht 23; Review 7b, B9)
+    exclude: plusMinus ? [a, b] : [],
   }, rng);
   return {
     format: 'solve', operation: ladder, a, b, result,

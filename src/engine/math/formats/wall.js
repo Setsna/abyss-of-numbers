@@ -7,10 +7,10 @@
 // Muster, Einheit der Grundsteine (1 oder 10), Grenzen der Grundsteine und Spitze stehen in der Stufe.
 // Falsche Antworten je Stein: F-WALL-a an der Rechenstelle um 1 daneben (± Einheit),
 // F-WALL-b addiert statt subtrahiert, F-WALL-c die Zahl eines der beiden bekannten Steine.
-import { formatEquation } from '../format.js?v=a8133bc4';
-import { drawUntil } from './common.js?v=a8133bc4';
-import { pickChoices } from '../mistakes.js?v=a8133bc4';
-import { wayFor } from '../ways.js?v=a8133bc4';
+import { formatEquation } from '../format.js?v=650280d9';
+import { drawUntil } from './common.js?v=650280d9';
+import { pickChoices, commonRound } from '../mistakes.js?v=650280d9';
+import { wayFor } from '../ways.js?v=650280d9';
 
 // Wie jeder Stein aus anderen folgt: [Zelle, Rechenart, Zelle x, Zelle y] mit Ergebnis = x op y.
 const HOW = {
@@ -30,7 +30,7 @@ export function generate(stage, area, rng) {
     const [x, y] = [cells[xi], cells[yi]];
     const all = { 'F-WALL-a': [result - u, result + u], 'F-WALL-b': op === 'sub' ? [x + y] : [], 'F-WALL-c': [x, y] };
     const cands = stage.mistakes.flatMap((type) => all[type].map((value) => ({ value, type })));
-    const { choices, correctIndex, choiceTypes } = pickChoices(result, cands, { min: 0, max: area.maxNumber, roundTo: u }, rng);
+    const { choices, correctIndex, choiceTypes } = pickChoices(result, cands, { min: 0, max: area.maxNumber, roundTo: commonRound(x, y) }, rng); // glatt wie die Steine (30 + 30 → nicht 61; Review 7b, B8)
     return {
       prompt: 'task.wall',
       display: null,

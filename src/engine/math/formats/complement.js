@@ -5,11 +5,11 @@
 // nächsthöheren Stelle um 1 daneben, F-COMP-c an der Rechenstelle um 1 daneben (A-9),
 // F-COMP-d die letzte Ziffer der ersten Zahl genannt (37 + ? = 40 → 7), F-COMP-e nur bis zum
 // nächsten Zehner (bei glatten Zahlen: Hunderter) ergänzt (37 + ? = 100 → 3).
-import { drawUntil } from './common.js?v=a8133bc4';
-import { pickChoices, commonRound } from '../mistakes.js?v=a8133bc4';
-import { calcPlace, digitAt } from '../places.js?v=a8133bc4';
-import { wayFor } from '../ways.js?v=a8133bc4';
-import { formatNumber } from '../format.js?v=a8133bc4';
+import { drawUntil } from './common.js?v=650280d9';
+import { pickChoices, commonRound } from '../mistakes.js?v=650280d9';
+import { calcPlace, digitAt } from '../places.js?v=650280d9';
+import { wayFor } from '../ways.js?v=650280d9';
+import { formatNumber } from '../format.js?v=650280d9';
 
 const nextMult = (a, k) => Math.ceil((a + 1) / k) * k;
 
@@ -40,7 +40,7 @@ export function generate(stageIn, area, rng) {
   };
   const cands = stage.mistakes.flatMap((type) => all[type].map((value) => ({ value, type })));
   const k = commonRound(a, target);
-  const { choices, correctIndex, choiceTypes } = pickChoices(answer, cands, { min: 1, max: area.maxNumber, roundTo: k }, rng);
+  const { choices, correctIndex, choiceTypes } = pickChoices(answer, cands, { min: 1, max: area.maxNumber, roundTo: k, exclude: [a, target] }, rng); // nie Startzahl oder Ziel (Review 7b, B9)
   return {
     format: 'complement',
     a, target,
