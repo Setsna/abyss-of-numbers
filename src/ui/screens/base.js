@@ -4,9 +4,9 @@
 //   Logbuch   – mit dem Schild „freie Punkte“,
 //   Ausrüstung – öffnet die Logbuch-Seite „Ausrüstung“.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=700613bf';
-import { renderAsset, assetUrl } from '../assets.js?v=700613bf';
-import { homeAreaId, worldLayer } from '../components/world.js?v=700613bf';
+import { ICON } from '../icons.js?v=a0977361';
+import { renderAsset, assetUrl } from '../assets.js?v=a0977361';
+import { homeAreaId, worldLayer } from '../components/world.js?v=a0977361';
 
 export function mountBase(root, { t, config, game, onDive, onLogbook }) {
   const v = game.view();
@@ -60,7 +60,9 @@ export function mountBase(root, { t, config, game, onDive, onLogbook }) {
       b.classList.add('is-soon');
       label.textContent = t('base.soon', { area: name });
     } else {
-      label.textContent = v.run?.areaId === a.id ? t('base.resume') : t('base.diveTo', { area: name });
+      // Sichtbar nur der Ortsname (Ingos Wunsch 18.11.2026); vorgelesen weiter „Abtauchen: …“
+      label.textContent = v.run?.areaId === a.id ? t('base.resume') : name;
+      if (v.run?.areaId !== a.id) b.setAttribute('aria-label', t('base.diveTo', { area: name }));
       b.addEventListener('click', once(() => onDive(a.id)));
     }
     b.append(win, label);

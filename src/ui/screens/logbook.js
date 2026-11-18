@@ -3,10 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=700613bf';
-import { ICON } from '../icons.js?v=700613bf';
-import { renderAsset } from '../assets.js?v=700613bf';
-import { renderCard } from '../components/card.js?v=700613bf';
+import { wayText } from '../text.js?v=a0977361';
+import { ICON } from '../icons.js?v=a0977361';
+import { renderAsset } from '../assets.js?v=a0977361';
+import { renderCard } from '../components/card.js?v=a0977361';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=a0977361';
 
 const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
 const SLOTS = ['kopf', 'koerper', 'hand'];
@@ -27,6 +28,10 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
     </section>
   </main>`;
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
+  // Spielwelt dahinter wie bei Beute und Händler (Ingos Wunsch 18.11.2026: das Logbuch gehört in die Unterwasserwelt)
+  const v0 = game.view();
+  const homeArea = homeAreaId(config, v0.profile, v0.run);
+  addWorld(root.querySelector('.screen'), `area.${homeArea}`);
   ref.title.textContent = t('logbook.title');
   ref.close.textContent = t('logbook.close');
   ref.close.addEventListener('click', () => onClose(), { once: true });
@@ -58,7 +63,8 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
           <button class="btn btn-quiet lb-reset" type="button"></button>
         </div>
       </div>`;
-    wrap.querySelector('.lb-hero-art').append(renderAsset(p.asset, p.name));
+    // Held steht im Bild seines Gebiets, wie ein Comicpanel
+    wrap.querySelector('.lb-hero-art').append(worldLayer(`area.${homeArea}`, 'lb-hero-scene'), renderAsset(p.asset, p.name));
     wrap.querySelector('.lb-name').textContent = p.name;
     const [line1, line2] = wrap.querySelectorAll('.lb-line');
     line1.textContent = `${t('logbook.level', { n: p.stufe })} · ${t('logbook.xp', { n: p.ep })} · ${t('logbook.hp', { n: p.maxHp })}`;
@@ -66,6 +72,7 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
     wrap.querySelector('.lb-stats').replaceChildren(...STATS.map((stat) => {
       const li = document.createElement('li');
       li.className = 'lb-stat';
+      li.dataset.stat = stat;
       li.innerHTML = `<span class="lb-stat-icon">${STAT_ICON[stat]}</span><span class="lb-stat-text"><b></b><small></small></span><span class="lb-stat-value"></span><button class="btn lb-plus" type="button">+</button>`;
       li.querySelector('b').textContent = t(`logbook.stat.${stat}`);
       li.querySelector('small').textContent = t(`logbook.statHelp.${stat}`);
@@ -165,7 +172,7 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
     ol.className = 'lb-rules';
     ol.replaceChildren(...RULE_ICON.map((icon, i) => {
       const li = document.createElement('li');
-      li.innerHTML = `<span class="lb-rule-icon">${icon}</span><span></span>`;
+      li.innerHTML = `<span class="lb-rule-num">${i + 1}</span><span class="lb-rule-icon">${icon}</span><span></span>`;
       li.lastChild.textContent = t(`logbook.rules.${i}`, { n: config.game.penalty.wrong });
       return li;
     }));

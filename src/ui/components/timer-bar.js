@@ -1,6 +1,6 @@
 // Zeitleiste über der Aufgabe: drei farbige Abschnitte, kein roter Bereich.
 // Takt per setInterval (läuft gleichmäßig), hält an, solange die Seite verdeckt ist.
-import { createTimer } from '../timer.js?v=700613bf';
+import { createTimer } from '../timer.js?v=a0977361';
 
 export function startTimerBar({ root, fill, limitMs, onTimeout }) {
   root.hidden = limitMs === 0;

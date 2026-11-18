@@ -5,17 +5,17 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=700613bf';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=700613bf';
-import { wayForKey } from './math/ways.js?v=700613bf';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=700613bf';
-import { nextCurrent, answerCode } from './combat/current.js?v=700613bf';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=700613bf';
-import { generateMap } from './dungeon/map.js?v=700613bf';
-import { createSave } from './save/save.js?v=700613bf';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js?v=700613bf';
-import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=700613bf';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=700613bf';
+import { createRng, deriveSeed } from './rng.js?v=a0977361';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=a0977361';
+import { wayForKey } from './math/ways.js?v=a0977361';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=a0977361';
+import { nextCurrent, answerCode } from './combat/current.js?v=a0977361';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=a0977361';
+import { generateMap } from './dungeon/map.js?v=a0977361';
+import { createSave } from './save/save.js?v=a0977361';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js?v=a0977361';
+import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=a0977361';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=a0977361';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));

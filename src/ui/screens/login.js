@@ -2,7 +2,7 @@
 // Aufbau wie der Titel (Riff im Hintergrund), darauf ein Papierkasten mit Eingabefeld.
 // busy: „Einen Moment …“ statt Eingabe (z. B. während der Aufkleber-Code geprüft wird).
 // Rückgabe: { fail(text), ready(text) } zum Melden eines Fehlers bzw. zum Freigeben der Eingabe.
-import { renderAsset } from '../assets.js?v=700613bf';
+import { renderAsset } from '../assets.js?v=a0977361';
 
 export function mountLogin(root, { t, hint = '', busy = false, onSubmit }) {
   root.innerHTML = `

@@ -207,7 +207,7 @@
   display: flex; align-items: center; gap: calc(28 * var(--u));
 }
 .base-hero { flex: none; height: calc(460 * var(--u)); width: calc(340 * var(--u)); display: flex; align-items: flex-end; justify-content: center; }
-.base-hero img { max-height: 100%; max-width: 100%; object-fit: contain; }
+.base-hero img { max-height: 100%; max-width: 100%; object-fit: contain; filter: var(--hero-glow); }
 .base-side { flex: 1 1 auto; display: flex; flex-direction: column; align-items: stretch; gap: calc(14 * var(--u)); }
 .base-name {
   font-weight: 700;
@@ -231,56 +231,119 @@
 }
 
 /* ---------- Logbuch ---------- */
+/* Seit 18.11.2026 (Ingos Wunsch: „passt nicht in die Spielwelt“): Das Logbuch liegt wie Beute und Händler
+   auf dem Gebietsbild. Kopf in Tiefseeblau mit Reitern, Seite in Meeresblau; Inhalte stehen auf
+   papierweißen Kästen mit Tuschekontur, die Karten auf dem dunklen Streifen wie in der Hand. */
 .logbook {
   width: min(100%, calc(1040 * var(--u)));
   height: 100%;
-  background: var(--paper);
+  background: transparent; /* die gemalte Welt scheint durch, die Inhalte liegen auf Kästen */
   display: flex; flex-direction: column;
 }
-.logbook-head { display: flex; align-items: center; flex-wrap: wrap; gap: calc(12 * var(--u)); padding: calc(12 * var(--u)) calc(16 * var(--u)); background: var(--sea); border-bottom: var(--line) solid var(--ink); }
+.logbook-head { display: flex; align-items: center; flex-wrap: wrap; gap: calc(12 * var(--u)); padding: calc(12 * var(--u)) calc(16 * var(--u)); background: var(--sea-deep); border-bottom: var(--line) solid var(--ink); }
 .logbook-title {
-  font-family: var(--font-loud); font-weight: 400; letter-spacing: 0.02em; font-size: calc(44 * var(--u)); line-height: 1;
+  font-family: var(--font-loud); font-weight: 400; letter-spacing: 0.02em; font-size: calc(48 * var(--u)); line-height: 1;
   color: var(--paper); -webkit-text-stroke: calc(3 * var(--u)) var(--ink); paint-order: stroke fill;
+  transform: rotate(-3deg);
 }
 .logbook-tabs { display: flex; flex-wrap: wrap; gap: calc(8 * var(--u)); flex: 1 1 auto; }
 .logbook-tab[aria-pressed="true"] { background: var(--sun); color: var(--ink); }
 .logbook-close { min-width: calc(140 * var(--u)); }
-.logbook-page { flex: 1 1 auto; min-height: 0; overflow: auto; padding: calc(18 * var(--u)) calc(24 * var(--u)); }
-.lb-quiet { color: var(--muted); font-weight: 700; font-size: calc(22 * var(--u)); }
-.lb-hero { display: flex; gap: calc(24 * var(--u)); align-items: flex-start; }
-.lb-hero-art { flex: none; width: calc(220 * var(--u)); height: calc(300 * var(--u)); display: flex; align-items: flex-end; justify-content: center; }
-.lb-hero-art img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.lb-hero-info { flex: 1 1 auto; display: flex; flex-direction: column; gap: calc(8 * var(--u)); }
-.lb-name { font-weight: 700; font-size: calc(34 * var(--u)); }
-.lb-line { font-weight: 700; font-size: calc(22 * var(--u)); }
-.lb-stats { list-style: none; display: flex; flex-direction: column; gap: calc(8 * var(--u)); margin-top: calc(6 * var(--u)); }
-.lb-stat { display: flex; align-items: center; gap: calc(12 * var(--u)); border: var(--line-thin) solid var(--ink); border-radius: var(--radius); padding: calc(6 * var(--u)) calc(10 * var(--u)); }
-.lb-stat-icon svg { width: calc(36 * var(--u)); height: calc(36 * var(--u)); display: block; }
+.logbook-page { flex: 1 1 auto; min-height: 0; overflow: auto; padding: calc(20 * var(--u)) calc(24 * var(--u)); }
+/* Satz über dem Inhalt: auf einem Textkasten, weil darunter das gemalte Bild liegt */
+.logbook .lb-quiet {
+  display: inline-block; color: var(--ink); font-weight: 700; font-size: calc(22 * var(--u));
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
+  padding: calc(4 * var(--u)) calc(12 * var(--u));
+}
+/* gemeinsamer Kasten der Seiten */
+.lb-box { background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius); }
+
+/* Held: Comicpanel mit Figur im Gebietsbild, daneben Name, Werte und Punkte */
+.lb-hero { display: flex; gap: calc(24 * var(--u)); align-items: stretch; }
+.lb-hero-art {
+  position: relative; overflow: hidden; flex: none;
+  width: calc(280 * var(--u)); min-height: calc(380 * var(--u));
+  border: var(--line) solid var(--ink); border-radius: var(--radius);
+  background: var(--sea-deep);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.lb-hero-scene { position: absolute; inset: 0; }
+.lb-hero-scene img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 70%; display: block; }
+.lb-hero-art > img { position: relative; max-width: 92%; max-height: 92%; object-fit: contain; margin-bottom: calc(8 * var(--u)); filter: var(--hero-glow); }
+.lb-hero-info { flex: 1 1 auto; display: flex; flex-direction: column; gap: calc(10 * var(--u)); }
+.lb-name {
+  align-self: flex-start;
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
+  padding: calc(4 * var(--u)) calc(14 * var(--u));
+  font-weight: 700; font-size: calc(34 * var(--u));
+}
+.lb-line {
+  align-self: flex-start; font-weight: 700; font-size: calc(22 * var(--u));
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
+  padding: calc(4 * var(--u)) calc(12 * var(--u));
+}
+.logbook .lb-line.lb-quiet { background: var(--sun-3); }
+.lb-stats { list-style: none; display: flex; flex-direction: column; gap: calc(10 * var(--u)); margin-top: calc(4 * var(--u)); }
+.lb-stat {
+  display: flex; align-items: center; gap: calc(12 * var(--u));
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
+  padding: calc(8 * var(--u)) calc(10 * var(--u));
+}
+.lb-stat-icon { flex: none; width: calc(56 * var(--u)); height: calc(56 * var(--u)); display: grid; place-items: center; border: var(--line-thin) solid var(--ink); border-radius: 50%; background: var(--kind-attack-soft); }
+.lb-stat[data-stat="ruhe"] .lb-stat-icon { background: var(--kind-block-soft); }
+.lb-stat[data-stat="leben"] .lb-stat-icon { background: var(--kind-heal-soft); }
+.lb-stat-icon svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); display: block; }
 .lb-stat-text { flex: 1 1 auto; display: flex; flex-direction: column; }
 .lb-stat-text b { font-size: calc(26 * var(--u)); }
-.lb-stat-text small { font-size: calc(18 * var(--u)); color: var(--muted); font-weight: 700; }
-.lb-stat-value { font-weight: 700; font-size: calc(34 * var(--u)); min-width: calc(40 * var(--u)); text-align: center; }
+.lb-stat-text small { font-size: calc(18 * var(--u)); color: var(--sea-deep); font-weight: 700; }
+.lb-stat-value { font-family: var(--font-loud); font-size: calc(44 * var(--u)); line-height: 1; min-width: calc(44 * var(--u)); text-align: center; }
 .lb-plus { background: var(--sun); min-width: calc(64 * var(--u)); font-size: calc(34 * var(--u)); }
-.lb-points { display: flex; align-items: center; justify-content: space-between; gap: calc(12 * var(--u)); }
-.lb-free { font-weight: 700; font-size: calc(24 * var(--u)); }
-.lb-free.is-on { background: var(--sun); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(12 * var(--u)); }
-.lb-deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(180 * var(--u)), 1fr)); gap: calc(18 * var(--u)); margin-top: calc(10 * var(--u)); }
+.lb-points { display: flex; align-items: center; justify-content: space-between; gap: calc(12 * var(--u)); margin-top: auto; }
+.lb-free { font-weight: 700; font-size: calc(24 * var(--u)); background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(12 * var(--u)); }
+.lb-free.is-on { color: var(--ink); background: var(--sun); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(12 * var(--u)); }
+
+/* Deck: Karten auf dem dunklen Streifen wie in der Hand */
+.lb-deck-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(180 * var(--u)), 1fr)); gap: calc(22 * var(--u)) calc(18 * var(--u));
+  margin-top: calc(12 * var(--u)); padding: calc(26 * var(--u)) calc(20 * var(--u)) calc(18 * var(--u));
+  background: var(--sea-deep); border: var(--line) solid var(--ink); border-radius: var(--radius);
+}
 .lb-deck-cell { position: relative; }
 .lb-deck-cell .card { width: 100%; min-height: calc(250 * var(--u)); }
-.lb-next { margin-top: calc(6 * var(--u)); font-weight: 700; font-size: calc(22 * var(--u)); text-align: center; }
+.lb-next { margin-top: calc(8 * var(--u)); font-weight: 700; font-size: calc(20 * var(--u)); text-align: center; color: var(--paper); }
 .lb-count { position: absolute; z-index: 3; bottom: calc(40 * var(--u)); right: calc(-8 * var(--u)); /* unten rechts: oben rechts sitzt das Rechenzeichen der Karte */ background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(10 * var(--u)); font-weight: 700; font-size: calc(24 * var(--u)); }
-.lb-rules { list-style: none; display: flex; flex-direction: column; gap: calc(12 * var(--u)); counter-reset: rule; }
-.lb-rules li { display: flex; align-items: center; gap: calc(16 * var(--u)); font-weight: 700; font-size: calc(30 * var(--u)); counter-increment: rule; }
-.lb-rules li::before { content: counter(rule); font-family: var(--font-loud); font-size: calc(40 * var(--u)); width: calc(36 * var(--u)); text-align: center; }
-.lb-rule-icon svg { width: calc(48 * var(--u)); height: calc(48 * var(--u)); display: block; }
-/* Übungsliste: eine Aufgabe pro Zeile mit Trennlinie, sonst laufen die Rechnungen ineinander (Ingo, 18.11.2026) */
-.lb-practice ul { list-style: none; margin-top: calc(12 * var(--u)); border-top: var(--line-thin) solid var(--disabled-fill); }
-.lb-practice li { font-weight: 700; font-size: calc(32 * var(--u)); padding: calc(8 * var(--u)) 0; border-bottom: var(--line-thin) solid var(--disabled-fill); }
+
+/* Regeln: sechs Kästen, Nummer als gelber Kreis, Symbol groß */
+.lb-rules { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(14 * var(--u)); }
+.lb-rules li {
+  display: flex; align-items: center; gap: calc(14 * var(--u));
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
+  padding: calc(18 * var(--u)) calc(16 * var(--u));
+  font-weight: 700; font-size: calc(28 * var(--u)); line-height: 1.2;
+}
+.lb-rule-num {
+  flex: none; width: calc(48 * var(--u)); height: calc(48 * var(--u)); display: grid; place-items: center;
+  background: var(--sun); border: var(--line-thin) solid var(--ink); border-radius: 50%;
+  font-family: var(--font-loud); font-size: calc(32 * var(--u)); line-height: 1;
+}
+.lb-rule-icon { flex: none; }
+.lb-rule-icon svg { width: calc(60 * var(--u)); height: calc(60 * var(--u)); display: block; }
+
+/* Übungsliste: jede Aufgabe auf einem eigenen Zettel */
+.lb-practice ul { list-style: none; margin-top: calc(12 * var(--u)); display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(300 * var(--u)), 1fr)); gap: calc(12 * var(--u)); }
+.lb-practice li {
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
+  padding: calc(10 * var(--u)) calc(14 * var(--u));
+  font-weight: 700; font-size: calc(32 * var(--u));
+}
 /* Rechenweg unter einer Übungsaufgabe (Phase 6b) */
-.practice-way { display: block; font-size: 0.7em; color: var(--sea-deep); }
+.practice-way { display: block; font-size: 0.66em; color: var(--sea-deep); margin-top: calc(4 * var(--u)); }
 @media (orientation: portrait) {
   .lb-hero { flex-direction: column; align-items: center; }
+  .lb-hero-art { width: calc(260 * var(--u)); min-height: calc(320 * var(--u)); }
   .lb-hero-info { width: 100%; }
+  .lb-rules { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---------- Hinweis (z. B. Speichern geht nicht) ---------- */
@@ -408,13 +471,15 @@
 /* ---------- Stärken und Ausrüstung (Phase 5, Etappe 7) ---------- */
 .figure-perk { font-weight: 700; font-size: calc(17 * var(--u)); color: var(--muted); text-align: center; line-height: 1.2; padding: 0 calc(6 * var(--u)); }
 .lb-gear { display: flex; flex-direction: column; gap: calc(14 * var(--u)); }
-.lb-slot { border: var(--line-thin) solid var(--ink); border-radius: var(--radius); padding: calc(10 * var(--u)) calc(14 * var(--u)); display: flex; flex-direction: column; gap: calc(8 * var(--u)); }
-.lb-slot-title { margin: 0; font-size: calc(24 * var(--u)); }
-.lb-item { display: flex; align-items: center; gap: calc(12 * var(--u)); padding: calc(6 * var(--u)) calc(10 * var(--u)); border-radius: calc(6 * var(--u)); }
+/* Ausrüstung: je Platz ein Kasten mit tiefseeblauem Kopf */
+.lb-slot { background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; gap: calc(8 * var(--u)); padding-bottom: calc(10 * var(--u)); }
+.lb-slot-title { margin: 0; font-size: calc(24 * var(--u)); background: var(--sea-deep); color: var(--paper); padding: calc(6 * var(--u)) calc(14 * var(--u)); border-bottom: var(--line-thin) solid var(--ink); }
+.lb-slot > .lb-quiet { color: var(--sea-deep); padding: 0 calc(14 * var(--u)); }
+.lb-item { display: flex; align-items: center; gap: calc(12 * var(--u)); padding: calc(6 * var(--u)) calc(10 * var(--u)); margin: 0 calc(8 * var(--u)); border-radius: calc(6 * var(--u)); }
 .lb-item.is-worn { background: var(--sun-3); }
 .lb-item-text { flex: 1 1 auto; display: flex; flex-direction: column; }
 .lb-item-text b { font-size: calc(24 * var(--u)); }
-.lb-item-text small { font-size: calc(18 * var(--u)); color: var(--muted); font-weight: 700; }
+.lb-item-text small { font-size: calc(18 * var(--u)); color: var(--sea-deep); font-weight: 700; }
 .lb-item-btn { min-width: calc(150 * var(--u)); min-height: 48px; }
 .gain-item { background: var(--sun); }
 .gain-current { background: var(--sea-deep); color: var(--paper); }
@@ -595,3 +660,18 @@
 .title-logout { min-height: 44px; min-width: 44px; padding: calc(4 * var(--u)) calc(12 * var(--u)); background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius); font: inherit; }
 .title-net { flex-basis: 100%; font-size: calc(16 * var(--u)); }
 .title-net[hidden] { display: none; }
+
+/* Held hebt sich vom gemalten Hintergrund ab (Ingos Wunsch 18.11.2026): heller Schimmer um die Figur */
+.station-art img { filter: var(--hero-glow); }
+
+/* Station: Schilder und Knöpfe in Tiefseeblau statt Papierweiß (Ingos Wunsch 18.11.2026: die weißen Schilder
+   stachen auf dem dunklen Bild heraus). Gelb bleibt der Hauptaktion (Bullaugen) und „freie Punkte“. */
+.station .station-name { background: var(--sea-deep); color: var(--paper); }
+.station .chip { background: var(--sea-deep); color: var(--paper); }
+.station .spot { background: var(--sea-deep); color: var(--paper); }
+.station .spot-icon {
+  display: grid; place-items: center; width: calc(64 * var(--u)); height: calc(64 * var(--u));
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: 50%;
+}
+.station .spot-icon svg { width: calc(40 * var(--u)); height: calc(40 * var(--u)); }
+.station .spot-badge { color: var(--ink); } /* gelbes Schild bleibt dunkel beschriftet */

@@ -9,8 +9,8 @@
 //             (`carry: true`) oder keinen (`carry: false`); ohne `carry` egal
 //   either    eine von mehreren Varianten (`variants`, jede eine Stufe ohne id), gewichtet mit `weights`
 // Für alle: Ergebnis zwischen `resultMin` und `resultMax` (wenn angegeben).
-import { drawUntil } from '../formats/common.js?v=700613bf';
-import { digitAt } from '../places.js?v=700613bf';
+import { drawUntil } from '../formats/common.js?v=a0977361';
+import { digitAt } from '../places.js?v=a0977361';
 
 function rangeCount(r) {
   return Math.floor((r.max - r.min) / (r.step ?? 1)) + 1;

@@ -26,6 +26,8 @@
   --kind-block: #ffc28a;   --kind-block-soft: #ffeedd;
   --kind-heal: #9fdcb5;    --kind-heal-soft: #e3f6ea;
   --kind-other: #c6aef0;   --kind-other-soft: #f0e9fc;
+  /* Schimmer um die Heldenfigur auf gemalten Hintergründen (18.11.2026): eine helle Kante und ein weicher Lichthof */
+  --hero-glow: drop-shadow(0 0 calc(2 * var(--u)) rgba(255, 255, 255, 0.95)) drop-shadow(0 0 calc(12 * var(--u)) rgba(214, 240, 255, 0.75));
 
   /* Maßeinheit: 1u = ein Pixel im Bezugsformat (quer 1080 × 810) */
   --u: min(calc(100vw / 1080), calc(100dvh / 810));
