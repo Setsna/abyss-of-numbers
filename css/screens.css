@@ -258,7 +258,7 @@
 .logbook-tabs { display: flex; flex-wrap: wrap; gap: calc(8 * var(--u)); flex: 1 1 auto; }
 .logbook-tab[aria-pressed="true"] { background: var(--sun); color: var(--ink); }
 .logbook-close { min-width: calc(140 * var(--u)); }
-.logbook-page { flex: 1 1 auto; min-height: 0; overflow: auto; padding: calc(20 * var(--u)) calc(24 * var(--u)); }
+.logbook-page { flex: 1 1 auto; min-height: 0; overflow: auto; padding: calc(20 * var(--u)) calc(24 * var(--u)); background: var(--sand); /* Sand wie der Meeresboden statt Riffbild: ruhig (Ingos Wunsch 18.11.2026) */ }
 /* Satz über dem Inhalt: auf einem Textkasten, weil darunter das gemalte Bild liegt */
 .logbook .lb-quiet {
   display: inline-block; color: var(--ink); font-weight: 700; font-size: calc(22 * var(--u));
@@ -281,23 +281,25 @@
 .lb-hero-scene img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 70%; display: block; }
 .lb-hero-art > img { position: relative; max-width: 92%; max-height: 92%; object-fit: contain; margin-bottom: calc(8 * var(--u)); filter: var(--hero-glow); }
 .lb-hero-info { flex: 1 1 auto; display: flex; flex-direction: column; gap: calc(10 * var(--u)); }
-.lb-name {
-  align-self: flex-start;
-  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
-  padding: calc(4 * var(--u)) calc(14 * var(--u));
-  font-weight: 700; font-size: calc(34 * var(--u));
+/* Steckbrief (seit 18.11.2026, Ingos Wunsch „wirkt unruhig“): eine einzige sandfarbene Karte statt vieler
+   Kästen, so hoch wie das Heldenbild; Kopf mit Name und Stufe, drei Werte durch dünne Linien getrennt,
+   unten die Punkte. Sand wie der Meeresboden der Gebietsbilder. */
+.lb-sheet {
+  gap: 0; background: var(--sand-light); border: var(--line) solid var(--ink); border-radius: var(--radius);
+  padding: calc(14 * var(--u)) calc(20 * var(--u)) calc(14 * var(--u));
 }
-.lb-line {
-  align-self: flex-start; font-weight: 700; font-size: calc(22 * var(--u));
-  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(6 * var(--u));
-  padding: calc(4 * var(--u)) calc(12 * var(--u));
+.lb-name { font-weight: 700; font-size: calc(36 * var(--u)); line-height: 1.1; }
+.lb-line { font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); margin-top: calc(4 * var(--u)); }
+.logbook .lb-sheet .lb-line.lb-quiet {
+  align-self: flex-start; margin-top: calc(8 * var(--u));
+  background: var(--sun-3); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u));
+  padding: calc(2 * var(--u)) calc(12 * var(--u)); font-size: calc(20 * var(--u)); color: var(--ink);
 }
-.logbook .lb-line.lb-quiet { background: var(--sun-3); }
-.lb-stats { list-style: none; display: flex; flex-direction: column; gap: calc(10 * var(--u)); margin-top: calc(4 * var(--u)); }
+.lb-stats { list-style: none; display: flex; flex-direction: column; margin-top: calc(14 * var(--u)); border-top: var(--line-thin) solid var(--sand-line); }
 .lb-stat {
-  display: flex; align-items: center; gap: calc(12 * var(--u));
-  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
-  padding: calc(8 * var(--u)) calc(10 * var(--u));
+  display: flex; align-items: center; gap: calc(14 * var(--u));
+  padding: calc(12 * var(--u)) 0;
+  border-bottom: var(--line-thin) solid var(--sand-line);
 }
 .lb-stat-icon { flex: none; width: calc(56 * var(--u)); height: calc(56 * var(--u)); display: grid; place-items: center; border: var(--line-thin) solid var(--ink); border-radius: 50%; background: var(--kind-attack-soft); }
 .lb-stat[data-stat="ruhe"] .lb-stat-icon { background: var(--kind-block-soft); }
@@ -308,9 +310,11 @@
 .lb-stat-text small { font-size: calc(18 * var(--u)); color: var(--sea-deep); font-weight: 700; }
 .lb-stat-value { font-family: var(--font-loud); font-size: calc(44 * var(--u)); line-height: 1; min-width: calc(44 * var(--u)); text-align: center; }
 .lb-plus { background: var(--sun); min-width: calc(64 * var(--u)); font-size: calc(34 * var(--u)); }
-.lb-points { display: flex; align-items: center; justify-content: space-between; gap: calc(12 * var(--u)); margin-top: auto; }
-.lb-free { font-weight: 700; font-size: calc(24 * var(--u)); background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(12 * var(--u)); }
-.lb-free.is-on { color: var(--ink); background: var(--sun); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(12 * var(--u)); }
+/* ohne freie Punkte: Plus nur angedeutet, damit es nicht die dunkelste Fläche ist */
+.lb-plus:disabled { background: transparent; color: var(--sand-line); border: var(--line-thin) dashed var(--sand-line); }
+.lb-points { display: flex; align-items: center; justify-content: space-between; gap: calc(12 * var(--u)); margin-top: auto; padding-top: calc(14 * var(--u)); }
+.lb-free { font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); }
+.lb-free.is-on { color: var(--ink); background: var(--sun); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: calc(2 * var(--u)) calc(12 * var(--u)); }
 
 /* Deck: Karten auf dem dunklen Streifen wie in der Hand */
 .lb-deck-grid {

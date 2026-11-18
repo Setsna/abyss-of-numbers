@@ -1,5 +1,5 @@
 // Leiter Plus (Regelwerk 5.1, 6.1). Zugarten in plus-minus.js.
-import { makeLadder } from './plus-minus.js?v=7aea6f1b';
+import { makeLadder } from './plus-minus.js?v=1ea03785';
 
 const ladder = makeLadder('add');
 export const kinds = ladder.kinds;

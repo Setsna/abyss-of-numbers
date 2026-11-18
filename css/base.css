@@ -15,6 +15,9 @@
   --sun: #ffd23f;          /* Bonus, Auswahl, Hauptaktion */
   --sun-2: #ffe48a;
   --sun-3: #fff3c4;
+  --sand: #f3e3bd;          /* Meeresboden: Grund der Logbuch-Seiten */
+  --sand-line: #b89a62;     /* Linien auf Sand */
+  --sand-light: #fbf2dc;    /* heller Sand: Steckbrief auf dem Sandgrund */
   --coral: #ff5a4e;        /* nur Gegnerangriff */
   --heal: #3fbf7f;         /* Heilung */
   --shield: #8fd3ff;       /* Schutz */

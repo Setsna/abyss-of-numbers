@@ -3,11 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=7aea6f1b';
-import { ICON } from '../icons.js?v=7aea6f1b';
-import { renderAsset } from '../assets.js?v=7aea6f1b';
-import { renderCard } from '../components/card.js?v=7aea6f1b';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=7aea6f1b';
+import { wayText } from '../text.js?v=1ea03785';
+import { ICON } from '../icons.js?v=1ea03785';
+import { renderAsset } from '../assets.js?v=1ea03785';
+import { renderCard } from '../components/card.js?v=1ea03785';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=1ea03785';
 
 const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
 const SLOTS = ['kopf', 'koerper', 'hand'];
@@ -53,7 +53,7 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
     const next = thresholds[p.stufe];
     wrap.innerHTML = `
       <div class="lb-hero-art"></div>
-      <div class="lb-hero-info">
+      <div class="lb-hero-info lb-sheet">
         <p class="lb-name"></p>
         <p class="lb-line"></p>
         <p class="lb-line lb-quiet"></p>
