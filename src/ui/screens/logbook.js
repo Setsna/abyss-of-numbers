@@ -3,11 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=1ea03785';
-import { ICON } from '../icons.js?v=1ea03785';
-import { renderAsset } from '../assets.js?v=1ea03785';
-import { renderCard } from '../components/card.js?v=1ea03785';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=1ea03785';
+import { wayText } from '../text.js?v=511d1702';
+import { ICON } from '../icons.js?v=511d1702';
+import { renderAsset } from '../assets.js?v=511d1702';
+import { renderCard } from '../components/card.js?v=511d1702';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=511d1702';
 
 const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
 const SLOTS = ['kopf', 'koerper', 'hand'];
@@ -15,7 +15,7 @@ const STATS = ['kraft', 'ruhe', 'leben'];
 const STAT_ICON = { kraft: ICON.attack, ruhe: ICON.bolt, leben: ICON.heart };
 const RULE_ICON = [ICON.attack, ICON.deck, ICON.check, ICON.bolt, ICON.heart, ICON.next];
 
-export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
+export function mountLogbook(root, { t, config, game, onCommand, onClose, onEditHero = () => {} }) {
   root.innerHTML = `
   <main class="screen logbook-screen">
     <section class="panel logbook">
@@ -62,7 +62,8 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
           <span class="lb-free"></span>
           <button class="btn btn-quiet lb-reset" type="button"></button>
         </div>
-      </div>`;
+      </div>
+      <button class="btn btn-quiet lb-change" type="button"></button>`;
     // Held steht im Bild seines Gebiets, wie ein Comicpanel
     wrap.querySelector('.lb-hero-art').append(worldLayer(`area.${homeArea}`, 'lb-hero-scene'), renderAsset(p.asset, p.name));
     wrap.querySelector('.lb-name').textContent = p.name;
@@ -90,6 +91,10 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose }) {
     reset.textContent = t('logbook.reset');
     reset.disabled = STATS.every((s) => p.punkte[s] === 0);
     reset.addEventListener('click', () => { onCommand({ type: 'resetPoints' }); render(); });
+    // Held ändern (18.11.2026): Figur und Name, öffnet die Heldenwahl
+    const change = wrap.querySelector('.lb-change');
+    change.textContent = t('logbook.changeHero');
+    change.addEventListener('click', () => onEditHero());
     return wrap;
   }
 

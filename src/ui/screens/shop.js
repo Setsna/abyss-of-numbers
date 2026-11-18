@@ -1,9 +1,9 @@
 // Händler (Phase 5, Etappe 2; Konzept 10 und 11): drei Karten gegen Perlen, darunter
 // „Eine Karte abgeben“ mit Auswahl aus dem Deck, „Weiter tauchen“. Jeder Tipp sperrt die
 // Knöpfe, bis die Engine geantwortet hat (Doppeltipp, Prüfschwerpunkt 2).
-import { ICON } from '../icons.js?v=1ea03785';
-import { renderCard } from '../components/card.js?v=1ea03785';
-import { addWorld } from '../components/world.js?v=1ea03785';
+import { ICON } from '../icons.js?v=511d1702';
+import { renderCard } from '../components/card.js?v=511d1702';
+import { addWorld } from '../components/world.js?v=511d1702';
 
 export function mountShop(root, { t, config, game, onCommand, onLeave }) {
   root.innerHTML = `

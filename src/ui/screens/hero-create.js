@@ -1,16 +1,18 @@
 // Heldenwahl (Plan Etappe 7): vier Figuren zum Antippen, Name aus zwei Wortlisten mit je einem Knopf
 // „anderes Wort“ und einem Würfel für beide. Keine Texteingabe (Konzept 10, Datenschutz).
 // Der Würfel nutzt Math.random: nur Oberfläche, der Spielstand bekommt ohnehin nur die zwei Nummern.
-import { ICON } from '../icons.js?v=1ea03785';
-import { renderAsset } from '../assets.js?v=1ea03785';
-import { addWorld } from '../components/world.js?v=1ea03785';
+import { ICON } from '../icons.js?v=511d1702';
+import { renderAsset } from '../assets.js?v=511d1702';
+import { addWorld } from '../components/world.js?v=511d1702';
 
-export function mountHeroCreate(root, { t, config, onDone }) {
+// Ändern-Modus (initial, onCancel; seit 18.11.2026): gleiche Wahl aus dem Logbuch, die jetzige Figur und der
+// jetzige Name sind vorausgewählt, dazu ein Knopf „Zurück“.
+export function mountHeroCreate(root, { t, config, onDone, initial = null, onCancel = null, areaId = null }) {
   const figures = Object.keys(config.heroes.figures);
   const { nameA, nameB } = config.heroes;
-  let figure = figures[0];
-  let a = 0;
-  let b = 0;
+  let figure = initial?.figur ?? figures[0];
+  let a = initial?.nameA ?? 0;
+  let b = initial?.nameB ?? 0;
 
   root.innerHTML = `
   <main class="screen hero-screen">
@@ -23,12 +25,23 @@ export function mountHeroCreate(root, { t, config, onDone }) {
         <div class="name-part"><span class="name-word" data-ref="wordB"></span><button class="btn btn-quiet name-other" type="button" data-ref="otherB"></button></div>
         <button class="btn btn-quiet name-dice" type="button" data-ref="dice"></button>
       </div>
-      <button class="btn btn-go" type="button" data-ref="done"></button>
+      <div class="hero-actions">
+        <button class="btn" type="button" data-ref="cancel" hidden></button>
+        <button class="btn btn-go" type="button" data-ref="done"></button>
+      </div>
     </section>
   </main>`;
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
-  addWorld(root.querySelector('.screen'), `area.${config.areas.order[0]}`); // Spielwelt dahinter (D25)
-  ref.title.textContent = t('heroCreate.title');
+  addWorld(root.querySelector('.screen'), `area.${areaId ?? config.areas.order[0]}`); // Spielwelt dahinter (D25)
+  ref.title.textContent = t(initial ? 'heroCreate.titleEdit' : 'heroCreate.title');
+  if (onCancel) {
+    ref.cancel.hidden = false;
+    ref.cancel.textContent = t('logbook.close');
+    ref.cancel.addEventListener('click', () => {
+      root.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+      onCancel();
+    }, { once: true });
+  }
   ref.nameLabel.textContent = t('heroCreate.name');
   ref.otherA.textContent = t('heroCreate.other');
   ref.otherB.textContent = t('heroCreate.other');

@@ -4,29 +4,29 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=1ea03785';
-import { createStorage, STORAGE_KEY } from './platform/storage.js?v=1ea03785';
-import { createAccount, accountBackend } from './platform/account.js?v=1ea03785';
-import { FIREBASE } from './platform/firebase-config.js?v=1ea03785';
-import { createAudio } from './platform/audio.js?v=1ea03785';
-import { validateConfig } from './engine/config/validate.js?v=1ea03785';
-import { createSave } from './engine/save/save.js?v=1ea03785';
-import { createGame } from './engine/game.js?v=1ea03785';
-import { setTexts, t } from './ui/text.js?v=1ea03785';
-import { setManifest } from './ui/assets.js?v=1ea03785';
-import { isLocalHost } from './ui/app.js?v=1ea03785';
-import { mountCombat } from './ui/screens/combat.js?v=1ea03785';
-import { mountReward } from './ui/screens/reward.js?v=1ea03785';
-import { mountShop } from './ui/screens/shop.js?v=1ea03785';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=1ea03785';
-import { mountBase } from './ui/screens/base.js?v=1ea03785';
-import { mountTitle } from './ui/screens/title.js?v=1ea03785';
-import { mountLogin } from './ui/screens/login.js?v=1ea03785';
-import { mountGrade } from './ui/screens/grade.js?v=1ea03785';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=1ea03785';
-import { mountLogbook } from './ui/screens/logbook.js?v=1ea03785';
-import { mountAdult } from './ui/screens/adult.js?v=1ea03785';
-import { createRng } from './engine/rng.js?v=1ea03785';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=511d1702';
+import { createStorage, STORAGE_KEY } from './platform/storage.js?v=511d1702';
+import { createAccount, accountBackend } from './platform/account.js?v=511d1702';
+import { FIREBASE } from './platform/firebase-config.js?v=511d1702';
+import { createAudio } from './platform/audio.js?v=511d1702';
+import { validateConfig } from './engine/config/validate.js?v=511d1702';
+import { createSave } from './engine/save/save.js?v=511d1702';
+import { createGame } from './engine/game.js?v=511d1702';
+import { setTexts, t } from './ui/text.js?v=511d1702';
+import { setManifest } from './ui/assets.js?v=511d1702';
+import { isLocalHost } from './ui/app.js?v=511d1702';
+import { mountCombat } from './ui/screens/combat.js?v=511d1702';
+import { mountReward } from './ui/screens/reward.js?v=511d1702';
+import { mountShop } from './ui/screens/shop.js?v=511d1702';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=511d1702';
+import { mountBase } from './ui/screens/base.js?v=511d1702';
+import { mountTitle } from './ui/screens/title.js?v=511d1702';
+import { mountLogin } from './ui/screens/login.js?v=511d1702';
+import { mountGrade } from './ui/screens/grade.js?v=511d1702';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=511d1702';
+import { mountLogbook } from './ui/screens/logbook.js?v=511d1702';
+import { mountAdult } from './ui/screens/adult.js?v=511d1702';
+import { createRng } from './engine/rng.js?v=511d1702';
 
 const app = document.getElementById('app');
 
@@ -207,11 +207,19 @@ function runGame(config, session = null) {
         t, config, game,
         onCommand: (command) => act(command),
         onClose: () => { act({ type: 'closeLogbook' }); route(); },
+        onEditHero: () => { act({ type: 'editHero' }); route(); },
+      }));
+    } else if (v.screen === 'heroEdit') {
+      // Held ändern (18.11.2026): dieselbe Heldenwahl, jetzige Figur und Name vorausgewählt
+      show(mountHeroCreate(app, {
+        t, config, initial: v.profile.held, areaId: v.run?.areaId ?? null,
+        onDone: (hero) => { act({ type: 'changeHero', ...hero }); route(); },
+        onCancel: () => { act({ type: 'cancelHeroEdit' }); route(); },
       }));
     } else if (v.screen === 'base') {
       show(mountBase(app, {
         t, config, game,
-        onDive: (areaId) => { act({ type: 'dive', areaId }); route(); },
+        onDive: (areaId, { abandon = false } = {}) => { act({ type: 'dive', areaId, abandon }); route(); },
         onLogbook: (page) => { act({ type: 'openLogbook', page }); route(); },
       }));
     } else if (v.screen === 'map') {

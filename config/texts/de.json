@@ -408,7 +408,10 @@
     "freeOne": "1 freier Punkt",
     "freeMany": "{n} freie Punkte",
     "diveTo": "Abtauchen: {area}",
-    "soon": "{area}: kommt bald"
+    "soon": "{area}: kommt bald",
+    "switchAsk": "Willst du zu „{to}“ tauchen? Dann ist dein Tauchgang in „{from}“ vorbei. Karten, Perlen und Ausrüstung behältst du.",
+    "switchYes": "Ja, tauchen",
+    "switchNo": "Nein"
   },
   "figures": {
     "diver": {
@@ -432,6 +435,7 @@
   },
   "heroCreate": {
     "title": "Wähle deine Figur",
+    "titleEdit": "Held ändern",
     "name": "Dein Name",
     "other": "anderes Wort",
     "dice": "Würfeln",
@@ -441,6 +445,7 @@
   "logbook": {
     "title": "Logbuch",
     "close": "Zurück",
+    "changeHero": "Held ändern",
     "tab": {
       "hero": "Held",
       "deck": "Deck",

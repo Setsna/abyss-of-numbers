@@ -4,9 +4,9 @@
 //   Logbuch   – mit dem Schild „freie Punkte“,
 //   Ausrüstung – öffnet die Logbuch-Seite „Ausrüstung“.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=1ea03785';
-import { renderAsset, assetUrl } from '../assets.js?v=1ea03785';
-import { homeAreaId, worldLayer } from '../components/world.js?v=1ea03785';
+import { ICON } from '../icons.js?v=511d1702';
+import { renderAsset, assetUrl } from '../assets.js?v=511d1702';
+import { homeAreaId, worldLayer } from '../components/world.js?v=511d1702';
 
 export function mountBase(root, { t, config, game, onDive, onLogbook }) {
   const v = game.view();
@@ -25,6 +25,13 @@ export function mountBase(root, { t, config, game, onDive, onLogbook }) {
         <button class="spot base-logbook" type="button" data-ref="logbook"></button>
         <button class="spot" type="button" data-ref="gear"></button>
       </div>
+      <div class="station-ask" data-ref="ask" role="dialog" aria-modal="true" hidden>
+        <p class="station-ask-text" data-ref="askText"></p>
+        <div class="station-ask-btns">
+          <button class="btn btn-go" type="button" data-ref="askYes"></button>
+          <button class="btn" type="button" data-ref="askNo"></button>
+        </div>
+      </div>
     </section>
   </main>`;
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
@@ -41,6 +48,19 @@ export function mountBase(root, { t, config, game, onDive, onLogbook }) {
 
   let busy = false;
   const once = (fn) => () => { if (busy) return; busy = true; fn(); };
+
+  // Nachfrage: der laufende Tauchgang endet, Gesammeltes bleibt
+  ref.askYes.textContent = t('base.switchYes');
+  ref.askNo.textContent = t('base.switchNo');
+  let askTarget = null;
+  function askSwitch(areaId, name) {
+    askTarget = areaId;
+    ref.askText.textContent = t('base.switchAsk', { from: t(`areas.${v.run.areaId}.name`), to: name });
+    ref.ask.hidden = false;
+    ref.askNo.focus({ preventScroll: true });
+  }
+  ref.askNo.addEventListener('click', () => { ref.ask.hidden = true; askTarget = null; });
+  ref.askYes.addEventListener('click', once(() => onDive(askTarget, { abandon: true })));
 
   // Bullaugen: Fenster mit dem Gebietsbild, darunter der Knopf; das ganze Bullauge ist der Knopf
   const openAreas = p.areas.filter((a) => a.open);
@@ -63,7 +83,9 @@ export function mountBase(root, { t, config, game, onDive, onLogbook }) {
       // Sichtbar nur der Ortsname (Ingos Wunsch 18.11.2026); vorgelesen weiter „Abtauchen: …“
       label.textContent = v.run?.areaId === a.id ? t('base.resume') : name;
       if (v.run?.areaId !== a.id) b.setAttribute('aria-label', t('base.diveTo', { area: name }));
-      b.addEventListener('click', once(() => onDive(a.id)));
+      // Läuft ein Tauchgang in einem anderen Gebiet, fragt die Station erst nach (Ingos Probespiel 18.11.2026)
+      if (v.run && v.run.areaId !== a.id) b.addEventListener('click', () => { if (!busy) askSwitch(a.id, name); });
+      else b.addEventListener('click', once(() => onDive(a.id)));
     }
     b.append(win, label);
     return b;

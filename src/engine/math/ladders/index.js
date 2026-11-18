@@ -1,9 +1,9 @@
 // Leitern des Regelwerks (Phase 6b). Jede Leiter: drawStage(stage, rng) → { a, b, result }.
 // Stufen und Fenster stehen in config/curricula/class<N>.json unter ladders und windows.
-import * as add from './add.js?v=1ea03785';
-import * as sub from './sub.js?v=1ea03785';
-import * as mul from './mul.js?v=1ea03785';
-import * as div from './div.js?v=1ea03785';
+import * as add from './add.js?v=511d1702';
+import * as sub from './sub.js?v=511d1702';
+import * as mul from './mul.js?v=511d1702';
+import * as div from './div.js?v=511d1702';
 
 export const LADDERS = { add, sub, mul, div };
 

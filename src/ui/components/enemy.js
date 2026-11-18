@@ -1,7 +1,7 @@
 // Gegner im Szenenpanel: Absicht, Immunität, Bild, Name, Leben, Schutz, Lebensbalken.
-import { ICON, OP_ICON } from '../icons.js?v=1ea03785';
-import { renderAsset } from '../assets.js?v=1ea03785';
-import { OPERATOR_SIGN } from '../../engine/math/format.js?v=1ea03785';
+import { ICON, OP_ICON } from '../icons.js?v=511d1702';
+import { renderAsset } from '../assets.js?v=511d1702';
+import { OPERATOR_SIGN } from '../../engine/math/format.js?v=511d1702';
 
 export function renderEnemy(e, { t, selected }) {
   const name = t(`enemies.${e.typeId}.name`);
@@ -44,13 +44,18 @@ export function renderEnemy(e, { t, selected }) {
 
   const plate = document.createElement('div');
   plate.className = 'plate';
-  plate.innerHTML = `<span class="stat">${ICON.heart}${e.hp}</span>${e.block > 0 ? `<span class="stat block">${ICON.shield}${e.block}</span>` : ''}`;
+  // Leben stehen im Balken; das Schild zeigt Schutz, und Leben nur, wo der Balken fehlt (3 oder 4 Gegner)
+  plate.innerHTML = `<span class="stat hp">${ICON.heart}${e.hp}</span>${e.block > 0 ? `<span class="stat block">${ICON.shield}${e.block}</span>` : ''}`;
 
   const bar = document.createElement('div');
   bar.className = 'hpbar';
   const fill = document.createElement('i');
   fill.style.width = `${(Math.max(0, e.hp) / e.maxHp) * 100}%`; // per CSSOM, CSP erlaubt keine style-Attribute
-  bar.append(fill);
+  const num = document.createElement('span');
+  num.className = 'hpbar-num';
+  num.innerHTML = `${ICON.heart}<span></span>`;
+  num.lastChild.textContent = String(e.hp);
+  bar.append(fill, num);
 
   b.append(row, art, label);
   if (e.shielded && e.alive) {

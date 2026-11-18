@@ -71,9 +71,11 @@
 .current[hidden] { display: none; }
 .current.is-low { background: var(--paper); color: var(--ink); }
 /* Lebensbalken (deutlicher seit 18.11.2026, Ingos Wunsch): dicker, heller Grund für den leeren Teil und
-   ein papierweißer Ring außen, damit er sich auch vor bunten Hintergründen abhebt */
+   ein papierweißer Ring außen, damit er sich auch vor bunten Hintergründen abhebt.
+   Herz und Zahl stehen im Balken (Ingos Wunsch am selben Tag): weiß mit Tuschekontur wie die Zahlen der Karten. */
 .hpbar {
-  width: 86%; height: calc(24 * var(--u));
+  position: relative;
+  width: 86%; height: calc(34 * var(--u));
   background: var(--disabled-fill);
   border: var(--line-thin) solid var(--ink);
   border-radius: calc(999 * var(--u));
@@ -82,6 +84,17 @@
 }
 .hpbar i { display: block; height: 100%; background: var(--heal); border-right: var(--line-thin) solid var(--ink); transition: width var(--t-mid) var(--ease-out); }
 .foe .hpbar i { background: var(--coral); }
+.hpbar-num {
+  position: absolute; left: calc(8 * var(--u)); top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; gap: calc(4 * var(--u));
+  font-weight: 700; font-size: calc(24 * var(--u)); line-height: 1; white-space: nowrap;
+  color: var(--paper); -webkit-text-stroke: calc(4 * var(--u)) var(--ink); paint-order: stroke fill;
+}
+.hpbar-num svg { width: 0.95em; height: 0.95em; flex: none; box-sizing: content-box; padding: calc(2 * var(--u)); background: var(--paper); border-radius: 50%; } /* weißer Kreis: rotes Herz auch auf rotem Balken sichtbar */
+/* Schild über dem Balken nur, wenn es etwas zu zeigen gibt (Schutz, Serie) */
+.hero-plate:not(:has(.stat:not([hidden]))) { display: none; }
+.foe .plate .stat.hp { display: none; }
+.foe .plate:not(:has(.block)) { display: none; }
 
 /* Gegner */
 .foes {
@@ -390,6 +403,9 @@
   .foes[data-n="3"] .intent, .foes[data-n="4"] .intent { font-size: calc(20 * var(--u)); padding: 0 calc(8 * var(--u)); }
   .foes[data-n="3"] .immune, .foes[data-n="4"] .immune { width: calc(36 * var(--u)); height: calc(36 * var(--u)); }
   .foes[data-n="3"] .hpbar, .foes[data-n="4"] .hpbar { display: none; }
+  /* ohne Balken: die Leben stehen wieder im Schild */
+  .foes[data-n="3"] .foe .plate, .foes[data-n="4"] .foe .plate { display: flex; }
+  .foes[data-n="3"] .foe .plate .stat.hp, .foes[data-n="4"] .foe .plate .stat.hp { display: inline-flex; }
   .foes[data-n="3"], .foes[data-n="4"] { --cols: 4; }
   .foes[data-n="2"] { --cols: 2; }
   .bubble, .bubble.is-wide { left: auto; right: 3%; top: auto; bottom: 4%; transform: none; width: 68%; max-width: none; }
@@ -461,6 +477,8 @@
 @media (orientation: landscape) {
   .foes[data-n="4"] { width: 52%; top: 4%; bottom: 3%; }
   .foes[data-n="4"] .hpbar { display: none; }
+  .foes[data-n="4"] .foe .plate { display: flex; }
+  .foes[data-n="4"] .foe .plate .stat.hp { display: inline-flex; }
 }
 @media (orientation: portrait) {
   .foes[data-n="4"] { --cols: 3; height: 92%; width: 64%; }

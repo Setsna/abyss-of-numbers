@@ -1,18 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=1ea03785';
-import { combatView } from '../../engine/combat/combat.js?v=1ea03785';
-import { ICON } from '../icons.js?v=1ea03785';
-import { renderAsset, assetUrl } from '../assets.js?v=1ea03785';
-import { poseBox, dashDistance } from '../components/pose.js?v=1ea03785';
-import { playEvents, wait, isCalm } from '../app.js?v=1ea03785';
-import { bindKeys } from '../input.js?v=1ea03785';
-import { renderEnemy } from '../components/enemy.js?v=1ea03785';
-import { renderCard, emptySlot } from '../components/card.js?v=1ea03785';
-import { createTaskPanel } from '../components/task-panel.js?v=1ea03785';
-import { startTimerBar } from '../components/timer-bar.js?v=1ea03785';
-import { createTutorial } from '../tutorial.js?v=1ea03785';
+import { wayText, hintAsk } from '../text.js?v=511d1702';
+import { combatView } from '../../engine/combat/combat.js?v=511d1702';
+import { ICON } from '../icons.js?v=511d1702';
+import { renderAsset, assetUrl } from '../assets.js?v=511d1702';
+import { poseBox, dashDistance } from '../components/pose.js?v=511d1702';
+import { playEvents, wait, isCalm } from '../app.js?v=511d1702';
+import { bindKeys } from '../input.js?v=511d1702';
+import { renderEnemy } from '../components/enemy.js?v=511d1702';
+import { renderCard, emptySlot } from '../components/card.js?v=511d1702';
+import { createTaskPanel } from '../components/task-panel.js?v=511d1702';
+import { startTimerBar } from '../components/timer-bar.js?v=511d1702';
+import { createTutorial } from '../tutorial.js?v=511d1702';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -23,11 +23,10 @@ const STAGE_HTML = `
       <div class="hero-art" id="heroArt"></div>
       <span class="current" id="currentPlate" hidden></span>
       <div class="plate hero-plate">
-        <span class="stat" id="heroHp"></span>
         <span class="stat block" id="heroBlock" hidden></span>
         <span class="stat streak" id="heroStreak" hidden></span>
       </div>
-      <div class="hpbar"><i id="heroHpBar"></i></div>
+      <div class="hpbar"><i id="heroHpBar"></i><span class="hpbar-num" id="heroHp"></span></div>
     </div>
     <div class="foes" id="foes"></div>
     <div class="bubble" id="bubble" hidden></div>

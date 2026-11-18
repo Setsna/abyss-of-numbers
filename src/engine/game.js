@@ -5,17 +5,17 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=1ea03785';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=1ea03785';
-import { wayForKey } from './math/ways.js?v=1ea03785';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=1ea03785';
-import { nextCurrent, answerCode } from './combat/current.js?v=1ea03785';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=1ea03785';
-import { generateMap } from './dungeon/map.js?v=1ea03785';
-import { createSave } from './save/save.js?v=1ea03785';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js?v=1ea03785';
-import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=1ea03785';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=1ea03785';
+import { createRng, deriveSeed } from './rng.js?v=511d1702';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=511d1702';
+import { wayForKey } from './math/ways.js?v=511d1702';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=511d1702';
+import { nextCurrent, answerCode } from './combat/current.js?v=511d1702';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=511d1702';
+import { generateMap } from './dungeon/map.js?v=511d1702';
+import { createSave } from './save/save.js?v=511d1702';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js?v=511d1702';
+import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=511d1702';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=511d1702';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -147,14 +147,22 @@ export function createGame({ config, save, seed }) {
     });
   }
 
-  function dive({ areaId }) {
+  // abandon: das Kind hat bestätigt, dass der laufende Tauchgang in einem anderen Gebiet endet (Ingos Probespiel
+  // 18.11.2026). Nur der Weg über die Seekarte geht verloren; Karten, Perlen, Erfahrung und Ausrüstung bleiben.
+  function dive({ areaId, abandon = false }) {
     if (state.screen !== 'base') return reject('screen');
     const area = config.areas.areas[areaId];
     if (!area) return reject('unknownArea');
     if (!state.save.gebiete[areaId]?.offen) return reject('locked');
     if (area.comingSoon) return reject('comingSoon');
-    const l = lauf();
-    if (l && l.gebiet !== areaId) return reject('otherRun');
+    let l = lauf();
+    const events = [];
+    if (l && l.gebiet !== areaId) {
+      if (!abandon) return reject('otherRun');
+      events.push({ type: 'runAbandoned', areaId: l.gebiet });
+      state.save.lauf = null;
+      l = null;
+    }
     if (!l) {
       state.save.lauf = {
         gebiet: areaId,
@@ -167,7 +175,7 @@ export function createGame({ config, save, seed }) {
       };
     }
     state.screen = 'map';
-    return [{ type: 'diveStarted', areaId, seed: lauf().seed, resumed: Boolean(l) }];
+    return [...events, { type: 'diveStarted', areaId, seed: lauf().seed, resumed: Boolean(l) }];
   }
 
   function enterRoom({ roomId }) {
@@ -489,6 +497,35 @@ export function createGame({ config, save, seed }) {
     return [{ type: 'logbookClosed' }];
   }
 
+  // Leben im Tauchgang nie über dem Höchstmaß, wenn es durch Figur, Ausrüstung oder Punkte sinkt (18.11.2026)
+  function capRunLife() {
+    const l = lauf();
+    if (l) l.leben = Math.min(l.leben, maxHp(state.save, config));
+  }
+
+  // Held ändern (Ingos Wunsch 18.11.2026): aus dem Logbuch, auch während eines Tauchgangs. Figur und Name wechseln,
+  // alles andere bleibt. Die Leben im Tauchgang werden höchstens auf das neue Höchstmaß gekürzt, nie erhöht.
+  function editHero() {
+    state.screen = 'heroEdit';
+    return [{ type: 'heroEditOpened' }];
+  }
+  function cancelHeroEdit() {
+    state.screen = 'logbook';
+    state.logbookPage = 'hero';
+    return [{ type: 'heroEditClosed' }];
+  }
+  function changeHero({ figureId, nameA, nameB }) {
+    const h = config.heroes;
+    if (!h.figures[figureId]) return reject('figure');
+    const okIndex = (i, list) => Number.isInteger(i) && i >= 0 && i < list.length;
+    if (!okIndex(nameA, h.nameA) || !okIndex(nameB, h.nameB)) return reject('name');
+    state.save.held = { figur: figureId, nameA, nameB };
+    capRunLife();
+    state.screen = 'logbook';
+    state.logbookPage = 'hero';
+    return [{ type: 'heroChanged', figureId, name: heroName(state.save, config) }];
+  }
+
   function spendPoint({ stat }) {
     if (!STATS.includes(stat)) return reject('stat');
     if (!spendHeroPoint(state.save, stat, config)) return reject('noPoints');
@@ -500,16 +537,19 @@ export function createGame({ config, save, seed }) {
     if (!state.save.ausruestung.besitz.includes(itemId)) return reject('item');
     const slot = config.items[itemId].slot;
     state.save.ausruestung.angelegt[slot] = itemId;
+    capRunLife(); // ein anderer Gegenstand im selben Platz kann Extra-Leben ersetzen
     return [{ type: 'itemEquipped', itemId, slot }];
   }
   function unequipItem({ slot }) {
     if (!SLOTS.includes(slot)) return reject('slot');
     state.save.ausruestung.angelegt[slot] = null;
+    capRunLife();
     return [{ type: 'itemUnequipped', slot }];
   }
 
   function resetPoints() {
     resetHeroPoints(state.save);
+    capRunLife();
     return [{ type: 'pointsReset', free: freePoints(state.save, config) }];
   }
 
@@ -523,6 +563,7 @@ export function createGame({ config, save, seed }) {
       name: heroName(s, config),
       figure: s.held.figur,
       asset: config.heroes.figures[s.held.figur].asset,
+      held: { ...s.held }, // Figur und Namensnummern, für „Held ändern“
       poseAnchor: config.heroes.figures[s.held.figur].poseAnchor ?? null, // Kampfposen (D36, Weg 2)
       klasse: s.klasse,
       stufe: s.stufe,
@@ -586,7 +627,7 @@ export function createGame({ config, save, seed }) {
   }
 
   // Befehle außerhalb des Kampfs; im Kampf werden sie mit „phase“ abgelehnt.
-  const MENU_COMMANDS = new Set(['start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem']);
+  const MENU_COMMANDS = new Set(['start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero']);
 
   // Erlaubte Befehle je Bildschirm.
   const COMMANDS = {
@@ -594,7 +635,8 @@ export function createGame({ config, save, seed }) {
     grade: { chooseGrade },
     heroCreate: { createHero },
     base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem },
-    logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem },
+    logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem, editHero },
+    heroEdit: { changeHero, cancelHeroEdit },
     map: { enterRoom, surface },
     reward: { pickReward },
     shop: { buyCard, buyItem, removeCard, leaveShop },
