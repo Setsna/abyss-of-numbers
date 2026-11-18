@@ -7,10 +7,10 @@
 // Falsche Antworten: F-PVS-a von links nach rechts gerechnet (immer dabei, wenn ganzzahlig und im
 // Zahlenraum), F-PVS-b die erste Zahl vergessen, F-PVS-c um 1 oder 10 daneben; bei Klammern F-KL-a Klammer
 // nicht beachtet, F-KL-b nur die erste Zahl der Klammer verrechnet, F-KL-c um 10 daneben.
-import { pickChoices } from '../mistakes.js?v=ea296573';
-import { wayFor } from '../ways.js?v=ea296573';
-import { formatNumber as fmt } from '../format.js?v=ea296573';
-import { MAX_TRIES } from './common.js?v=ea296573';
+import { pickChoices } from '../mistakes.js?v=700613bf';
+import { wayFor } from '../ways.js?v=700613bf';
+import { formatNumber as fmt } from '../format.js?v=700613bf';
+import { MAX_TRIES } from './common.js?v=700613bf';
 
 const SIGN = { add: '+', sub: '−', mul: '·', div: ':' };
 const APPLY = { add: (x, y) => x + y, sub: (x, y) => x - y, mul: (x, y) => x * y, div: (x, y) => x / y };

@@ -5,11 +5,11 @@
 // sonst gibt es kein Malglied (D13: kein 18 · 3).
 // Falsche Antworten je Glied: die Fehlertypen der Rechenart (linkMistakes je Rechenart).
 // Jedes Glied ist ein Schritt mit vier Antworten.
-import { formatEquation, formatExpression } from '../format.js?v=ea296573';
-import { mistakesFor, pickChoices, commonRound } from '../mistakes.js?v=ea296573';
-import { calcPlace } from '../places.js?v=ea296573';
-import { MAX_TRIES } from './common.js?v=ea296573';
-import { wayFor } from '../ways.js?v=ea296573';
+import { formatEquation, formatExpression } from '../format.js?v=700613bf';
+import { mistakesFor, pickChoices, commonRound } from '../mistakes.js?v=700613bf';
+import { calcPlace } from '../places.js?v=700613bf';
+import { MAX_TRIES } from './common.js?v=700613bf';
+import { wayFor } from '../ways.js?v=700613bf';
 
 const drawRange = (r, rng) => r.min + (r.step ?? 1) * rng.nextInt(0, Math.floor((r.max - r.min) / (r.step ?? 1)));
 

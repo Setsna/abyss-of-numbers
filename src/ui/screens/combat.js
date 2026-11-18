@@ -1,17 +1,17 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=ea296573';
-import { combatView } from '../../engine/combat/combat.js?v=ea296573';
-import { ICON } from '../icons.js?v=ea296573';
-import { renderAsset } from '../assets.js?v=ea296573';
-import { playEvents, wait, isCalm } from '../app.js?v=ea296573';
-import { bindKeys } from '../input.js?v=ea296573';
-import { renderEnemy } from '../components/enemy.js?v=ea296573';
-import { renderCard, emptySlot } from '../components/card.js?v=ea296573';
-import { createTaskPanel } from '../components/task-panel.js?v=ea296573';
-import { startTimerBar } from '../components/timer-bar.js?v=ea296573';
-import { createTutorial } from '../tutorial.js?v=ea296573';
+import { wayText, hintAsk } from '../text.js?v=700613bf';
+import { combatView } from '../../engine/combat/combat.js?v=700613bf';
+import { ICON } from '../icons.js?v=700613bf';
+import { renderAsset } from '../assets.js?v=700613bf';
+import { playEvents, wait, isCalm } from '../app.js?v=700613bf';
+import { bindKeys } from '../input.js?v=700613bf';
+import { renderEnemy } from '../components/enemy.js?v=700613bf';
+import { renderCard, emptySlot } from '../components/card.js?v=700613bf';
+import { createTaskPanel } from '../components/task-panel.js?v=700613bf';
+import { startTimerBar } from '../components/timer-bar.js?v=700613bf';
+import { createTutorial } from '../tutorial.js?v=700613bf';
 
 const STAGE_HTML = `
 <main class="stage">
