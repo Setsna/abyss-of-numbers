@@ -24,7 +24,9 @@
       "operation": "add"
     },
     "target": "enemy",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "undertow": {
     "cost": 1,
@@ -51,7 +53,9 @@
       "operation": "sub"
     },
     "target": "enemy",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "waveSlam": {
     "cost": 2,
@@ -78,7 +82,9 @@
       "operation": "mul"
     },
     "target": "enemy",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "deepRift": {
     "cost": 2,
@@ -105,7 +111,9 @@
       "operation": "div"
     },
     "target": "enemy",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "shieldBubble": {
     "cost": 1,
@@ -131,7 +139,9 @@
       "format": "pickTrue"
     },
     "target": "hero",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "healingAlgae": {
     "cost": 1,
@@ -158,7 +168,9 @@
       "format": "pickFalse"
     },
     "target": "hero",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "whirlpool": {
     "cost": 1,
@@ -169,7 +181,9 @@
     },
     "task": null,
     "target": "hero",
-    "price": 5
+    "price": 5,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "harpoon": {
     "cost": 2,
@@ -195,7 +209,9 @@
       "format": "numberLine"
     },
     "target": "enemy",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "conchHorn": {
     "cost": 1,
@@ -223,7 +239,9 @@
       "format": "sequence"
     },
     "target": "hero",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "kelpPotion": {
     "cost": 1,
@@ -250,7 +268,9 @@
       "format": "complement"
     },
     "target": "hero",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "shellCracker": {
     "cost": 1,
@@ -277,7 +297,9 @@
       "ifLadder": "teil"
     },
     "target": "enemy",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "bubbleChain": {
     "cost": 1,
@@ -304,7 +326,9 @@
       "freeMistakes": 0
     },
     "target": "enemies",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "coralWall": {
     "cost": 3,
@@ -331,7 +355,9 @@
       "freeMistakes": 2
     },
     "target": "enemy",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "pearlFind": {
     "cost": 0,
@@ -359,7 +385,9 @@
       "freeMistakes": 2
     },
     "target": "hero",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
   },
   "inkCloud": {
     "cost": 1,
@@ -386,6 +414,285 @@
       "format": "compareTerms"
     },
     "target": "enemy",
-    "price": 8
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 0
+  },
+  "wavebreaker": {
+    "cost": 1,
+    "effect": {
+      "type": "damageBlock",
+      "amount": 4,
+      "block": 4
+    },
+    "task": {
+      "format": "solve",
+      "operation": "sub"
+    },
+    "target": "enemy",
+    "price": 8,
+    "upgrades": [
+      {
+        "amount": 5,
+        "block": 5
+      },
+      {
+        "amount": 6,
+        "block": 6
+      },
+      {
+        "amount": 7,
+        "block": 7
+      },
+      {
+        "amount": 8,
+        "block": 8
+      }
+    ],
+    "rarity": "common",
+    "unlockStars": 2
+  },
+  "floodWave": {
+    "cost": 2,
+    "effect": {
+      "type": "damageAll",
+      "amount": 6
+    },
+    "task": {
+      "format": "solve",
+      "operation": "add"
+    },
+    "target": "enemies",
+    "price": 8,
+    "upgrades": [
+      {
+        "amount": 8
+      },
+      {
+        "amount": 10
+      },
+      {
+        "amount": 12
+      },
+      {
+        "amount": 14
+      }
+    ],
+    "rarity": "common",
+    "unlockStars": 4
+  },
+  "poisonAlgae": {
+    "cost": 1,
+    "effect": {
+      "type": "poison",
+      "amount": 3,
+      "turns": 3
+    },
+    "task": {
+      "format": "solve",
+      "operation": "div"
+    },
+    "target": "enemy",
+    "price": 8,
+    "upgrades": [
+      {
+        "amount": 4
+      },
+      {
+        "amount": 5
+      },
+      {
+        "amount": 6
+      },
+      {
+        "amount": 7
+      }
+    ],
+    "rarity": "common",
+    "unlockStars": 15
+  },
+  "airSupply": {
+    "cost": 1,
+    "effect": {
+      "type": "draw",
+      "amount": 2
+    },
+    "task": {
+      "format": "complement"
+    },
+    "target": "hero",
+    "price": 8,
+    "upgrades": [
+      {
+        "amount": 2
+      },
+      {
+        "amount": 3
+      },
+      {
+        "amount": 3
+      },
+      {
+        "amount": 3
+      }
+    ],
+    "rarity": "common",
+    "unlockStars": 9
+  },
+  "calmCurrent": {
+    "cost": 0,
+    "effect": {
+      "type": "slowTime",
+      "factor": 2
+    },
+    "task": null,
+    "target": "hero",
+    "price": 8,
+    "rarity": "common",
+    "unlockStars": 21
+  },
+  "streakWave": {
+    "cost": 1,
+    "effect": {
+      "type": "damage",
+      "amount": 6,
+      "perStreak": 3
+    },
+    "task": {
+      "format": "solve",
+      "operation": "mul"
+    },
+    "target": "enemy",
+    "price": 14,
+    "upgrades": [
+      {
+        "amount": 8
+      },
+      {
+        "amount": 10
+      },
+      {
+        "amount": 12
+      },
+      {
+        "amount": 14
+      }
+    ],
+    "rarity": "rare",
+    "unlockStars": 6
+  },
+  "twinHarpoon": {
+    "cost": 2,
+    "effect": {
+      "type": "damageTwo",
+      "amount": 12
+    },
+    "task": {
+      "format": "numberLine"
+    },
+    "target": "enemy",
+    "price": 14,
+    "upgrades": [
+      {
+        "amount": 14
+      },
+      {
+        "amount": 16
+      },
+      {
+        "amount": 18
+      },
+      {
+        "amount": 20
+      }
+    ],
+    "rarity": "rare",
+    "unlockStars": 12
+  },
+  "thornCoral": {
+    "cost": 1,
+    "effect": {
+      "type": "thorns",
+      "amount": 4,
+      "turns": 3
+    },
+    "task": {
+      "format": "sequence"
+    },
+    "target": "hero",
+    "price": 14,
+    "upgrades": [
+      {
+        "amount": 5
+      },
+      {
+        "amount": 6
+      },
+      {
+        "amount": 7
+      },
+      {
+        "amount": 8
+      }
+    ],
+    "rarity": "rare",
+    "unlockStars": 18
+  },
+  "armorBubble": {
+    "cost": 2,
+    "effect": {
+      "type": "block",
+      "amount": 12,
+      "keep": 1
+    },
+    "task": {
+      "format": "pickTrue"
+    },
+    "target": "hero",
+    "price": 14,
+    "upgrades": [
+      {
+        "amount": 14
+      },
+      {
+        "amount": 16
+      },
+      {
+        "amount": 18
+      },
+      {
+        "amount": 20
+      }
+    ],
+    "rarity": "rare",
+    "unlockStars": 25
+  },
+  "deepQuake": {
+    "cost": 3,
+    "effect": {
+      "type": "damageAll",
+      "amount": 14
+    },
+    "task": {
+      "format": "compareTerms"
+    },
+    "target": "enemies",
+    "price": 14,
+    "upgrades": [
+      {
+        "amount": 17
+      },
+      {
+        "amount": 20
+      },
+      {
+        "amount": 23
+      },
+      {
+        "amount": 26
+      }
+    ],
+    "rarity": "rare",
+    "unlockStars": 30
   }
 }

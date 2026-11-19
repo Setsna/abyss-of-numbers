@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=ad3e5b3d';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=ad3e5b3d';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=ad3e5b3d';
-import { chooseSource } from '../learning/learning.js?v=ad3e5b3d';
-import { crossPlace } from '../math/places.js?v=ad3e5b3d';
-import { neighborWay } from '../math/ways.js?v=ad3e5b3d';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=ad3e5b3d';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=ad3e5b3d';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=ad3e5b3d';
-import { cardEffect } from '../cards/effect.js?v=ad3e5b3d';
+import { createRng, deriveSeed } from '../rng.js?v=01d505e2';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=01d505e2';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=01d505e2';
+import { chooseSource } from '../learning/learning.js?v=01d505e2';
+import { crossPlace } from '../math/places.js?v=01d505e2';
+import { neighborWay } from '../math/ways.js?v=01d505e2';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=01d505e2';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=01d505e2';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=01d505e2';
+import { cardEffect } from '../cards/effect.js?v=01d505e2';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -104,7 +104,9 @@ function startTurn(c) {
       if (e.immuneBroken === 0) restored.push({ type: 'immunityRestored', enemyUid: e.uid });
     }
   }
-  c.hero.block = 0;
+  if (c.blockKeep > 0) c.blockKeep -= 1; else c.hero.block = 0;
+  c.slowNext = 0;
+  if (c.hero.thorns && --c.hero.thorns.turns <= 0) c.hero.thorns = null;
   c.hero.energy = c.config.game.hero.energy;
   c.discardsLeft = c.discardsPerTurn ?? c.config.game.hero.discardsPerTurn;
   c.phase = 'player';
@@ -129,6 +131,11 @@ function setStreak(c, value, events) {
   events.push({ type: 'streakChanged', streak: value });
 }
 const findHand = (c, uid) => c.piles.hand.find((k) => k.uid === uid);
+
+// Gegner ist gegen die Rechenart dieser Karte immun (und die Immunität ist nicht aufgehoben)
+function immuneTo(enemy, cardDef) {
+  return Boolean(enemy.immune && enemy.immuneBroken === 0 && cardDef.task?.operation === enemy.immune);
+}
 
 function isShielded(c, enemy) {
   return enemy.shieldedBy.length > 0 && c.enemies.some((o) => o !== enemy && alive(o) && enemy.shieldedBy.includes(o.typeId));
@@ -379,6 +386,13 @@ function playCard(c, { cardUid, targetUid }) {
   c.hero.energy -= def.cost;
   const events = [{ type: 'cardPlayed', cardUid, cardId: card.cardId, targetUid: target?.uid ?? null }];
 
+  if (def.effect.type === 'slowTime') {
+    // Ruhige Strömung (Phase 9): die nächste Aufgabe in diesem Zug hat factor-mal so viel Zeit
+    moveToDiscard(c.piles, cardUid);
+    c.slowNext = def.effect.factor;
+    events.push({ type: 'timeSlowed', factor: def.effect.factor });
+    return events;
+  }
   if (def.effect.type === 'cycle') {
     moveToDiscard(c.piles, cardUid);
     c.cycle = { required: Math.min(def.effect.discard, c.piles.hand.length), draw: def.effect.draw };
@@ -426,6 +440,7 @@ function playCard(c, { cardUid, targetUid }) {
       ? timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game, task.stepTimeClass, task.stepExtraMs)
       : timeLimitFor(task.format, c.hero.calm, c.moreTime, c.config.game, task.timeClass ?? null, task.extraMs ?? 0);
   }
+  if (c.slowNext && task.timeLimitMs > 0) { task.timeLimitMs = Math.round(task.timeLimitMs * c.slowNext); c.slowNext = 0; }
   if (c.forgiving) task.forgiving = true;
   c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? null, task };
   c.phase = 'task';
@@ -437,14 +452,35 @@ function applyCorrect(c, def, pending, multiplier) {
   const events = [];
   const fx = effectOf(c, pending.cardId); // Wirkung der Kartenstufe
   const amountFor = (base) => (c.config.game.tempo.appliesTo.includes(fx.type) ? applyMultiplier(base, multiplier) : base);
-  if (fx.type === 'damage') {
-    const target = c.enemies.find((e) => e.uid === pending.targetUid);
-    // Serie nur bei Schadenskarten, vor dem Tempo-Bonus wie die Kraft
-    const dmg = amountFor(fx.amount + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c));
+  // Schaden mit Kraft, Serie und Tempo-Bonus; perStreak (Serienwelle): je Stufe der laufenden Serie mehr
+  const damageNow = () => amountFor(fx.amount + (fx.perStreak ?? 0) * c.streak + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c));
+  const strike = (target, dmg) => {
     const r = hit(target, dmg);
     events.push({ type: 'damageDealt', targetUid: target.uid, amount: r.amount, blocked: r.blocked });
     if (!alive(target)) events.push({ type: 'enemyDefeated', enemyUid: target.uid });
     checkPhase(target, events);
+  };
+  if (fx.type === 'damage' || fx.type === 'damageBlock' || fx.type === 'damageTwo') {
+    const target = c.enemies.find((e) => e.uid === pending.targetUid);
+    const dmg = damageNow();
+    strike(target, dmg);
+    if (fx.type === 'damageBlock') { c.hero.block += fx.block; events.push({ type: 'blockGained', amount: fx.block }); }
+    if (fx.type === 'damageTwo') {
+      const second = c.enemies.find((e) => e !== target && alive(e) && !isShielded(c, e) && !immuneTo(e, def));
+      if (second) strike(second, dmg);
+    }
+  } else if (fx.type === 'damageAll') {
+    const dmg = damageNow();
+    for (const e of c.enemies.filter((x) => alive(x) && !isShielded(c, x) && !immuneTo(x, def))) strike(e, dmg);
+  } else if (fx.type === 'poison') {
+    const target = c.enemies.find((e) => e.uid === pending.targetUid);
+    target.poison = { amount: fx.amount, turns: fx.turns };
+    events.push({ type: 'poisoned', enemyUid: target.uid, amount: fx.amount, turns: fx.turns });
+  } else if (fx.type === 'thorns') {
+    c.hero.thorns = { amount: fx.amount, turns: fx.turns };
+    events.push({ type: 'thornsGained', amount: fx.amount, turns: fx.turns });
+  } else if (fx.type === 'draw') {
+    events.push(...drawCount(c.piles, fx.amount, c.rng.shuffle));
   } else if (fx.type === 'weaken') {
     const target = c.enemies.find((e) => e.uid === pending.targetUid);
     target.weak = { amount: fx.amount, turns: fx.turns };
@@ -452,6 +488,7 @@ function applyCorrect(c, def, pending, multiplier) {
   } else if (fx.type === 'block') {
     const amount = amountFor(fx.amount);
     c.hero.block += amount;
+    if (fx.keep) c.blockKeep = Math.max(c.blockKeep ?? 0, fx.keep); // Panzerblase: Schutz hält länger
     events.push({ type: 'blockGained', amount });
   } else if (fx.type === 'energy') {
     c.hero.energy += fx.amount;
@@ -596,6 +633,11 @@ function endTurn(c) {
     if (intent.type === 'attack') {
       const r = hit(c.hero, intent.amount);
       events.push({ type: 'heroDamaged', amount: r.amount, blocked: r.blocked });
+      if (c.hero.thorns) { // Dornenkoralle (Phase 9)
+        const t = hit(enemy, c.hero.thorns.amount);
+        events.push({ type: 'thornsHit', enemyUid: enemy.uid, amount: t.amount });
+        if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
+      }
     } else if (intent.type === 'block') {
       enemy.block += intent.amount;
     }
@@ -611,6 +653,13 @@ function endTurn(c) {
         events.push({ type: 'eliteRegen', enemyUid: enemy.uid, healed });
       }
     }
+    if (enemy.poison && alive(enemy)) { // Giftalge (Phase 9)
+      const lost = Math.min(enemy.hp, enemy.poison.amount);
+      enemy.hp -= lost;
+      events.push({ type: 'poisonTick', enemyUid: enemy.uid, amount: lost });
+      if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
+      if (--enemy.poison.turns <= 0) enemy.poison = null;
+    }
     if (enemy.weak && --enemy.weak.turns <= 0) { enemy.weak = null; events.push({ type: 'weakEnded', enemyUid: enemy.uid }); }
     if (c.hero.hp <= 0 && c.secondWind > 0) {
       // Talent Zweite Luft (Phase 9): einmal je Tauchgang mit secondWind Leben weiter
@@ -623,6 +672,12 @@ function endTurn(c) {
       events.push({ type: 'combatLost' });
       return events;
     }
+  }
+  // Gift oder Dornen können den letzten Gegner im Gegnerzug besiegen (Phase 9)
+  if (c.enemies.every((e) => !alive(e))) {
+    c.phase = 'won';
+    events.push({ type: 'combatWon' });
+    return events;
   }
   events.push(...startTurn(c));
   return events;
@@ -653,6 +708,7 @@ export function combatView(combat, { targetUid } = {}) {
       alive: alive(e), shielded: isShielded(c, e), intent: alive(e) ? effectiveIntent(e) : null,
       rule: e.rule?.type ?? null, phase: e.phase, weakTurns: e.weak?.turns ?? 0,
       elite: e.elite?.rule ?? null, // Phase 9
+      poisonTurns: e.poison?.turns ?? 0,
     })),
     hand: c.piles.hand.map((k) => {
       const def = c.config.cards[k.cardId];

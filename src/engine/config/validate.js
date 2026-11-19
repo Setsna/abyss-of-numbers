@@ -1,9 +1,9 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=ad3e5b3d';
-import { nextSlots } from '../dungeon/map.js?v=ad3e5b3d';
-import { REJECT_REASONS } from '../combat/combat.js?v=ad3e5b3d';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=ad3e5b3d';
+import { CONFIG_FILES } from './files.js?v=01d505e2';
+import { nextSlots } from '../dungeon/map.js?v=01d505e2';
+import { REJECT_REASONS } from '../combat/combat.js?v=01d505e2';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=01d505e2';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -170,7 +170,8 @@ function validateLadders(c, cur) {
 }
 
 const OPERATIONS = ['add', 'sub', 'mul', 'div'];
-const EFFECT_TYPES = ['damage', 'block', 'heal', 'cycle', 'buff', 'breakImmunity', 'damagePerStep', 'energy', 'weaken'];
+const EFFECT_TYPES = ['damage', 'block', 'heal', 'cycle', 'buff', 'breakImmunity', 'damagePerStep', 'energy', 'weaken',
+  'damageBlock', 'damageAll', 'damageTwo', 'poison', 'draw', 'slowTime', 'thorns']; // neue Wirkungen: Phase 9, Etappe 5
 const BUFF_STATS = ['strength'];
 const TASK_FORMATS = ['solve', 'pickTrue', 'pickFalse', 'numberLine', 'sequence', 'complement', 'chain', 'wall', 'match', 'compareTerms'];
 const RULE_FORMATS = ['twoStep', 'pointBeforeLine']; // nur über Bossregeln
@@ -183,23 +184,36 @@ function validateCards(file, cards, errors, config) {
   for (const [id, card] of Object.entries(cards)) {
     c.number(`${id}.cost`, { min: 0, integer: true });
     c.number(`${id}.price`, { min: 0, integer: true });
+    // Sorten und Freischalten (Phase 9, Etappe 5)
+    if (!['common', 'rare'].includes(card.rarity)) c.fail(`${id}.rarity`, 'common oder rare');
+    c.number(`${id}.unlockStars`, { min: 0, integer: true });
+    if (card.rarity === 'rare' && card.unlockStars === 0) c.fail(`${id}.unlockStars`, 'seltene Karten brauchen eine Sternzahl');
     if (!TARGETS.includes(card.target)) c.fail(`${id}.target`, `muss ${TARGETS.join(' oder ')} sein`);
     const type = card.effect?.type;
     if (!EFFECT_TYPES.includes(type)) { c.fail(`${id}.effect.type`, `unbekannt: ${type}`); continue; }
+    if (type === 'slowTime') {
+      // Ruhige Strömung (Phase 9): keine Aufgabe, Faktor auf die Zeit der nächsten Aufgabe
+      c.number(`${id}.effect.factor`, { min: 1, max: 4 });
+      if (card.task !== null) c.fail(`${id}.task`, 'slowTime hat keine Aufgabe (null)');
+      continue;
+    }
     if (type === 'cycle') {
       c.number(`${id}.effect.discard`, { min: 0, integer: true });
       c.number(`${id}.effect.draw`, { min: 0, integer: true });
       if (card.task !== null) c.fail(`${id}.task`, 'Strudel-Karten haben keine Aufgabe (null)');
       continue;
     }
-    if (type === 'breakImmunity' || type === 'weaken') c.number(`${id}.effect.turns`, { min: 1, integer: true });
+    if (type === 'breakImmunity' || type === 'weaken' || type === 'poison' || type === 'thorns') c.number(`${id}.effect.turns`, { min: 1, integer: true });
+    if (type === 'damageBlock') c.number(`${id}.effect.block`, { min: 1, integer: true });
+    if (card.effect.keep !== undefined) c.number(`${id}.effect.keep`, { min: 1, integer: true });
+    if (card.effect.perStreak !== undefined) c.number(`${id}.effect.perStreak`, { min: 1, integer: true });
     if (type !== 'breakImmunity') c.number(`${id}.effect.amount`, { min: 1, integer: true });
     if (type === 'buff' && !BUFF_STATS.includes(card.effect.stat)) c.fail(`${id}.effect.stat`, `muss ${BUFF_STATS.join(', ')} sein`);
     const format = card.task?.format;
     if (!TASK_FORMATS.includes(format)) { c.fail(`${id}.task.format`, `unbekannt: ${format}`); continue; }
     if (format === 'solve' && !OPERATIONS.includes(card.task.operation)) c.fail(`${id}.task.operation`, `muss ${OPERATIONS.join(', ')} sein`);
     if (card.task.ifLadder !== undefined && !FORMAT_KINDS[card.task.ifLadder]) c.fail(`${id}.task.ifLadder`, 'unbekannte Leiter');
-    const wanted = type === 'damage' || type === 'breakImmunity' || type === 'weaken' ? 'enemy' : type === 'damagePerStep' ? 'enemies' : 'hero';
+    const wanted = ['damage', 'breakImmunity', 'weaken', 'damageBlock', 'damageTwo', 'poison'].includes(type) ? 'enemy' : ['damagePerStep', 'damageAll'].includes(type) ? 'enemies' : 'hero';
     if (card.target !== wanted) c.fail(`${id}.target`, `muss ${wanted} sein (Wirkung ${type})`);
     if (type === 'damagePerStep' && !MULTI_STEP.includes(format)) c.fail(`${id}.task.format`, 'Schaden je Schritt braucht ein mehrschrittiges Format');
     if (card.task.freeMistakes !== undefined) c.number(`${id}.task.freeMistakes`, { min: 0, integer: true });

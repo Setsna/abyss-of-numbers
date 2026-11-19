@@ -5,19 +5,19 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=ad3e5b3d';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=ad3e5b3d';
-import { wayForKey } from './math/ways.js?v=ad3e5b3d';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=ad3e5b3d';
-import { nextCurrent, answerCode } from './combat/current.js?v=ad3e5b3d';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=ad3e5b3d';
-import { generateMap } from './dungeon/map.js?v=ad3e5b3d';
-import { createSave } from './save/save.js?v=ad3e5b3d';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=ad3e5b3d';
-import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=ad3e5b3d';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=ad3e5b3d';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=ad3e5b3d';
-import { rollEvent, optionCost } from './dungeon/events.js?v=ad3e5b3d';
+import { createRng, deriveSeed } from './rng.js?v=01d505e2';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=01d505e2';
+import { wayForKey } from './math/ways.js?v=01d505e2';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=01d505e2';
+import { nextCurrent, answerCode } from './combat/current.js?v=01d505e2';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=01d505e2';
+import { generateMap } from './dungeon/map.js?v=01d505e2';
+import { createSave } from './save/save.js?v=01d505e2';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=01d505e2';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=01d505e2';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=01d505e2';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=01d505e2';
+import { rollEvent, optionCost } from './dungeon/events.js?v=01d505e2';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -272,7 +272,7 @@ export function createGame({ config, save, seed }) {
     const [lo, hi] = config.rewards.treasurePearls;
     const pearls = rng.nextInt(lo, hi);
     s.perlen += pearls;
-    const cards = rollRewardCards(s, l.gebiet, rng, config);
+    const cards = rollRewardCards(s, l.gebiet, rng, config, { depth: l.tiefe });
     const item = rng.nextUint32() / 4294967296 < config.rewards.itemChance ? rollItem(rng) : null;
     state.reward = { cards, xp: 0, pearls, levelUps: 0, practice: [], lightningHits: 0, treasure: true, item, cardLevelUps: [] };
     state.afterReward = 'map';
@@ -346,7 +346,7 @@ export function createGame({ config, save, seed }) {
   // Kartenauswahl eines Ereignisses: aus dem Seed des Raums, deshalb nach dem Neuladen dieselbe
   function offerEventCards(roomId) {
     const l = lauf();
-    const cards = rollRewardCards(state.save, l.gebiet, createRng(deriveSeed(l.seed, `event:${roomId}:cards`)), config);
+    const cards = rollRewardCards(state.save, l.gebiet, createRng(deriveSeed(l.seed, `event:${roomId}:cards`)), config, { depth: l.tiefe });
     state.reward = { cards, xp: 0, pearls: 0, levelUps: 0, practice: [], lightningHits: 0, event: true, item: null, cardLevelUps: [] };
     state.afterReward = 'map';
     state.screen = 'reward';
@@ -367,7 +367,7 @@ export function createGame({ config, save, seed }) {
   function openShop(roomId) {
     const l = lauf();
     const rng = createRng(deriveSeed(l.seed, `shop:${roomId}`));
-    const offer = createShopOffer(state.save, l.gebiet, rng, config);
+    const offer = createShopOffer(state.save, l.gebiet, rng, config, { depth: l.tiefe });
     // ein Gegenstand, den das Kind beim ersten Betreten noch nicht hatte (Etappe 7)
     l.laden[roomId] ??= { gekauft: [], abgegeben: false, gegenstand: rollItem(rng), gegenstandGekauft: false };
     state.shop = { roomId, offer };
@@ -477,7 +477,7 @@ export function createGame({ config, save, seed }) {
     s.perlen += pearls;
     addPractice(s, info.mistakes, state.now, config);
     const rewardArea = lauf()?.gebiet ?? info.areaId;
-    const cards = rollRewardCards(s, rewardArea, state.loot, config);
+    const cards = rollRewardCards(s, rewardArea, state.loot, config, { depth: info.depth ?? 1, elite: Boolean(info.elite) });
     const shown = info.mistakes.slice(-config.game.practiceShownAfterCombat);
     const practice = shown.map((m) => m.text);
     const practiceWays = shown.map((m) => wayForKey(m.key)); // Rechenweg je Übungsaufgabe (Regelwerk 8.3)
@@ -687,6 +687,17 @@ export function createGame({ config, save, seed }) {
     return [{ type: 'itemUnequipped', slot }];
   }
 
+  // Neue Karten (Phase 9, Etappe 5): Meldung „Neue Karte entdeckt!“ einmal je Karte, in der Station bestätigt
+  function newCards() {
+    const s = state.save;
+    return unlockedCards(s, config).filter((id) => config.cards[id].unlockStars > 0 && !s.entdeckt.includes(id));
+  }
+  function ackNewCards() {
+    const cards = newCards();
+    state.save.entdeckt.push(...cards);
+    return [{ type: 'newCardsSeen', cards }];
+  }
+
   // Talente (Phase 9, Konzept 10): bei Stufe 5, 10, 15 und 20 eins von zwei, jederzeit umwählbar
   function chooseTalent({ level, talentId }) {
     const key = String(level);
@@ -725,7 +736,8 @@ export function createGame({ config, save, seed }) {
       gear: { besitz: s.ausruestung.besitz.slice(), angelegt: { ...s.ausruestung.angelegt } },
       perk: config.heroes.figures[s.held.figur].perk ? s.held.figur : null,
       // Kartenalbum und Meeresbuch (Phase 9, Etappe 4)
-      album: Object.keys(config.cards).map((cardId) => ({ cardId, found: (s.gefunden ?? []).includes(cardId), level: cardLevel(s, cardId, config), toNext: toNextLevel(s, cardId, config) })),
+      album: Object.keys(config.cards).map((cardId) => ({ cardId, found: (s.gefunden ?? []).includes(cardId), level: cardLevel(s, cardId, config), toNext: toNextLevel(s, cardId, config), unlockStars: config.cards[cardId].unlockStars ?? 0, locked: !unlockedCards(s, config).includes(cardId), rare: config.cards[cardId].rarity === 'rare' })),
+      newCards: newCards(),
       book: BOOK.map((b) => ({ ...b, count: s.besiegt?.[b.typeId] ?? 0, eliteCount: s.besiegt?.[`${b.typeId}.elite`] ?? 0 })).map(({ typeId, areaId, count, eliteCount, boss }) => ({ typeId, areaId, count, eliteCount, boss })),
       talents: TALENT_LEVELS.map((level) => ({ level: Number(level), options: config.talents[level].map((x) => x.id), chosen: s.talente?.[level] ?? null, available: s.stufe >= Number(level) })),
       talentOpen: TALENT_LEVELS.some((level) => s.stufe >= Number(level) && !s.talente?.[level]),
@@ -790,14 +802,14 @@ export function createGame({ config, save, seed }) {
   }
 
   // Befehle außerhalb des Kampfs; im Kampf werden sie mit „phase“ abgelehnt.
-  const MENU_COMMANDS = new Set(['chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero']);
+  const MENU_COMMANDS = new Set(['ackNewCards', 'chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero']);
 
   // Erlaubte Befehle je Bildschirm.
   const COMMANDS = {
     title: { start, setSetting, resetSave },
     grade: { chooseGrade },
     heroCreate: { createHero },
-    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent },
+    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent, ackNewCards },
     logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem, editHero, chooseTalent },
     heroEdit: { changeHero, cancelHeroEdit },
     map: { enterRoom, surface },

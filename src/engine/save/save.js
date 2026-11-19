@@ -1,7 +1,7 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=ad3e5b3d';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=ad3e5b3d';
+import { generateMap } from '../dungeon/map.js?v=01d505e2';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=01d505e2';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -16,7 +16,8 @@ import { curriculumOf, stageById } from '../math/ladders/index.js?v=ad3e5b3d';
 // Version 10 (Phase 9, Etappe 3): talente { "5", "10", "15", "20": Kennung oder null }; lauf.zweiteLuft (frei).
 // Version 11 (Phase 9, Etappe 4): gefunden (Karten fürs Album), besiegt (Gegner fürs Meeresbuch).
 // Version 12 (D54, 19.11.2026): Strömung höchstens 1,2; ältere Stände werden darauf begrenzt.
-export const SAVE_VERSION = 12;
+// Version 13 (Phase 9, Etappe 5): entdeckt (neue Karten, deren Meldung schon gezeigt wurde).
+export const SAVE_VERSION = 13;
 const MIX_COUNT_MAX = 100; // Obergrenze für den Zähler der Mischregel (gespeichert wird der Rest beim Teilen durch mixEvery)
 const SLOTS = ['kopf', 'koerper', 'hand'];
 const STATS = ['kraft', 'ruhe', 'leben'];
@@ -51,6 +52,7 @@ export function createSave(now, grade, config, hero = null) {
     talente: { 5: null, 10: null, 15: null, 20: null }, // Talente (Phase 9)
     gefunden: [...new Set(config.decks.starter)], // Kartenalbum (Phase 9)
     besiegt: {}, // Meeresbuch: Gegner-Id oder <Id>.elite → Anzahl (Phase 9)
+    entdeckt: [], // neue Karten, deren Meldung gezeigt wurde (Phase 9, Etappe 5)
   };
 }
 
@@ -140,6 +142,7 @@ export function validateSave(s, config) {
     if (!config.enemies[id] && !config.bosses.bosses[id]) fail(`besiegt.${key}`, 'unbekannter Gegner');
     else if (!(Number.isInteger(n) && n >= 1)) fail(`besiegt.${key}`, 'ganze Zahl ≥ 1');
   }
+  if (!Array.isArray(s.entdeckt) || !s.entdeckt.every((id) => config.cards[id]) || new Set(s.entdeckt).size !== s.entdeckt.length) fail('entdeckt', 'Liste bekannter Karten, jede einmal');
   // Talente (Phase 9): genau die vier Stufen, je null oder ein Talent dieser Stufe
   const levels = Object.keys(config.talents ?? {});
   if (!isObj(s.talente) || Object.keys(s.talente).sort().join() !== [...levels].sort().join()) fail('talente', `genau die Stufen ${levels.join(', ')}`);
@@ -287,6 +290,12 @@ export function migrateSave(raw, config) {
     if (typeof s.stroemung === 'number') s.stroemung = Math.min(s.stroemung, config.game.current.max);
     s.version = 12;
     notes.push('version: 11 → 12 (Strömung höchstens 1,2)');
+  }
+  if (s.version === 12) {
+    // Neue Karten (Phase 9, Etappe 5): noch keine Meldung gezeigt; die Station meldet alle schon erreichten einmal
+    s.entdeckt = [];
+    s.version = 13;
+    notes.push('version: 12 → 13 (neue Karten)');
   }
   return { save: s, notes };
 }

@@ -872,3 +872,18 @@
 .lb-book-count { font-weight: 700; font-size: max(1rem, calc(17 * var(--u))); color: var(--sea-deep); }
 .lb-book-entry.is-unknown .lb-book-pic img { filter: brightness(0) opacity(0.3); }
 .lb-book-entry.is-unknown { background: var(--disabled-fill); box-shadow: none; }
+
+/* Neue Karten entdeckt (Phase 9, Etappe 5): Hinweis über der Station */
+.station-news {
+  position: absolute; inset: 0; z-index: 6;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(16 * var(--u));
+  background: rgba(8, 42, 66, 0.78); padding: calc(24 * var(--u));
+}
+.station-news[hidden] { display: none; }
+.station-news-title {
+  margin: 0; font-family: var(--font-loud); font-size: calc(64 * var(--u)); color: var(--sun);
+  -webkit-text-stroke: calc(4 * var(--u)) var(--ink); paint-order: stroke fill; transform: rotate(-3deg);
+}
+.station-news-cards { display: flex; flex-wrap: wrap; gap: calc(14 * var(--u)); justify-content: center; max-width: 100%; }
+.station-news-cards .card { width: calc(170 * var(--u)); min-height: calc(240 * var(--u)); }
+.station-news .btn-go { min-width: calc(220 * var(--u)); font-size: calc(30 * var(--u)); }

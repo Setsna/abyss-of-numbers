@@ -1,4 +1,18 @@
 // Fortschritt: Erfahrung und Stufen, Kartenbeute, Deck, Übungsliste.
+import { starCount } from './depth.js?v=01d505e2';
+
+// Karten, die mit den Seesternen des Kindes frei sind (Phase 9, Konzept 11)
+export function unlockedCards(save, config) {
+  const stars = starCount(save);
+  return Object.keys(config.cards).filter((id) => (config.cards[id].unlockStars ?? 0) <= stars);
+}
+
+// Karte darf hier angeboten werden: frei, und selten nur ab Tiefe 3 oder nach einem Elitegegner
+export function offerable(save, cardId, config, { depth = 1, elite = false } = {}) {
+  const def = config.cards[cardId];
+  if ((def.unlockStars ?? 0) > starCount(save)) return false;
+  return def.rarity !== 'rare' || depth >= config.elites.fromDepth || elite;
+}
 
 export function grantXp(save, amount, config) {
   const before = save.stufe;
@@ -12,13 +26,19 @@ export function grantXp(save, amount, config) {
 
 // Drei verschiedene Karten aus dem Pool des Gebiets. Fehlt die Pflichtkarte
 // (firstRewardIncludes) im Deck, ist sie beim ersten Mal dabei.
-export function rollRewardCards(save, areaId, rng, config) {
-  const pool = config.decks.rewardPools[areaId];
-  if (!pool) throw new Error(`kein Beutepool für ${areaId}`);
+// options (Phase 9): depth (Tiefe des Tauchgangs), elite (nach einem Elitegegner sicher eine seltene, wenn eine frei ist)
+export function rollRewardCards(save, areaId, rng, config, { depth = 1, elite = false } = {}) {
+  const full = config.decks.rewardPools[areaId];
+  if (!full) throw new Error(`kein Beutepool für ${areaId}`);
+  const pool = full.filter((id) => offerable(save, id, config, { depth, elite }));
   const count = config.rewards.cardChoices;
   const must = config.decks.firstRewardIncludes;
   const chosen = [];
   if (must && pool.includes(must) && !(save.deck[must] > 0)) chosen.push(must);
+  if (elite) {
+    const rare = rng.shuffle(pool.filter((id) => config.cards[id].rarity === 'rare'))[0];
+    if (rare && !chosen.includes(rare)) chosen.push(rare);
+  }
   for (const id of rng.shuffle(pool)) {
     if (chosen.length >= count) break;
     if (!chosen.includes(id)) chosen.push(id);

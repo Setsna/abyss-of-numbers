@@ -3,11 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=ad3e5b3d';
-import { ICON } from '../icons.js?v=ad3e5b3d';
-import { renderAsset } from '../assets.js?v=ad3e5b3d';
-import { renderCard } from '../components/card.js?v=ad3e5b3d';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=ad3e5b3d';
+import { wayText } from '../text.js?v=01d505e2';
+import { ICON } from '../icons.js?v=01d505e2';
+import { renderAsset } from '../assets.js?v=01d505e2';
+import { renderCard } from '../components/card.js?v=01d505e2';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=01d505e2';
 
 const PAGES = ['hero', 'talents', 'deck', 'collection', 'gear', 'rules', 'practice']; // talents, collection: Phase 9
 const SLOTS = ['kopf', 'koerper', 'hand'];
@@ -165,7 +165,8 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose, onEdit
         cell.append(card);
         const next = document.createElement('p');
         next.className = 'lb-next';
-        next.textContent = !has ? t('collection.notFound') : toNext !== null ? t('logbook.deckNext', { n: toNext }) : level > 1 ? t('logbook.deckMax') : '';
+        const albumRow = p.album[i];
+        next.textContent = !has && albumRow.locked ? t('collection.fromStars', { n: albumRow.unlockStars }) : !has ? t('collection.notFound') : toNext !== null ? t('logbook.deckNext', { n: toNext }) : level > 1 ? t('logbook.deckMax') : '';
         if (next.textContent) cell.append(next);
         return cell;
       }));

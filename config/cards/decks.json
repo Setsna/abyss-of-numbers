@@ -27,7 +27,17 @@
       "shellCracker",
       "bubbleChain",
       "coralWall",
-      "pearlFind"
+      "pearlFind",
+      "wavebreaker",
+      "floodWave",
+      "airSupply",
+      "poisonAlgae",
+      "calmCurrent",
+      "streakWave",
+      "twinHarpoon",
+      "thornCoral",
+      "armorBubble",
+      "deepQuake"
     ],
     "caves": [
       "currentStrike",
@@ -43,7 +53,17 @@
       "bubbleChain",
       "coralWall",
       "pearlFind",
-      "inkCloud"
+      "inkCloud",
+      "wavebreaker",
+      "floodWave",
+      "airSupply",
+      "poisonAlgae",
+      "calmCurrent",
+      "streakWave",
+      "twinHarpoon",
+      "thornCoral",
+      "armorBubble",
+      "deepQuake"
     ],
     "city": [
       "currentStrike",
@@ -59,7 +79,17 @@
       "bubbleChain",
       "coralWall",
       "pearlFind",
-      "inkCloud"
+      "inkCloud",
+      "wavebreaker",
+      "floodWave",
+      "airSupply",
+      "poisonAlgae",
+      "calmCurrent",
+      "streakWave",
+      "twinHarpoon",
+      "thornCoral",
+      "armorBubble",
+      "deepQuake"
     ],
     "trench": [
       "currentStrike",
@@ -75,7 +105,17 @@
       "bubbleChain",
       "coralWall",
       "pearlFind",
-      "inkCloud"
+      "inkCloud",
+      "wavebreaker",
+      "floodWave",
+      "airSupply",
+      "poisonAlgae",
+      "calmCurrent",
+      "streakWave",
+      "twinHarpoon",
+      "thornCoral",
+      "armorBubble",
+      "deepQuake"
     ]
   },
   "firstRewardIncludes": "whirlpool"

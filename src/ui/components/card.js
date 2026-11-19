@@ -2,12 +2,12 @@
 // pastelliger Rand in der Farbe der Kartenart (Angriff, Schutz, Heilung, Sonstiges), oben rechts das Rechenzeichen
 // oder Format, unten rechts auf dem Bild die Wirkung als Plakette, darunter Name und Wirkung als Text.
 // Kosten als gelbe Perle links oben, Sterne für die Kartenstufe, Stempel mit dem Grund für „geht nicht“.
-import { ICON, OP_ICON } from '../icons.js?v=ad3e5b3d';
-import { assetUrl } from '../assets.js?v=ad3e5b3d';
-import { cardEffect } from '../../engine/cards/effect.js?v=ad3e5b3d';
+import { ICON, OP_ICON } from '../icons.js?v=01d505e2';
+import { assetUrl } from '../assets.js?v=01d505e2';
+import { cardEffect } from '../../engine/cards/effect.js?v=01d505e2';
 
 // Kartenart je Wirkung; alles andere ist „Sonstiges“
-const KIND = { damage: 'attack', damagePerStep: 'attack', block: 'block', heal: 'heal' };
+const KIND = { damage: 'attack', damagePerStep: 'attack', damageBlock: 'attack', damageAll: 'attack', damageTwo: 'attack', block: 'block', heal: 'heal' };
 // Karten ohne Rechenart zeigen ihr Aufgabenformat (Phase 5, Etappen 3 und 4)
 const FORMAT_ICON = { numberLine: ICON.harpoon, wall: ICON.wall, chain: ICON.bubbles, match: ICON.pearl };
 
@@ -22,6 +22,11 @@ function plaque(e) {
     case 'weaken': return [ICON.ink, `−${e.amount}`];
     case 'breakImmunity': return [ICON.crack, e.turns];
     case 'cycle': return [ICON.swirl, null];
+    case 'damageBlock': case 'damageAll': case 'damageTwo': return [ICON.attack, e.amount];
+    case 'poison': return [ICON.ink, e.amount];
+    case 'thorns': return [ICON.crack, e.amount];
+    case 'draw': return [ICON.deck, `+${e.amount}`];
+    case 'slowTime': return [ICON.swirl, `×${e.factor}`];
     default: return [null, null];
   }
 }
@@ -29,7 +34,10 @@ function plaque(e) {
 // level: Kartenstufe (Phase 5, Etappe 8); Stufe 2 und 3 zeigen die stärkere Wirkung.
 export function effectText(def, t, level = 1) {
   const e = cardEffect(def, level);
-  return e.type === 'cycle' ? t('eff.cycle', { discard: e.discard, draw: e.draw }) : t(`eff.${e.type}`, { n: e.amount, turns: e.turns });
+  if (e.type === 'cycle') return t('eff.cycle', { discard: e.discard, draw: e.draw });
+  if (e.type === 'damage' && e.perStreak) return t('eff.damageStreak', { n: e.amount });
+  if (e.type === 'block' && e.keep) return t('eff.blockKeep', { n: e.amount });
+  return t(`eff.${e.type}`, { n: e.amount, b: e.block, turns: e.turns });
 }
 
 // h: Handkarte aus combatView; def: Karte aus cards.json.
@@ -37,7 +45,7 @@ export function effectText(def, t, level = 1) {
 export function renderCard(h, def, { t, why, picked, pending }) {
   const b = document.createElement('button');
   b.type = 'button';
-  b.className = `card k-${KIND[def.effect.type] ?? 'other'}`;
+  b.className = `card k-${KIND[def.effect.type] ?? 'other'}${def.rarity === 'rare' ? ' is-rare' : ''}`; // seltene Karte (Phase 9)
   b.dataset.uid = h.uid;
   if (why) b.classList.add('is-off');
   if (picked) b.classList.add('is-picked');

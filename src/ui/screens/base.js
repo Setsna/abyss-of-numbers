@@ -6,11 +6,12 @@
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=ad3e5b3d';
-import { renderAsset, assetUrl } from '../assets.js?v=ad3e5b3d';
-import { homeAreaId, worldLayer } from '../components/world.js?v=ad3e5b3d';
+import { ICON } from '../icons.js?v=01d505e2';
+import { renderAsset, assetUrl } from '../assets.js?v=01d505e2';
+import { homeAreaId, worldLayer } from '../components/world.js?v=01d505e2';
+import { renderCard } from '../components/card.js?v=01d505e2';
 
-export function mountBase(root, { t, config, game, onDive, onLogbook, account = null }) {
+export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, account = null }) {
   const v = game.view();
   const p = v.profile;
   root.innerHTML = `
@@ -30,6 +31,11 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, account = 
       <div class="title-who station-who" data-ref="who" hidden>
         <span data-ref="whoName"></span>
         <button class="title-logout" type="button" data-ref="logout"></button>
+      </div>
+      <div class="station-news" data-ref="news" role="status" hidden>
+        <p class="station-news-title" data-ref="newsTitle"></p>
+        <div class="station-news-cards" data-ref="newsCards"></div>
+        <button class="btn btn-go" type="button" data-ref="newsOk"></button>
       </div>
       <div class="station-ask" data-ref="ask" role="dialog" aria-modal="true" hidden>
         <p class="station-ask-text" data-ref="askText"></p>
@@ -165,6 +171,20 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, account = 
     b.append(win, label);
     return b;
   }));
+
+  // Neue Karten entdeckt (Phase 9, Etappe 5): einmal je Karte, mit Bild; „Super!“ bestätigt
+  if (p.newCards?.length) {
+    ref.news.hidden = false;
+    ref.newsTitle.textContent = p.newCards.length === 1 ? t('collection.newOne') : t('collection.newMany', { n: p.newCards.length });
+    ref.newsCards.replaceChildren(...p.newCards.map((cardId, i) => {
+      const card = renderCard({ uid: `n${i}`, cardId, level: 1 }, config.cards[cardId], { t, why: null });
+      card.disabled = true;
+      card.tabIndex = -1;
+      return card;
+    }));
+    ref.newsOk.textContent = t('collection.newOk');
+    ref.newsOk.addEventListener('click', () => { onAckNewCards?.(); ref.news.hidden = true; }, { once: true });
+  }
 
   ref.logbook.innerHTML = `<span class="spot-icon">${ICON.book}</span><span class="spot-label"></span>`;
   ref.logbook.querySelector('.spot-label').textContent = t('base.logbook');

@@ -89,6 +89,36 @@
     },
     "inkCloud": {
       "name": "Tinten­wolke"
+    },
+    "wavebreaker": {
+      "name": "Wellenbrecher"
+    },
+    "floodWave": {
+      "name": "Flutwelle"
+    },
+    "poisonAlgae": {
+      "name": "Giftalge"
+    },
+    "airSupply": {
+      "name": "Luftvorrat"
+    },
+    "calmCurrent": {
+      "name": "Ruhige Strömung"
+    },
+    "streakWave": {
+      "name": "Serienwelle"
+    },
+    "twinHarpoon": {
+      "name": "Zwillingsharpune"
+    },
+    "thornCoral": {
+      "name": "Dornenkoralle"
+    },
+    "armorBubble": {
+      "name": "Panzerblase"
+    },
+    "deepQuake": {
+      "name": "Tiefenbeben"
     }
   },
   "enemies": {
@@ -269,7 +299,16 @@
     "breakImmunity": "Immunität weg, {turns} Züge",
     "damagePerStep": "{n} Schaden je Glied",
     "energy": "+{n} Energie",
-    "weaken": "Gegner {n} schwächer, {turns} Züge"
+    "weaken": "Gegner {n} schwächer, {turns} Züge",
+    "damageBlock": "{n} Schaden und {b} Schutz",
+    "damageAll": "{n} Schaden an allen Gegnern",
+    "poison": "Gift: {n} Schaden, {turns} Züge",
+    "draw": "Zieh {n} Karten",
+    "slowTime": "Nächste Aufgabe: doppelte Zeit",
+    "damageStreak": "{n} Schaden, mehr mit Serie",
+    "damageTwo": "{n} Schaden an zwei Gegnern",
+    "thorns": "Angreifer bekommen {n} Schaden, {turns} Züge",
+    "blockKeep": "{n} Schutz, hält länger"
   },
   "hud": {
     "energy": "Energie {n} von {max}",
@@ -287,7 +326,9 @@
     "weak": "greift noch {n} Züge schwächer an",
     "hidden": "versteckt",
     "streak": "Serie {n}",
-    "cardLevel": "Stufe {n}"
+    "cardLevel": "Stufe {n}",
+    "poison": "vergiftet, noch {n} Züge",
+    "thorns": "Dornen, noch {n} Züge"
   },
   "reward": {
     "xp": "+{n} Erfahrung",
@@ -555,7 +596,17 @@
       "bubbleChain": "Rechne mit dem Ergebnis weiter. Jedes richtige Glied trifft einen Gegner.",
       "coralWall": "Fülle die Zahlenmauer. Zwei Fehler sind frei. Dann trifft die Mauer sehr hart.",
       "pearlFind": "Finde zu jeder Aufgabe das Ergebnis. Zwei Fehler sind frei. Dann bekommst du Energie.",
-      "inkCloud": "Tippe einen Gegner an. Finde die Rechnung mit demselben Wert. Dann greift er drei Züge lang schwächer an."
+      "inkCloud": "Tippe einen Gegner an. Finde die Rechnung mit demselben Wert. Dann greift er drei Züge lang schwächer an.",
+      "wavebreaker": "Rechne minus. Richtig? Du triffst und bekommst Schutz.",
+      "floodWave": "Rechne plus. Richtig? Die Welle trifft alle Gegner.",
+      "poisonAlgae": "Rechne geteilt. Richtig? Der Gegner verliert jede Runde Leben.",
+      "airSupply": "Ergänze zur Zahl. Richtig? Du ziehst neue Karten.",
+      "calmCurrent": "Keine Aufgabe. Deine nächste Aufgabe hat doppelt so viel Zeit.",
+      "streakWave": "Rechne mal. Je länger deine Serie, desto stärker der Treffer.",
+      "twinHarpoon": "Finde die Zahl am Zahlenstrahl. Richtig? Zwei Gegner werden getroffen.",
+      "thornCoral": "Setze die Zahlenfolge fort. Richtig? Wer dich angreift, sticht sich.",
+      "armorBubble": "Welche Rechnung stimmt? Richtig? Viel Schutz, der länger hält.",
+      "deepQuake": "Finde die Rechnung mit demselben Wert. Richtig? Alle Gegner werden getroffen."
     }
   },
   "adult": {
@@ -796,6 +847,10 @@
     "unknownCard": "Karte noch nicht gefunden",
     "unknownName": "???",
     "count": "{n}× besiegt",
-    "countElite": "{n}× besiegt, {e}× als starker Gegner"
+    "countElite": "{n}× besiegt, {e}× als starker Gegner",
+    "fromStars": "ab {n} Seesternen",
+    "newOne": "Neue Karte entdeckt!",
+    "newMany": "{n} neue Karten entdeckt!",
+    "newOk": "Super!"
   }
 }

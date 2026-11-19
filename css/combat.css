@@ -653,3 +653,6 @@
 .foe.is-elite .foe-name { display: inline-flex; align-items: center; gap: calc(4 * var(--u)); }
 .foe-star { display: inline-flex; }
 .foe-star svg { width: 1.15em; height: 1.15em; display: block; }
+
+/* Seltene Karten (Phase 9, Etappe 5): goldener Rand um den Farbrand der Kartenart */
+.card.is-rare { box-shadow: 0 0 0 calc(4 * var(--u)) #f2a900, 0 0 calc(10 * var(--u)) rgb(242 169 0 / 0.55); }
