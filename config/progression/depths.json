@@ -1,0 +1,6 @@
+{
+  "enemyPerDepth": 0.08,
+  "rewardPerDepth": 0.1,
+  "bossDeepPhaseFrom": 5,
+  "repeatBossPearlsFactor": 0.5
+}

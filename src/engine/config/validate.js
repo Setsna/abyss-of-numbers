@@ -1,8 +1,9 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=03719b61';
-import { REJECT_REASONS } from '../combat/combat.js?v=03719b61';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=03719b61';
+import { CONFIG_FILES } from './files.js?v=ad3e5b3d';
+import { nextSlots } from '../dungeon/map.js?v=ad3e5b3d';
+import { REJECT_REASONS } from '../combat/combat.js?v=ad3e5b3d';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=ad3e5b3d';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -177,7 +178,7 @@ const MULTI_STEP = ['chain', 'wall', 'match'];
 const TARGETS = ['enemy', 'hero', 'enemies']; // enemies: ohne Zielwahl, trifft Gegner selbst (Blasenkette)
 const INTENT_TYPES = ['attack', 'block'];
 
-function validateCards(file, cards, errors) {
+function validateCards(file, cards, errors, config) {
   const c = checker(file, cards, errors);
   for (const [id, card] of Object.entries(cards)) {
     c.number(`${id}.cost`, { min: 0, integer: true });
@@ -205,6 +206,8 @@ function validateCards(file, cards, errors) {
     // Kartenstufen (Etappe 8): je Stufe ab 2 ein Teil der Wirkung, gleiche Schlüssel, Typ bleibt
     if (card.upgrades !== undefined) {
       if (!Array.isArray(card.upgrades)) { c.fail(`${id}.upgrades`, 'Liste'); continue; }
+      // je Schwelle in game.json (cardLevels) eine Stufe (Phase 9: Stufe 4 und 5)
+      if (Array.isArray(config.game?.cardLevels) && card.upgrades.length !== config.game.cardLevels.length) c.fail(`${id}.upgrades`, `genau ${config.game.cardLevels.length} Stufen (wie cardLevels)`);
       card.upgrades.forEach((u, i) => {
         const keys = Object.keys(u ?? {});
         if (keys.length === 0 || keys.some((k) => k === 'type' || !(k in card.effect))) c.fail(`${id}.upgrades[${i}]`, 'nur vorhandene Werte der Wirkung, ohne type');
@@ -235,6 +238,78 @@ function validateLevels(file, levels, errors) {
     c.fail('xpThresholds', 'muss mit 0 beginnen und streng steigen');
   }
   c.number('pointsPerLevel', { min: 1, integer: true });
+  c.number('maxPointsPerStat', { min: 1, integer: true }); // Phase 9
+}
+
+// Tiefenstufen (Phase 9, Jahresausbau Konzept 7)
+function validateDepths(file, d, errors) {
+  const c = checker(file, d, errors);
+  c.number('enemyPerDepth', { min: 0, max: 1 });
+  c.number('rewardPerDepth', { min: 0, max: 1 });
+  c.number('bossDeepPhaseFrom', { min: 2, integer: true });
+  c.number('repeatBossPearlsFactor', { min: 0, max: 1 });
+}
+
+// Elitegegner (Phase 9, Etappe 2)
+function validateElites(file, e, errors) {
+  const c = checker(file, e, errors);
+  c.number('fromDepth', { min: 2, integer: true });
+  c.number('hpFactor', { min: 1, max: 3 });
+  c.number('rewardPearls', { min: 0, integer: true });
+  if (!c.object('rules')) return;
+  const known = { guard: ['block', 'every'], regen: ['heal'], rage: ['plus', 'max'] };
+  for (const [rule, cfg] of Object.entries(e.rules)) {
+    if (!known[rule]) { c.fail(`rules.${rule}`, `unbekannt, erlaubt: ${Object.keys(known).join(', ')}`); continue; }
+    for (const k of known[rule]) c.number(`rules.${rule}.${k}`, { min: 1, integer: true });
+  }
+}
+
+// Ereignisräume (Phase 9, Etappe 2): feste Liste von Wirkungen, je Option höchstens eine Karte oder ein Kampf
+const EVENT_EFFECTS = ['hp', 'heal', 'pearls', 'card', 'item', 'fight'];
+function validateEvents(file, ev, errors, config) {
+  const c = checker(file, ev, errors);
+  // Abschlussreview: für Räume ohne Gegner muss es ein Ereignis ohne Kampf geben
+  if (!Object.values(ev).some((e) => Array.isArray(e?.options) && e.options.every((o) => !(o?.effects ?? []).some((f) => f?.type === 'fight')))) c.fail('(Ereignisse)', 'mindestens ein Ereignis ohne Kampf');
+  for (const [id, e] of Object.entries(ev)) {
+    if (!Array.isArray(e?.options) || e.options.length < 2 || e.options.length > 3) { c.fail(`${id}.options`, '2 bis 3 Optionen'); continue; }
+    if (e.areas !== undefined && (!Array.isArray(e.areas) || !e.areas.every((a) => config.areas?.areas?.[a]))) c.fail(`${id}.areas`, 'Liste bekannter Gebiete');
+    if (typeof config.texts?.events?.[id]?.text !== 'string') c.fail(id, `Text events.${id}.text fehlt`);
+    e.options.forEach((o, oi) => {
+      const p = `${id}.options[${oi}]`;
+      if (typeof o?.id !== 'string' || !o.id) { c.fail(`${p}.id`, 'fehlt'); return; }
+      if (typeof config.texts?.events?.[id]?.[o.id] !== 'string') c.fail(p, `Text events.${id}.${o.id} fehlt`);
+      if (!Array.isArray(o.effects)) { c.fail(`${p}.effects`, 'Liste'); return; }
+      let big = 0;
+      o.effects.forEach((f, fi) => {
+        const q = `${p}.effects[${fi}]`;
+        if (!EVENT_EFFECTS.includes(f?.type)) { c.fail(q, `unbekannte Wirkung ${f?.type}, erlaubt: ${EVENT_EFFECTS.join(', ')}`); return; }
+        if (f.type === 'hp' || f.type === 'pearls') { if (!(Number.isInteger(f.amount) && f.amount !== 0)) c.fail(`${q}.amount`, 'ganze Zahl ungleich 0'); }
+        if (f.type === 'heal' && !(typeof f.share === 'number' && f.share > 0 && f.share <= 1)) c.fail(`${q}.share`, 'Zahl über 0 bis 1');
+        if (f.type === 'fight' && !(Number.isInteger(f.bonusPearls) && f.bonusPearls >= 0)) c.fail(`${q}.bonusPearls`, 'ganze Zahl ≥ 0');
+        if (f.type === 'card' || f.type === 'fight') big += 1;
+      });
+      if (big > 1) c.fail(p, 'höchstens eine Karte oder ein Kampf je Option');
+    });
+    // Abschlussreview: mindestens eine Option kostet keine Perlen, sonst steckt ein Kind ohne Perlen fest
+    if (!e.options.some((o) => !(o?.effects ?? []).some((f) => f?.type === 'pearls' && f.amount < 0))) c.fail(`${id}.options`, 'mindestens eine Option ohne Perlenpreis');
+  }
+}
+
+// Talente (Phase 9, Etappe 3): je Stufe 5, 10, 15, 20 genau zwei, Kennungen eindeutig, Texte vorhanden
+function validateTalents(file, tal, errors, config) {
+  const c = checker(file, tal, errors);
+  const keys = Object.keys(tal);
+  if (keys.join() !== '5,10,15,20') c.fail('(Stufen)', 'genau 5, 10, 15 und 20');
+  const seen = new Set();
+  for (const [lv, list] of Object.entries(tal)) {
+    if (!Array.isArray(list) || list.length !== 2) { c.fail(lv, 'genau zwei Talente'); continue; }
+    list.forEach((x, i) => {
+      if (typeof x?.id !== 'string' || seen.has(x.id)) c.fail(`${lv}[${i}].id`, 'fehlt oder doppelt');
+      seen.add(x?.id);
+      checkEffect(c, `${lv}[${i}].effect`, x?.effect);
+      if (!config.texts?.talents?.[x?.id]?.name || !config.texts?.talents?.[x?.id]?.text) c.fail(`${lv}[${i}]`, `Text talents.${x?.id} fehlt`);
+    });
+  }
 }
 
 function validateRewards(file, r, errors) {
@@ -244,7 +319,6 @@ function validateRewards(file, r, errors) {
   c.number('shopCards', { min: 1, integer: true });
   c.number('removePrice', { min: 0, integer: true });
   c.number('minDeckSize', { min: 1, integer: true });
-  c.number('repeatBossPearlsFactor', { min: 0, max: 1 });
   c.number('restHealShare', { min: 0, max: 1 });
   const tp = r.treasurePearls;
   if (!Array.isArray(tp) || tp.length !== 2 || !tp.every((n) => Number.isInteger(n) && n >= 0) || tp[0] > tp[1]) c.fail('treasurePearls', 'zwei ganze Zahlen [von, bis]');
@@ -253,7 +327,8 @@ function validateRewards(file, r, errors) {
 }
 
 // Wirkungen von Stärken und Gegenständen (Phase 5, Etappe 7)
-const HERO_EFFECTS = ['maxHp', 'strength', 'calmMs', 'startBlock', 'healBonus', 'discards', 'extraPearls'];
+const HERO_EFFECTS = ['maxHp', 'strength', 'calmMs', 'startBlock', 'healBonus', 'discards', 'extraPearls',
+  'firstTurnEnergy', 'healAfterWin', 'streakMaxBonus', 'restHealShare', 'secondWind', 'handSize']; // Talente (Phase 9)
 function checkEffect(c, path, effect) {
   if (!effect || typeof effect !== 'object' || Object.keys(effect).length === 0) { c.fail(path, 'Wirkung fehlt'); return; }
   for (const [k, v] of Object.entries(effect)) {
@@ -310,11 +385,13 @@ function checkEnemyList(c, enemies, prefix) {
         if (!RULE_FORMATS.includes(r.format)) c.fail(`${id}.rule.format`, `muss ${RULE_FORMATS.join(' oder ')} sein`);
       } else c.fail(`${id}.rule.type`, 'hidden oder taskModifier');
     }
-    if (e.phases !== undefined) {
-      if (!Array.isArray(e.phases)) c.fail(`${id}.phases`, 'Liste');
-      else e.phases.forEach((ph, i) => {
-        if (!(Number.isInteger(ph?.belowHpPercent) && ph.belowHpPercent > 0 && ph.belowHpPercent < 100)) c.fail(`${id}.phases[${i}].belowHpPercent`, '1 bis 99');
-        if (!Array.isArray(ph?.pattern) || ph.pattern.length === 0 || ph.pattern.some((st) => !INTENT_TYPES.includes(st?.type) || !(Number.isInteger(st.amount) && st.amount >= 0))) c.fail(`${id}.phases[${i}].pattern`, 'Muster aus attack/block');
+    // deepPhases (Phase 9): zweites Muster ab der Tiefe depths.bossDeepPhaseFrom, gleiche Form wie phases
+    for (const key of ['phases', 'deepPhases']) {
+      if (e[key] === undefined) continue;
+      if (!Array.isArray(e[key])) c.fail(`${id}.${key}`, 'Liste');
+      else e[key].forEach((ph, i) => {
+        if (!(Number.isInteger(ph?.belowHpPercent) && ph.belowHpPercent > 0 && ph.belowHpPercent < 100)) c.fail(`${id}.${key}[${i}].belowHpPercent`, '1 bis 99');
+        if (!Array.isArray(ph?.pattern) || ph.pattern.length === 0 || ph.pattern.some((st) => !INTENT_TYPES.includes(st?.type) || !(Number.isInteger(st.amount) && st.amount >= 0))) c.fail(`${id}.${key}[${i}].pattern`, 'Muster aus attack/block');
       });
     }
     if (e.shieldedBy !== undefined) {
@@ -359,8 +436,89 @@ function validateStarterCoverage(c, config) {
   }
 }
 
-const ROOM_TYPES = ['combat', 'rest', 'boss', 'treasure', 'shop'];
-const CHOICE_TYPES = ['combat', 'rest', 'treasure', 'shop']; // „choices“ darf keinen Boss ziehen
+const ROOM_TYPES = ['combat', 'rest', 'boss', 'treasure', 'shop', 'elite', 'event'];
+const FIGHT_TYPES = ['combat', 'elite']; // zählen als Kampf auf dem Weg (Phase 9)
+const CHOICE_TYPES = ['combat', 'rest', 'treasure', 'shop', 'event']; // „choices“ darf keinen Boss ziehen
+
+// Eine Vorlage der Seekarte prüfen (seit Phase 9 mehrere je Gebiet: layers und moreLayouts[i].layers).
+// lp: Pfad für Meldungen, dp: Punkt-Pfad für checker.number.
+function validateLayers(c, lp, dp, layers, config) {
+  if (!Array.isArray(layers) || layers.length === 0) { c.fail(lp, 'fehlt oder ist leer'); return; }
+  if (layers.at(-1)?.rooms?.length !== 1 || layers.at(-1).rooms[0].type !== 'boss') c.fail(lp, 'letzte Schicht muss genau ein Boss-Raum sein');
+  // Seekarte (Phase 5, Etappe 2): 1 bis 3 Räume je Schicht, Nachbarn unterscheiden sich um höchstens 1, 7 bis 9 Räume
+  const sizes = layers.map((l) => (Array.isArray(l?.rooms) ? l.rooms.length : 0));
+  if (sizes.some((n) => n < 1 || n > 3)) c.fail(lp, 'jede Schicht braucht 1 bis 3 Räume');
+  if (sizes.some((n, i) => i > 0 && Math.abs(n - sizes[i - 1]) > 1)) c.fail(lp, 'benachbarte Schichten dürfen sich um höchstens einen Raum unterscheiden');
+  const total = sizes.reduce((a, b) => a + b, 0);
+  if (total < 7 || total > 9) c.fail(lp, `7 bis 9 Räume, gefunden ${total}`);
+  if (layers.slice(0, -1).some((l) => l?.rooms?.some((r) => r.type === 'boss'))) c.fail(lp, 'Boss nur in der letzten Schicht');
+  layers.forEach((layer, li) => {
+    if (!Array.isArray(layer?.rooms) || layer.rooms.length === 0) { c.fail(`${lp}[${li}].rooms`, 'fehlt oder ist leer'); return; }
+    layer.rooms.forEach((room, ri) => {
+      const p = `${lp}[${li}].rooms[${ri}]`;
+      let types;
+      if (room.choices !== undefined) {
+        if (room.type !== undefined) { c.fail(p, 'entweder type oder choices'); return; }
+        if (!Array.isArray(room.choices) || room.choices.length < 2 || !room.choices.every((x) => CHOICE_TYPES.includes(x))) {
+          c.fail(`${p}.choices`, `mindestens zwei aus ${CHOICE_TYPES.join(', ')}`); return;
+        }
+        types = room.choices;
+      } else {
+        if (!ROOM_TYPES.includes(room.type)) { c.fail(`${p}.type`, `muss ${ROOM_TYPES.join(', ')} sein`); return; }
+        types = [room.type];
+      }
+      // Räume ab einer Tiefe (Phase 9): fromDepth mit fallback (darunter gilt der Ersatzraum)
+      if (room.fromDepth !== undefined) {
+        if (!(Number.isInteger(room.fromDepth) && room.fromDepth >= 2)) c.fail(`${p}.fromDepth`, 'ganze Zahl ab 2');
+        const fb = room.fallback;
+        if (!fb || !['combat', 'rest', 'treasure', 'shop'].includes(fb.type)) c.fail(`${p}.fallback`, 'Ersatzraum mit type combat, rest, treasure oder shop');
+        else if (fb.type === 'combat' && (!Array.isArray(fb.pool) || fb.pool.length === 0)) c.fail(`${p}.fallback.pool`, 'fehlt oder ist leer');
+      }
+      // Eliteräume erst ab elites.fromDepth (Abschlussreview)
+      if (room.type === 'elite' && !(Number.isInteger(room.fromDepth) && room.fromDepth >= (config.elites?.fromDepth ?? 1))) c.fail(`${p}.fromDepth`, `Eliteraum braucht fromDepth ab ${config.elites?.fromDepth}`);
+      if (types.includes('combat') || types.includes('elite') || (room.type === 'event' && room.pool)) {
+        if (!Array.isArray(room.pool) || room.pool.length === 0) c.fail(`${p}.pool`, 'fehlt oder ist leer');
+        else room.pool.forEach((group, gi) => {
+          if (!Array.isArray(group) || group.length < 1 || group.length > 3) c.fail(`${p}.pool[${gi}]`, '1 bis 3 Gegner');
+          else checkGroup(c, `${p}.pool[${gi}]`, group, config);
+        });
+      }
+      // Gruppen ab einer Tiefe (Phase 9): deepPools [{ fromDepth ≥ 2, groups }]
+      if (room.deepPools !== undefined) {
+        if (!Array.isArray(room.deepPools)) c.fail(`${p}.deepPools`, 'Liste');
+        else room.deepPools.forEach((dpool, di) => {
+          if (!(Number.isInteger(dpool?.fromDepth) && dpool.fromDepth >= 2)) c.fail(`${p}.deepPools[${di}].fromDepth`, 'ganze Zahl ab 2');
+          if (!Array.isArray(dpool?.groups) || dpool.groups.length === 0) { c.fail(`${p}.deepPools[${di}].groups`, 'fehlt oder ist leer'); return; }
+          dpool.groups.forEach((group, gi) => {
+            if (!Array.isArray(group) || group.length < 1 || group.length > 3) c.fail(`${p}.deepPools[${di}].groups[${gi}]`, '1 bis 3 Gegner');
+            else checkGroup(c, `${p}.deepPools[${di}].groups[${gi}]`, group, config);
+          });
+        });
+      }
+      if (types.includes('boss')) {
+        const enc = config.bosses?.encounters?.[room.encounter];
+        if (!enc) c.fail(`${p}.encounter`, `unbekannte Begegnung: ${room.encounter}`);
+        else checkGroup(c, `${p}.encounter`, enc, config);
+      }
+      if (types.includes('combat') || types.includes('boss') || types.includes('elite')) c.number(`${dp}.${li}.rooms.${ri}.level`, { min: 1, integer: true });
+    });
+  });
+  // Elitegegner (Konzept 8) lassen sich umgehen: nie allein in einer Schicht
+  layers.forEach((layer, li) => {
+    if (Array.isArray(layer?.rooms) && layer.rooms.length === 1 && (layer.rooms[0].type === 'elite' || layer.rooms[0].choices?.includes('elite'))) c.fail(`${lp}[${li}]`, 'Eliteraum nie allein in einer Schicht');
+  });
+  // Jahresausbau (Konzept 8): auf jedem Weg mindestens zwei Kämpfe vor dem Boss
+  if (layers.length >= 2 && layers.every((l) => Array.isArray(l?.rooms) && l.rooms.length)) {
+    const fight = (spec) => Boolean(spec) && ((FIGHT_TYPES.includes(spec.type) && (spec.fallback === undefined || fight(spec.fallback)))
+      || (Array.isArray(spec.choices) && spec.choices.every((x) => FIGHT_TYPES.includes(x))));
+    const walk = (li, si, n) => {
+      const here = n + (fight(layers[li].rooms[si]) ? 1 : 0);
+      if (li >= layers.length - 2) return here >= 2;
+      return nextSlots(si, layers[li + 1].rooms.length, layers[li].rooms.length).every((x) => walk(li + 1, x, here));
+    };
+    if (!layers[0].rooms.every((_, si) => walk(0, si, 0))) c.fail(lp, 'jeder Weg braucht mindestens zwei Kämpfe vor dem Boss');
+  }
+}
 
 function validateAreas(file, a, errors, config) {
   const c = checker(file, a, errors);
@@ -372,6 +530,9 @@ function validateAreas(file, a, errors, config) {
   }
   for (const [areaId, area] of Object.entries(a.areas)) {
     const base = `areas.${areaId}`;
+    // Preis in Seesternen (Phase 9, Konzept 9); das erste Gebiet ist immer offen
+    c.number(`${base}.price`, { min: 0, integer: true });
+    if (a.order?.[0] === areaId && area.price !== 0) c.fail(`${base}.price`, 'das erste Gebiet kostet 0');
     if (area.comingSoon === true) continue;
     if (!config.decks?.rewardPools?.[areaId]) c.fail(base, 'kein Beutepool in decks.json');
     // Formate mit eigener Leiter (Phase 6b) brauchen ihre Leiter im Gebietsfenster
@@ -384,46 +545,9 @@ function validateAreas(file, a, errors, config) {
         if (ladder && !win[ladder]) c.fail(base, `Karte ${cardId} braucht die Leiter ${ladder} im Fenster (${grade}.windows.${area.curriculum})`);
       }
     }
-    const layers = area.layers;
-    if (!Array.isArray(layers) || layers.length === 0) { c.fail(`${base}.layers`, 'fehlt oder ist leer'); continue; }
-    if (layers.at(-1)?.rooms?.length !== 1 || layers.at(-1).rooms[0].type !== 'boss') c.fail(`${base}.layers`, 'letzte Schicht muss genau ein Boss-Raum sein');
-    // Seekarte (Phase 5, Etappe 2): 1 bis 3 Räume je Schicht, Nachbarn unterscheiden sich um höchstens 1, 7 bis 9 Räume
-    const sizes = layers.map((l) => (Array.isArray(l?.rooms) ? l.rooms.length : 0));
-    if (sizes.some((n) => n < 1 || n > 3)) c.fail(`${base}.layers`, 'jede Schicht braucht 1 bis 3 Räume');
-    if (sizes.some((n, i) => i > 0 && Math.abs(n - sizes[i - 1]) > 1)) c.fail(`${base}.layers`, 'benachbarte Schichten dürfen sich um höchstens einen Raum unterscheiden');
-    const total = sizes.reduce((a, b) => a + b, 0);
-    if (total < 7 || total > 9) c.fail(`${base}.layers`, `7 bis 9 Räume, gefunden ${total}`);
-    if (layers.slice(0, -1).some((l) => l?.rooms?.some((r) => r.type === 'boss'))) c.fail(`${base}.layers`, 'Boss nur in der letzten Schicht');
-    layers.forEach((layer, li) => {
-      if (!Array.isArray(layer?.rooms) || layer.rooms.length === 0) { c.fail(`${base}.layers[${li}].rooms`, 'fehlt oder ist leer'); return; }
-      layer.rooms.forEach((room, ri) => {
-        const p = `${base}.layers[${li}].rooms[${ri}]`;
-        let types;
-        if (room.choices !== undefined) {
-          if (room.type !== undefined) { c.fail(p, 'entweder type oder choices'); return; }
-          if (!Array.isArray(room.choices) || room.choices.length < 2 || !room.choices.every((x) => CHOICE_TYPES.includes(x))) {
-            c.fail(`${p}.choices`, `mindestens zwei aus ${CHOICE_TYPES.join(', ')}`); return;
-          }
-          types = room.choices;
-        } else {
-          if (!ROOM_TYPES.includes(room.type)) { c.fail(`${p}.type`, `muss ${ROOM_TYPES.join(', ')} sein`); return; }
-          types = [room.type];
-        }
-        if (types.includes('combat')) {
-          if (!Array.isArray(room.pool) || room.pool.length === 0) c.fail(`${p}.pool`, 'fehlt oder ist leer');
-          else room.pool.forEach((group, gi) => {
-            if (!Array.isArray(group) || group.length < 1 || group.length > 3) c.fail(`${p}.pool[${gi}]`, '1 bis 3 Gegner');
-            else checkGroup(c, `${p}.pool[${gi}]`, group, config);
-          });
-        }
-        if (types.includes('boss')) {
-          const enc = config.bosses?.encounters?.[room.encounter];
-          if (!enc) c.fail(`${p}.encounter`, `unbekannte Begegnung: ${room.encounter}`);
-          else checkGroup(c, `${p}.encounter`, enc, config);
-        }
-        if (types.includes('combat') || types.includes('boss')) c.number(`${base}.layers.${li}.rooms.${ri}.level`, { min: 1, integer: true });
-      });
-    });
+    if (area.moreLayouts !== undefined && !Array.isArray(area.moreLayouts)) c.fail(`${base}.moreLayouts`, 'Liste von Vorlagen');
+    validateLayers(c, `${base}.layers`, `${base}.layers`, area.layers, config);
+    (Array.isArray(area.moreLayouts) ? area.moreLayouts : []).forEach((l, i) => validateLayers(c, `${base}.moreLayouts[${i}].layers`, `${base}.moreLayouts.${i}.layers`, l?.layers, config));
   }
   validateStarterCoverage(checker('decks/startdeck', {}, errors), config);
 }
@@ -489,7 +613,7 @@ const VALIDATORS = {
   game: validateGame, texts: validateTexts, class3: validateCurriculum, class4: validateCurriculum,
   cards: validateCards, decks: validateDecks, enemies: validateEnemies,
   bosses: validateBosses, areas: validateAreas,
-  levels: validateLevels, rewards: validateRewards, heroes: validateHeroes, items: validateItems,
+  levels: validateLevels, rewards: validateRewards, depths: validateDepths, elites: validateElites, events: validateEvents, talents: validateTalents, heroes: validateHeroes, items: validateItems,
   sounds: validateSounds,
 };
 

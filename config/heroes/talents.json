@@ -1,0 +1,18 @@
+{
+  "5": [
+    { "id": "thickSkin", "effect": { "startBlock": 4 } },
+    { "id": "quickStart", "effect": { "firstTurnEnergy": 1 } }
+  ],
+  "10": [
+    { "id": "provisions", "effect": { "healAfterWin": 3 } },
+    { "id": "pearlEye", "effect": { "extraPearls": 1 } }
+  ],
+  "15": [
+    { "id": "longStreak", "effect": { "streakMaxBonus": 1 } },
+    { "id": "deepRest", "effect": { "restHealShare": 1 } }
+  ],
+  "20": [
+    { "id": "secondWind", "effect": { "secondWind": 10 } },
+    { "id": "bigHand", "effect": { "handSize": 1 } }
+  ]
+}

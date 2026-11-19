@@ -1,7 +1,7 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=03719b61';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=03719b61';
+import { generateMap } from '../dungeon/map.js?v=ad3e5b3d';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=ad3e5b3d';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -11,7 +11,12 @@ import { curriculumOf, stageById } from '../math/ladders/index.js?v=03719b61';
 // Version 7 (Phase 6b, Etappe 4): lernen (Lernstufen je Klasse, Gebiet und Leiter, Regelwerk 7.5);
 // Übungseinträge können stufe (Kennung) und richtig (Zähler) tragen. Seit dem Review 7b kann jede Leiter in
 // lernen zusätzlich misch tragen (Zähler der Mischregel, Regelwerk 7.2); das Feld ist freiwillig, die Version bleibt 7.
-export const SAVE_VERSION = 7;
+// Version 8 (Phase 9, Jahresausbau Etappe 1): gebiete[id].tiefe (höchste geschaffte Tiefe) und lauf.tiefe.
+// Version 9 (Phase 9, Etappe 2): neue Seekarten-Vorlagen; ein laufender Tauchgang endet beim Umbau.
+// Version 10 (Phase 9, Etappe 3): talente { "5", "10", "15", "20": Kennung oder null }; lauf.zweiteLuft (frei).
+// Version 11 (Phase 9, Etappe 4): gefunden (Karten fürs Album), besiegt (Gegner fürs Meeresbuch).
+// Version 12 (D54, 19.11.2026): Strömung höchstens 1,2; ältere Stände werden darauf begrenzt.
+export const SAVE_VERSION = 12;
 const MIX_COUNT_MAX = 100; // Obergrenze für den Zähler der Mischregel (gespeichert wird der Rest beim Teilen durch mixEvery)
 const SLOTS = ['kopf', 'koerper', 'hand'];
 const STATS = ['kraft', 'ruhe', 'leben'];
@@ -21,7 +26,7 @@ export function createSave(now, grade, config, hero = null) {
   const deck = {};
   for (const id of config.decks.starter) deck[id] = (deck[id] ?? 0) + 1;
   const areaIds = config.areas.order;
-  const gebiete = Object.fromEntries(areaIds.map((id, i) => [id, { offen: i === 0, geschafft: false }]));
+  const gebiete = Object.fromEntries(areaIds.map((id, i) => [id, { offen: i === 0, geschafft: false, tiefe: 0 }]));
   return {
     version: SAVE_VERSION,
     angelegt: now,
@@ -43,6 +48,9 @@ export function createSave(now, grade, config, hero = null) {
     stroemung: 1, // Strömung (D33/D34)
     antworten: [], // letzte Antworten: s schnell richtig, r richtig, f falsch
     lernen: {}, // Lernstufen (Phase 6b, Regelwerk 7)
+    talente: { 5: null, 10: null, 15: null, 20: null }, // Talente (Phase 9)
+    gefunden: [...new Set(config.decks.starter)], // Kartenalbum (Phase 9)
+    besiegt: {}, // Meeresbuch: Gegner-Id oder <Id>.elite → Anzahl (Phase 9)
   };
 }
 
@@ -68,6 +76,7 @@ export function validateSave(s, config) {
   }
 
   if (!isObj(s.punkte) || !STATS.every((k) => isCount(s.punkte[k]))) fail('punkte', 'kraft, ruhe, leben als ganze Zahlen ≥ 0');
+  else if (STATS.some((k) => s.punkte[k] > config.levels.maxPointsPerStat)) fail('punkte', `höchstens ${config.levels.maxPointsPerStat} je Wert`);
 
   if (!isObj(s.deck)) fail('deck', 'fehlt');
   else for (const [id, n] of Object.entries(s.deck)) {
@@ -78,6 +87,7 @@ export function validateSave(s, config) {
   if (!isObj(s.gebiete)) fail('gebiete', 'fehlt');
   else for (const [id, g] of Object.entries(s.gebiete)) {
     if (!isObj(g) || typeof g.offen !== 'boolean' || typeof g.geschafft !== 'boolean') fail(`gebiete.${id}`, 'offen und geschafft als true/false');
+    else if (!isCount(g.tiefe)) fail(`gebiete.${id}.tiefe`, 'ganze Zahl ≥ 0 (höchste geschaffte Tiefe)');
   }
 
   // Strömung (D33/D34)
@@ -122,6 +132,20 @@ export function validateSave(s, config) {
   }
 
   validateLearning(s.lernen, config, fail);
+  // Kartenalbum und Meeresbuch (Phase 9, Etappe 4)
+  if (!Array.isArray(s.gefunden) || !s.gefunden.every((id) => config.cards[id]) || new Set(s.gefunden).size !== s.gefunden.length) fail('gefunden', 'Liste bekannter Karten, jede einmal');
+  if (!isObj(s.besiegt)) fail('besiegt', 'fehlt');
+  else for (const [key, n] of Object.entries(s.besiegt)) {
+    const id = key.endsWith('.elite') ? key.slice(0, -6) : key;
+    if (!config.enemies[id] && !config.bosses.bosses[id]) fail(`besiegt.${key}`, 'unbekannter Gegner');
+    else if (!(Number.isInteger(n) && n >= 1)) fail(`besiegt.${key}`, 'ganze Zahl ≥ 1');
+  }
+  // Talente (Phase 9): genau die vier Stufen, je null oder ein Talent dieser Stufe
+  const levels = Object.keys(config.talents ?? {});
+  if (!isObj(s.talente) || Object.keys(s.talente).sort().join() !== [...levels].sort().join()) fail('talente', `genau die Stufen ${levels.join(', ')}`);
+  else for (const [lv, id] of Object.entries(s.talente)) {
+    if (id !== null && !config.talents[lv].some((x) => x.id === id)) fail(`talente.${lv}`, 'unbekanntes Talent');
+  }
   const e = s.einstellung;
   if (!isObj(e)) fail('einstellung', 'fehlt');
   else {
@@ -166,8 +190,11 @@ function validateRun(l, config, fail) {
   if (!area || area.comingSoon) { fail('lauf.gebiet', 'unbekanntes oder noch nicht spielbares Gebiet'); return; }
   if (!Number.isInteger(l.seed) || l.seed < 0 || l.seed > 0xffffffff) { fail('lauf.seed', 'ganze Zahl 0 bis 2^32−1'); return; }
   if (!Number.isInteger(l.leben) || l.leben < 1) fail('lauf.leben', 'ganze Zahl ≥ 1');
-  const ids = new Set(generateMap(area, l.seed, config).rooms.map((r) => r.id));
+  if (!Number.isInteger(l.tiefe) || l.tiefe < 1) fail('lauf.tiefe', 'ganze Zahl ≥ 1');
+  if (l.zweiteLuft !== undefined && typeof l.zweiteLuft !== 'boolean') fail('lauf.zweiteLuft', 'true oder false');
+  const ids = new Set(generateMap(area, l.seed, config, Number.isInteger(l.tiefe) ? l.tiefe : 1).rooms.map((r) => r.id));
   if (!Array.isArray(l.erledigt) || !l.erledigt.every((id) => ids.has(id))) fail('lauf.erledigt', 'Liste vorhandener Räume');
+  if (l.beute !== undefined && (!ids.has(l.beute) || !l.erledigt?.includes?.(l.beute))) fail('lauf.beute', 'erledigter Raum mit offener Kartenauswahl');
   if (l.position !== null && !ids.has(l.position)) fail('lauf.position', 'null oder ein vorhandener Raum');
   if (!isObj(l.versuche) || !Object.entries(l.versuche).every(([id, n]) => ids.has(id) && isCount(n))) fail('lauf.versuche', 'Raum → Anzahl');
   if (!isObj(l.laden)) fail('lauf.laden', 'fehlt');
@@ -224,6 +251,42 @@ export function migrateSave(raw, config) {
     s.lernen = (s.klasse === 3 || s.klasse === 4) ? { [s.klasse]: { gebiete: {}, hoechste: {}, eingefuehrt: open } } : {};
     s.version = 7;
     notes.push('version: 6 → 7 (Lernstufen)');
+  }
+  if (s.version === 7) {
+    // Tiefenstufen (Phase 9, Konzept 16): ein geschafftes Gebiet zählt als Tiefe 1 und gibt einen Seestern;
+    // offene Gebiete bleiben offen, auch wenn die Sterne dafür nicht reichen. Ein laufender Tauchgang ist Tiefe 1.
+    for (const g of Object.values(isObj(s.gebiete) ? s.gebiete : {})) if (isObj(g)) g.tiefe = g.geschafft ? 1 : 0;
+    if (isObj(s.lauf)) s.lauf.tiefe = 1;
+    s.version = 8;
+    notes.push('version: 7 → 8 (Tiefen)');
+  }
+  if (s.version === 8) {
+    // Neue Seekarten (Phase 9, Konzept 16): Die Räume eines laufenden Tauchgangs passen nicht mehr.
+    // Er endet ohne Verlust; Karten, Perlen, Stufe, Ausrüstung, Lernstufen und Tiefen bleiben.
+    if (s.lauf) notes.push('lauf: laufender Tauchgang beendet (neue Seekarten)');
+    s.lauf = null;
+    s.version = 9;
+    notes.push('version: 8 → 9 (Seekarten)');
+  }
+  if (s.version === 9) {
+    // Talente (Phase 9, Etappe 3): noch keins gewählt; wer schon Stufe 5 hat, wählt in der Station
+    s.talente = { 5: null, 10: null, 15: null, 20: null };
+    s.version = 10;
+    notes.push('version: 9 → 10 (Talente)');
+  }
+  if (s.version === 10) {
+    // Kartenalbum und Meeresbuch (Phase 9, Etappe 4): gefunden aus Deck und Kartenstufen; das Meeresbuch beginnt leer
+    const known = (id) => Boolean(config.cards[id]);
+    s.gefunden = [...new Set([...config.decks.starter, ...Object.keys(isObj(s.deck) ? s.deck : {}), ...Object.keys(isObj(s.karten) ? s.karten : {})])].filter(known);
+    s.besiegt = {};
+    s.version = 11;
+    notes.push('version: 10 → 11 (Album und Meeresbuch)');
+  }
+  if (s.version === 11) {
+    // D54: Strömung höchstens current.max (1,2); ein Kind mit 1,3 oder 1,4 bekommt 1,2
+    if (typeof s.stroemung === 'number') s.stroemung = Math.min(s.stroemung, config.game.current.max);
+    s.version = 12;
+    notes.push('version: 11 → 12 (Strömung höchstens 1,2)');
   }
   return { save: s, notes };
 }

@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=03719b61';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=03719b61';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=03719b61';
-import { chooseSource } from '../learning/learning.js?v=03719b61';
-import { crossPlace } from '../math/places.js?v=03719b61';
-import { neighborWay } from '../math/ways.js?v=03719b61';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=03719b61';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=03719b61';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=03719b61';
-import { cardEffect } from '../cards/effect.js?v=03719b61';
+import { createRng, deriveSeed } from '../rng.js?v=ad3e5b3d';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=ad3e5b3d';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=ad3e5b3d';
+import { chooseSource } from '../learning/learning.js?v=ad3e5b3d';
+import { crossPlace } from '../math/places.js?v=ad3e5b3d';
+import { neighborWay } from '../math/ways.js?v=ad3e5b3d';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=ad3e5b3d';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=ad3e5b3d';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=ad3e5b3d';
+import { cardEffect } from '../cards/effect.js?v=ad3e5b3d';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -30,7 +30,9 @@ function enemyType(config, typeId) {
   return t;
 }
 
-export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off', areaId, level = 1, seed, untimedTasks = 0, grade = 3, forgiving = false, cardLevels = {}, enemyPower = 1, taskPlan = null }) {
+export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off', areaId, level = 1, seed, untimedTasks = 0, grade = 3, forgiving = false, cardLevels = {}, enemyPower = 1, depthPower = 1, deep = false, elite = null, taskPlan = null }) {
+  // elite (Phase 9, Etappe 2): Regel aus elites.json für den ersten Gegner (guard, regen, rage)
+  // depthPower (Phase 9): Tiefe des Tauchgangs, wirkt wie die Strömung auf Leben und Angriff; deep: zweites Bossmuster (deepPhases)
   // taskPlan (Phase 6b): { grade, stageOf: { <leiter>: n }, windows: { <leiter>: [von, bis] } }; ohne Plan Regelwerk 7.6 nach level
   // enemyPower: Strömung (D33), Leben und Angriff der Gegner × enemyPower
   // cardLevels: Stufe je Kartenart (Etappe 8), gilt für den ganzen Kampf
@@ -59,12 +61,15 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
     discardsPerTurn: hero.discards ?? config.game.hero.discardsPerTurn,
     enemies: enemyTypeIds.map((typeId, i) => {
       const t = enemyType(config, typeId);
-      const hp = Math.round(t.hp * enemyPower);
+      const power = Math.round(enemyPower * depthPower * 100) / 100;
+      const isElite = Boolean(elite) && i === 0;
+      const hp = Math.round(t.hp * power * (isElite ? config.elites.hpFactor : 1));
       return {
-        uid: `e${i + 1}`, typeId, hp, maxHp: hp, block: 0, power: enemyPower,
+        uid: `e${i + 1}`, typeId, hp, maxHp: hp, block: 0, power,
         immune: t.immune ?? null, immuneBroken: 0, pattern: t.pattern, patternIndex: 0, shieldedBy: t.shieldedBy ?? [],
         // Phase 5, Etappe 6: Bossregel, Kampfphasen, Schwächung durch die Tintenwolke
-        rule: t.rule ?? null, phases: t.phases ?? [], phase: 1, weak: null,
+        rule: t.rule ?? null, phases: t.phases ?? (deep ? t.deepPhases ?? [] : []), phase: 1, weak: null,
+        elite: isElite ? { rule: elite, acts: 0, cfg: config.elites.rules[elite] } : null,
       };
     }),
     piles: createPiles(deck, shuffleRng),
@@ -75,11 +80,17 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
     startEvents: [],
     cardLevels: { ...cardLevels },
     enemyPower,
+    // Talente (Phase 9, Etappe 3): Handgröße, Obergrenze der Serie, zweite Luft (Leben, 0 = keine)
+    handSize: hero.handSize ?? config.game.hero.handSize,
+    streakMax: config.game.streak.maxBonus + (hero.streakMaxBonus ?? 0),
+    secondWind: hero.secondWind ?? 0,
     streak: 0, // Serie richtiger Antworten in Folge (Etappe 8, M13); die Zeit wird nie kürzer
   };
   combat.startEvents = startTurn(combat);
   // Tüftlerin, Korallenpanzer (Phase 5, Etappe 7): Schutz zu Beginn des Kampfs
   if (hero.startBlock) combat.hero.block = hero.startBlock;
+  if (hero.firstTurnEnergy) combat.hero.energy += hero.firstTurnEnergy; // Talent Frühstart
+  for (const e of combat.enemies) if (e.elite) combat.startEvents.push({ type: 'eliteRule', enemyUid: e.uid, rule: e.elite.rule });
   return combat;
 }
 
@@ -97,7 +108,7 @@ function startTurn(c) {
   c.hero.energy = c.config.game.hero.energy;
   c.discardsLeft = c.discardsPerTurn ?? c.config.game.hero.discardsPerTurn;
   c.phase = 'player';
-  return [...restored, { type: 'turnStarted', turn: c.turn }, ...drawTo(c.piles, c.config.game.hero.handSize, c.rng.shuffle)];
+  return [...restored, { type: 'turnStarted', turn: c.turn }, ...drawTo(c.piles, c.handSize ?? c.config.game.hero.handSize, c.rng.shuffle)];
 }
 
 const alive = (e) => e.hp > 0;
@@ -109,7 +120,7 @@ function streakBonus(c) {
   const st = c.config.game.streak;
   const next = c.streak + 1;
   if (next < st.from) return 0;
-  return Math.min(st.maxBonus, (next - st.from + 1) * st.bonusPerStep);
+  return Math.min(c.streakMax ?? st.maxBonus, (next - st.from + 1) * st.bonusPerStep);
 }
 
 function setStreak(c, value, events) {
@@ -148,6 +159,8 @@ function hit(unit, amount, floor = 0) {
 export function effectiveIntent(enemy) {
   let intent = intentFor(enemy);
   if (intent.type === 'attack' && enemy.power && enemy.power !== 1) intent = { ...intent, amount: Math.round(intent.amount * enemy.power) };
+  // Elite „rage“ (Phase 9): jeder Angriff je eigenem Zug um plus stärker, höchstens max
+  if (intent.type === 'attack' && enemy.elite?.rule === 'rage') intent = { ...intent, amount: intent.amount + Math.min(enemy.elite.cfg.max, enemy.elite.cfg.plus * enemy.elite.acts) };
   if (intent.type === 'attack' && enemy.weak) return { ...intent, amount: Math.max(0, intent.amount - enemy.weak.amount) };
   return intent;
 }
@@ -587,7 +600,24 @@ function endTurn(c) {
       enemy.block += intent.amount;
     }
     advancePattern(enemy);
+    // Elitegegner (Phase 9, Etappe 2): Regel nach seinem Zug
+    if (enemy.elite) {
+      enemy.elite.acts += 1;
+      const { rule, cfg, acts } = enemy.elite;
+      if (rule === 'guard' && acts % cfg.every === 0) { enemy.block += cfg.block; events.push({ type: 'eliteGuard', enemyUid: enemy.uid, block: cfg.block }); }
+      if (rule === 'regen' && enemy.hp < enemy.maxHp) {
+        const healed = Math.min(cfg.heal, enemy.maxHp - enemy.hp);
+        enemy.hp += healed;
+        events.push({ type: 'eliteRegen', enemyUid: enemy.uid, healed });
+      }
+    }
     if (enemy.weak && --enemy.weak.turns <= 0) { enemy.weak = null; events.push({ type: 'weakEnded', enemyUid: enemy.uid }); }
+    if (c.hero.hp <= 0 && c.secondWind > 0) {
+      // Talent Zweite Luft (Phase 9): einmal je Tauchgang mit secondWind Leben weiter
+      c.hero.hp = c.secondWind;
+      c.secondWind = 0;
+      events.push({ type: 'secondWind', hp: c.hero.hp });
+    }
     if (c.hero.hp <= 0) {
       c.phase = 'lost';
       events.push({ type: 'combatLost' });
@@ -622,6 +652,7 @@ export function combatView(combat, { targetUid } = {}) {
       uid: e.uid, typeId: e.typeId, hp: e.hp, maxHp: e.maxHp, block: e.block, immune: e.immune, immuneBroken: e.immuneBroken,
       alive: alive(e), shielded: isShielded(c, e), intent: alive(e) ? effectiveIntent(e) : null,
       rule: e.rule?.type ?? null, phase: e.phase, weakTurns: e.weak?.turns ?? 0,
+      elite: e.elite?.rule ?? null, // Phase 9
     })),
     hand: c.piles.hand.map((k) => {
       const def = c.config.cards[k.cardId];

@@ -5,17 +5,19 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=03719b61';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=03719b61';
-import { wayForKey } from './math/ways.js?v=03719b61';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=03719b61';
-import { nextCurrent, answerCode } from './combat/current.js?v=03719b61';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=03719b61';
-import { generateMap } from './dungeon/map.js?v=03719b61';
-import { createSave } from './save/save.js?v=03719b61';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS } from './hero/hero.js?v=03719b61';
-import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=03719b61';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=03719b61';
+import { createRng, deriveSeed } from './rng.js?v=ad3e5b3d';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=ad3e5b3d';
+import { wayForKey } from './math/ways.js?v=ad3e5b3d';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=ad3e5b3d';
+import { nextCurrent, answerCode } from './combat/current.js?v=ad3e5b3d';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=ad3e5b3d';
+import { generateMap } from './dungeon/map.js?v=ad3e5b3d';
+import { createSave } from './save/save.js?v=ad3e5b3d';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=ad3e5b3d';
+import { grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=ad3e5b3d';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=ad3e5b3d';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=ad3e5b3d';
+import { rollEvent, optionCost } from './dungeon/events.js?v=ad3e5b3d';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -34,6 +36,7 @@ export function createGame({ config, save, seed }) {
     afterReward: null, // Bildschirm nach der Beute
     cleared: null,     // { areaId, unlocked } nach dem Boss
     shop: null,        // { roomId, offer } im Laden (Angebot aus dem Seed des Raums)
+    event: null,       // { roomId, eventId } im Ereignisraum (Phase 9)
     hp: save ? maxHp(save, config) : config.game.hero.maxHp, // nur Testkampf ohne Tauchgang
     combatCount: 0,
     loot: createRng(deriveSeed(seed, 'loot')),
@@ -42,13 +45,26 @@ export function createGame({ config, save, seed }) {
     now: save?.geaendert ?? 0,
   };
 
+  // Seesterne (Phase 9): Reichen die Sterne für ein Gebiet, das noch zu ist (z. B. Preis später gesenkt), öffnet es sich beim Laden
+  if (state.save?.gebiete) for (const id of areasToOpen(state.save, config)) state.save.gebiete[id] = { geschafft: false, tiefe: 0, ...state.save.gebiete[id], offen: true };
+
+  // Gegner, die nur einen anderen schützen (Krakenarme), und Zuordnung Gegner → Gebiet für das Meeresbuch (Phase 9)
+  const SHIELD_PARTS = new Set(Object.values(config.bosses.bosses).flatMap((b) => b.shieldedBy ?? []));
+  const BOOK = config.areas.order.flatMap((areaId) => {
+    const area = config.areas.areas[areaId];
+    const own = [...new Set(area.layers.flatMap((l) => l.rooms.flatMap((r) => (r.pool ?? (r.fallback?.pool ?? [])).flat())))];
+    const boss = area.layers.at(-1).rooms[0].encounter;
+    const bosses = (config.bosses.encounters[boss] ?? []).filter((id) => !SHIELD_PARTS.has(id));
+    return [...own.map((typeId) => ({ typeId, areaId, boss: false })), ...bosses.map((typeId) => ({ typeId, areaId, boss: true }))];
+  }).filter((x, i, all) => all.findIndex((y) => y.typeId === x.typeId) === i);
+
   const lauf = () => state.save?.lauf ?? null;
 
   function currentMap() {
     const l = lauf();
     if (!l) return null;
     if (state.map?.seed !== l.seed || state.map?.areaId !== l.gebiet) {
-      state.map = { seed: l.seed, areaId: l.gebiet, data: generateMap(config.areas.areas[l.gebiet], l.seed, config) };
+      state.map = { seed: l.seed, areaId: l.gebiet, data: generateMap(config.areas.areas[l.gebiet], l.seed, config, l.tiefe ?? 1) };
     }
     return state.map.data;
   }
@@ -61,14 +77,15 @@ export function createGame({ config, save, seed }) {
     return ids.filter((id) => !l.erledigt.includes(id));
   }
 
-  function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1 }) {
+  function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1, depth = 1, elite = null }) {
     const s = state.save;
     const taskPlan = planFor({ areaId, level, boss, inDive: roomId !== null });
     const tutorial = untimedTasks > 0 && roomId !== null;
     state.combat = createCombat({
       config,
       enemyTypeIds,
-      hero: { ...heroStats(s, config), hp: Math.min(hp, maxHp(s, config)) }, // Stärke der Figur und Ausrüstung (Etappe 7)
+      // Stärke der Figur, Ausrüstung (Etappe 7) und Talente (Phase 9); zweite Luft nur einmal je Tauchgang
+      hero: { ...heroStats(s, config), hp: Math.min(hp, maxHp(s, config)), secondWind: roomId !== null && !lauf()?.zweiteLuft ? heroStats(s, config).secondWind : 0 },
       deck: deckList(s),
       moreTime: s.einstellung.mehrZeit,
       areaId,
@@ -79,10 +96,13 @@ export function createGame({ config, save, seed }) {
       forgiving: tutorial, // D24: Fehler in der Erklärung kosten nichts
       cardLevels: cardLevels(s, config), // Kartenstufen (Etappe 8); Aufstieg gilt ab dem nächsten Kampf
       enemyPower, // Strömung (D33)
+      depthPower: depthPower(depth, config.depths), // Tiefe des Tauchgangs (Phase 9)
+      deep: depth >= config.depths.bossDeepPhaseFrom,
+      elite, // Elitegegner (Phase 9, Etappe 2)
       taskPlan,
     });
     // stageChanged: Leitern, deren Stufe in diesem Kampf gewechselt hat (zählen bis zum Kampfende nicht mehr)
-    state.combatInfo = { areaId, roomId, boss, enemyTypeIds, openTask: null, mistakes: [], lightningHits: 0, tutorial, cardLevelUps: [], stageUps: [], stageChanged: [] };
+    state.combatInfo = { areaId, roomId, boss, depth, elite: Boolean(elite), enemyTypeIds, openTask: null, mistakes: [], lightningHits: 0, tutorial, cardLevelUps: [], stageUps: [], stageChanged: [] };
     state.reward = null;
     state.screen = 'combat';
     return state.combat.startEvents;
@@ -144,20 +164,27 @@ export function createGame({ config, save, seed }) {
       enemyTypeIds, level, areaId: options.areaId ?? 'reef', hp: state.hp,
       combatSeed: deriveSeed(seed, `combat${state.combatCount}`), untimedTasks: options.untimedTasks ?? 0,
       enemyPower: options.enemyPower ?? 1,
+      elite: options.elite ?? null, // Testkampf mit Elitegegner (Phase 9)
     });
   }
 
   // abandon: das Kind hat bestätigt, dass der laufende Tauchgang in einem anderen Gebiet endet (Ingos Probespiel
   // 18.11.2026). Nur der Weg über die Seekarte geht verloren; Karten, Perlen, Erfahrung und Ausrüstung bleiben.
-  function dive({ areaId, abandon = false }) {
+  // depth (Phase 9): Tiefe 1 bis openDepths; ohne Angabe die höchste offene. Ein laufender Tauchgang
+  // im selben Gebiet geht in seiner Tiefe weiter.
+  function dive({ areaId, depth, abandon = false }) {
     if (state.screen !== 'base') return reject('screen');
     const area = config.areas.areas[areaId];
     if (!area) return reject('unknownArea');
     if (!state.save.gebiete[areaId]?.offen) return reject('locked');
     if (area.comingSoon) return reject('comingSoon');
+    const maxDepth = openDepths(state.save, areaId);
+    if (depth !== undefined && !(Number.isInteger(depth) && depth >= 1 && depth <= maxDepth)) return reject('depth');
     let l = lauf();
+    if (l && l.gebiet === areaId && depth !== undefined && depth !== l.tiefe && !abandon) return reject('otherDepth');
     const events = [];
-    if (l && l.gebiet !== areaId) {
+    // anderes Gebiet, oder dasselbe in anderer Tiefe (Abschlussreview Phase 9): der laufende Tauchgang endet
+    if (l && (l.gebiet !== areaId || (depth !== undefined && depth !== l.tiefe))) {
       if (!abandon) return reject('otherRun');
       events.push({ type: 'runAbandoned', areaId: l.gebiet });
       state.save.lauf = null;
@@ -172,10 +199,13 @@ export function createGame({ config, save, seed }) {
         leben: maxHp(state.save, config),
         versuche: {},
         laden: {},
+        tiefe: depth ?? maxDepth, // Tiefe des Tauchgangs (Phase 9)
       };
     }
     state.screen = 'map';
-    return [...events, { type: 'diveStarted', areaId, seed: lauf().seed, resumed: Boolean(l) }];
+    // offene Kartenauswahl aus einem Ereignis (Perlen oder Leben schon bezahlt) kommt nach dem Neuladen wieder
+    if (l && l.beute) offerEventCards(l.beute);
+    return [...events, { type: 'diveStarted', areaId, seed: lauf().seed, depth: lauf().tiefe, resumed: Boolean(l) }];
   }
 
   function enterRoom({ roomId }) {
@@ -186,12 +216,14 @@ export function createGame({ config, save, seed }) {
     if (room.type === 'rest') {
       // Ruheplatz heilt einen Anteil der Höchstleben (Balance nach Probespiel 17.11.2026)
       const full = maxHp(state.save, config);
-      const healed = Math.max(0, Math.min(Math.round(full * config.rewards.restHealShare), full - l.leben));
+      const share = Math.max(config.rewards.restHealShare, heroStats(state.save, config).restHealShare); // Talent Tiefe Ruhe
+      const healed = Math.max(0, Math.min(Math.round(full * share), full - l.leben));
       l.leben += healed;
       events.push({ type: 'restUsed', healed }, markCleared(roomId));
       return events;
     }
     if (room.type === 'treasure') return [...events, ...openTreasure(roomId)];
+    if (room.type === 'event') return [...events, ...openEvent(room)];
     if (room.type === 'shop') return [...events, ...openShop(roomId)];
     l.versuche[roomId] = (l.versuche[roomId] ?? 0) + 1;
     const area = config.areas.areas[l.gebiet];
@@ -206,6 +238,9 @@ export function createGame({ config, save, seed }) {
       // Erklärung im ersten Kampf (Konzept 11): erste Aufgabe ohne Zeitleiste
       untimedTasks: room.tutorial && !state.save.erklaert.firstCombat ? 1 : 0,
       enemyPower: state.save.stroemung, // Strömung (D33/D34), nur im Tauchgang
+      depth: l.tiefe,
+      // Eliteraum (Phase 9): Regel aus dem Seed des Raums, gleich auch nach dem Neuladen
+      elite: room.type === 'elite' ? createRng(deriveSeed(l.seed, `elite:${roomId}`)).pick(Object.keys(config.elites.rules)) : null,
     }));
     return events;
   }
@@ -245,6 +280,86 @@ export function createGame({ config, save, seed }) {
     const events = [{ type: 'treasureOpened', pearls }, markCleared(roomId)];
     if (item) events.push(giveItem(item));
     return [...events, { type: 'rewardOffered', cards }];
+  }
+
+  // Ereignisraum (Phase 9, Konzept 8): das Ereignis entsteht aus dem Seed, gespeichert wird nur, ob der Raum erledigt ist.
+  function openEvent(room) {
+    const l = lauf();
+    const area = config.areas.areas[l.gebiet];
+    const eventId = rollEvent(room.id, l.seed, config, l.gebiet, Boolean(room.enemies?.length));
+    state.event = { roomId: room.id, eventId, enemies: room.enemies ?? null, level: room.level ?? 2, curriculum: area.curriculum };
+    state.screen = 'event';
+    return [{ type: 'eventOpened', roomId: room.id, eventId }];
+  }
+
+  function chooseEventOption({ optionId }) {
+    const s = state.save;
+    const l = lauf();
+    const ev = state.event;
+    const option = config.events[ev.eventId].options.find((o) => o.id === optionId);
+    if (!option) return reject('option');
+    if (optionCost(option) > s.perlen) return reject('pearls');
+    const rng = createRng(deriveSeed(l.seed, `event:${ev.roomId}:effects`));
+    const events = [{ type: 'eventResolved', eventId: ev.eventId, optionId }];
+    const full = maxHp(s, config);
+    let next = null;
+    for (const f of option.effects) {
+      if (f.type === 'hp') {
+        const before = l.leben;
+        l.leben = Math.min(full, Math.max(1, l.leben + f.amount)); // nie unter 1
+        events.push({ type: 'eventHp', amount: l.leben - before });
+      } else if (f.type === 'heal') {
+        const healed = Math.max(0, Math.min(Math.round(full * f.share), full - l.leben));
+        l.leben += healed;
+        events.push({ type: 'restUsed', healed });
+      } else if (f.type === 'pearls') {
+        const before = s.perlen;
+        s.perlen = Math.max(0, s.perlen + f.amount); // nie unter 0
+        events.push({ type: f.amount > 0 ? 'pearlsGained' : 'pearlsSpent', amount: Math.abs(s.perlen - before), event: true });
+      } else if (f.type === 'item') {
+        const item = rollItem(rng);
+        if (item) events.push(giveItem(item));
+        else { s.perlen += config.elites.rewardPearls; events.push({ type: 'pearlsGained', amount: config.elites.rewardPearls, event: true }); } // alle Gegenstände schon da
+      } else next = f;
+    }
+    state.event = null;
+    if (next?.type === 'fight' && ev.enemies) {
+      l.versuche[ev.roomId] = (l.versuche[ev.roomId] ?? 0) + 1;
+      events.push(...beginCombat({
+        enemyTypeIds: ev.enemies, level: ev.level, areaId: ev.curriculum, hp: l.leben,
+        combatSeed: deriveSeed(l.seed, `room:${ev.roomId}:${l.versuche[ev.roomId]}`),
+        roomId: ev.roomId, enemyPower: s.stroemung, depth: l.tiefe,
+      }));
+      state.combatInfo.bonusPearls = next.bonusPearls;
+      return events;
+    }
+    events.push(markCleared(ev.roomId));
+    if (next?.type === 'card') {
+      l.beute = ev.roomId; // bis die Karte gewählt ist (Abschlussreview: Neuladen darf die bezahlte Karte nicht kosten)
+      events.push({ type: 'rewardOffered', cards: offerEventCards(ev.roomId) });
+      return events;
+    }
+    state.screen = 'map';
+    return events;
+  }
+
+  // Kartenauswahl eines Ereignisses: aus dem Seed des Raums, deshalb nach dem Neuladen dieselbe
+  function offerEventCards(roomId) {
+    const l = lauf();
+    const cards = rollRewardCards(state.save, l.gebiet, createRng(deriveSeed(l.seed, `event:${roomId}:cards`)), config);
+    state.reward = { cards, xp: 0, pearls: 0, levelUps: 0, practice: [], lightningHits: 0, event: true, item: null, cardLevelUps: [] };
+    state.afterReward = 'map';
+    state.screen = 'reward';
+    return cards;
+  }
+
+  function eventView() {
+    const ev = state.event;
+    if (!ev) return null;
+    return {
+      eventId: ev.eventId, roomId: ev.roomId,
+      options: config.events[ev.eventId].options.map((o) => ({ id: o.id, cost: optionCost(o), available: optionCost(o) <= state.save.perlen })),
+    };
   }
 
   // Händler: bleibt offen, bis das Kind „Weiter tauchen“ tippt (leaveShop). Erst dann ist der
@@ -338,16 +453,25 @@ export function createGame({ config, save, seed }) {
     const r = config.rewards;
     let xp = 0;
     let pearls = 0;
+    // Tiefe (Phase 9): Erfahrung und Perlen wachsen je Tiefe; der Boss einer schon geschafften Tiefe gibt weniger Perlen
+    const factor = rewardFactor(info.depth ?? 1, config.depths);
     if (info.boss) {
-      xp = r.xpBoss;
-      // Wiederholen (Etappe 8): nach dem ersten Sieg im Gebiet nur noch ein Teil der Boss-Perlen
-      const again = Boolean(lauf() && s.gebiete[lauf().gebiet]?.geschafft);
-      pearls = again ? Math.round(r.pearlsBoss * r.repeatBossPearlsFactor) : r.pearlsBoss;
+      xp = Math.round(r.xpBoss * factor);
+      const again = Boolean(lauf() && (s.gebiete[lauf().gebiet]?.tiefe ?? 0) >= lauf().tiefe);
+      pearls = Math.round(r.pearlsBoss * factor * (again ? config.depths.repeatBossPearlsFactor : 1));
     } else {
       for (let i = 0; i < info.enemyTypeIds.length; i++) {
         xp += r.xpPerEnemy;
         pearls += state.loot.nextInt(r.pearlsPerEnemy[0], r.pearlsPerEnemy[1]) + heroStats(s, config).extraPearls;
       }
+      xp = Math.round(xp * factor);
+      pearls = Math.round(pearls * factor);
+    }
+    // Meeresbuch (Phase 9): jeden besiegten Gegner zählen; Schildträger (Krakenarme) zählen nicht einzeln
+    for (const e of state.combat.enemies) {
+      if (SHIELD_PARTS.has(e.typeId)) continue;
+      const key = e.elite ? `${e.typeId}.elite` : e.typeId;
+      s.besiegt[key] = (s.besiegt[key] ?? 0) + 1;
     }
     const { levelUps } = grantXp(s, xp, config);
     s.perlen += pearls;
@@ -357,13 +481,18 @@ export function createGame({ config, save, seed }) {
     const shown = info.mistakes.slice(-config.game.practiceShownAfterCombat);
     const practice = shown.map((m) => m.text);
     const practiceWays = shown.map((m) => wayForKey(m.key)); // Rechenweg je Übungsaufgabe (Regelwerk 8.3)
-    // Boss: sicher ein Gegenstand (Phase 5, Etappe 7)
-    const item = info.boss ? rollItem(state.loot) : null;
-    state.reward = { cards, xp, pearls, levelUps, practice, lightningHits: info.lightningHits, item, cardLevelUps: info.cardLevelUps.slice(), current: info.currentChange ?? null, stageUps: info.stageUps.slice(), practiceWays };
+    // Boss: sicher ein Gegenstand (Phase 5, Etappe 7); Elitegegner auch, sonst Perlen (Phase 9, Konzept 8)
+    const item = info.boss || info.elite ? rollItem(state.loot) : null;
+    const elitePearls = info.elite && !item ? config.elites.rewardPearls : 0;
+    const eventPearls = info.bonusPearls ?? 0; // Kampf aus einem Ereignis (Phase 9)
+    s.perlen += elitePearls + eventPearls;
+    state.reward = { cards, xp, pearls: pearls + elitePearls + eventPearls, levelUps, practice, lightningHits: info.lightningHits, item, cardLevelUps: info.cardLevelUps.slice(), current: info.currentChange ?? null, stageUps: info.stageUps.slice(), practiceWays };
     state.screen = 'reward';
     const events = [{ type: 'xpGained', amount: xp }];
     if (levelUps > 0) events.push({ type: 'levelUp', levels: levelUps, stufe: s.stufe });
     events.push({ type: 'pearlsGained', amount: pearls });
+    if (elitePearls) events.push({ type: 'pearlsGained', amount: elitePearls, elite: true });
+    if (eventPearls) events.push({ type: 'pearlsGained', amount: eventPearls, event: true });
     if (item) events.push(giveItem(item));
     events.push({ type: 'rewardOffered', cards });
 
@@ -373,19 +502,28 @@ export function createGame({ config, save, seed }) {
       state.afterReward = null;
       return events;
     }
-    l.leben = state.combat.hero.hp;
+    l.leben = Math.min(maxHp(s, config), state.combat.hero.hp + heroStats(s, config).healAfterWin); // Talent Proviant
     events.push(markCleared(info.roomId));
     state.afterReward = 'map';
     if (info.boss) {
+      // Seesterne (Phase 9, Konzept 9): der erste Sieg einer Tiefe gibt einen Stern und öffnet die nächste Tiefe;
+      // Gebiete öffnen sich über ihren Preis. Der Boss öffnet nicht mehr das nächste Gebiet.
       const areaId = l.gebiet;
-      s.gebiete[areaId] = { ...(s.gebiete[areaId] ?? { offen: true }), geschafft: true };
-      const order = config.areas.order;
-      const unlocked = order[order.indexOf(areaId) + 1] ?? null;
-      if (unlocked) s.gebiete[unlocked] = { geschafft: false, ...(s.gebiete[unlocked] ?? {}), offen: true };
+      const depth = l.tiefe;
+      const g = s.gebiete[areaId] ?? { offen: true, geschafft: false, tiefe: 0 };
+      const star = depth > g.tiefe;
+      s.gebiete[areaId] = { ...g, geschafft: true, tiefe: Math.max(g.tiefe, depth) };
+      const stars = starCount(s);
+      if (star) events.push({ type: 'starGained', areaId, depth, stars });
+      const unlocked = areasToOpen(s, config);
+      for (const id of unlocked) {
+        s.gebiete[id] = { geschafft: false, tiefe: 0, ...(s.gebiete[id] ?? {}), offen: true };
+        events.push({ type: 'areaUnlocked', areaId: id });
+      }
       s.lauf = null;
-      state.cleared = { areaId, unlocked };
+      state.cleared = { areaId, depth, star, stars, unlocked };
       state.afterReward = 'areaCleared';
-      events.push({ type: 'areaCleared', areaId, unlocked });
+      events.push({ type: 'areaCleared', areaId, depth, star, unlocked });
     }
     return events;
   }
@@ -395,6 +533,7 @@ export function createGame({ config, save, seed }) {
     const info = state.combatInfo;
     const extra = [];
     for (const e of events) {
+      if (e.type === 'secondWind' && lauf()) lauf().zweiteLuft = true; // Talent Zweite Luft: einmal je Tauchgang
       if (e.type === 'taskOpened' || e.type === 'stepOpened') info.openTask = e.task;
       // Mischregel (Regelwerk 7.2; Review 7b, B1): der Zähler je Leiter steht im Spielstand
       if (e.type === 'taskOpened' && lauf() && info.roomId !== null && state.combat.taskPlan.mixEvery) {
@@ -445,6 +584,7 @@ export function createGame({ config, save, seed }) {
   function pickReward({ cardId }) {
     if (cardId !== null && !state.reward.cards.includes(cardId)) return reject('notOffered');
     if (cardId !== null) addCardToDeck(state.save, cardId);
+    if (lauf()?.beute) delete lauf().beute;
     state.screen = state.afterReward;
     return [{ type: 'rewardTaken', cardId }];
   }
@@ -456,7 +596,7 @@ export function createGame({ config, save, seed }) {
   }
 
   // ---------- Start, Klassenstufe, Held, Logbuch (Etappe 7) ----------
-  const LOGBOOK_PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
+  const LOGBOOK_PAGES = ['hero', 'talents', 'deck', 'collection', 'gear', 'rules', 'practice']; // talents, collection: Phase 9
 
   function start() {
     state.screen = state.save ? 'base' : 'grade';
@@ -547,6 +687,16 @@ export function createGame({ config, save, seed }) {
     return [{ type: 'itemUnequipped', slot }];
   }
 
+  // Talente (Phase 9, Konzept 10): bei Stufe 5, 10, 15 und 20 eins von zwei, jederzeit umwählbar
+  function chooseTalent({ level, talentId }) {
+    const key = String(level);
+    if (!TALENT_LEVELS.includes(key)) return reject('level');
+    if (state.save.stufe < Number(key)) return reject('level');
+    if (!config.talents[key].some((x) => x.id === talentId)) return reject('talent');
+    state.save.talente[key] = talentId;
+    return [{ type: 'talentChosen', level: Number(key), talentId }];
+  }
+
   function resetPoints() {
     resetHeroPoints(state.save);
     capRunLife();
@@ -574,13 +724,26 @@ export function createGame({ config, save, seed }) {
       maxHp: maxHp(s, config),
       gear: { besitz: s.ausruestung.besitz.slice(), angelegt: { ...s.ausruestung.angelegt } },
       perk: config.heroes.figures[s.held.figur].perk ? s.held.figur : null,
+      // Kartenalbum und Meeresbuch (Phase 9, Etappe 4)
+      album: Object.keys(config.cards).map((cardId) => ({ cardId, found: (s.gefunden ?? []).includes(cardId), level: cardLevel(s, cardId, config), toNext: toNextLevel(s, cardId, config) })),
+      book: BOOK.map((b) => ({ ...b, count: s.besiegt?.[b.typeId] ?? 0, eliteCount: s.besiegt?.[`${b.typeId}.elite`] ?? 0 })).map(({ typeId, areaId, count, eliteCount, boss }) => ({ typeId, areaId, count, eliteCount, boss })),
+      talents: TALENT_LEVELS.map((level) => ({ level: Number(level), options: config.talents[level].map((x) => x.id), chosen: s.talente?.[level] ?? null, available: s.stufe >= Number(level) })),
+      talentOpen: TALENT_LEVELS.some((level) => s.stufe >= Number(level) && !s.talente?.[level]),
       deck: Object.entries(s.deck).filter(([, n]) => n > 0).map(([cardId, n]) => ({ cardId, n, level: cardLevel(s, cardId, config), toNext: toNextLevel(s, cardId, config) })),
       practice,
       practiceWays,
-      areas: config.areas.order.map((id) => ({
-        id, open: Boolean(s.gebiete[id]?.offen), cleared: Boolean(s.gebiete[id]?.geschafft),
-        comingSoon: Boolean(config.areas.areas[id].comingSoon),
-      })),
+      stars: starCount(s), // Seesterne (Phase 9)
+      areas: config.areas.order.map((id) => {
+        const open = Boolean(s.gebiete[id]?.offen);
+        return {
+          id, open, cleared: Boolean(s.gebiete[id]?.geschafft),
+          comingSoon: Boolean(config.areas.areas[id].comingSoon),
+          price: config.areas.areas[id].price,
+          depth: s.gebiete[id]?.tiefe ?? 0, // geschaffte Tiefe
+          maxDepth: openDepths(s, id), // höchste wählbare Tiefe
+          missing: open ? 0 : Math.max(0, config.areas.areas[id].price - starCount(s)),
+        };
+      }),
     };
   }
 
@@ -627,19 +790,20 @@ export function createGame({ config, save, seed }) {
   }
 
   // Befehle außerhalb des Kampfs; im Kampf werden sie mit „phase“ abgelehnt.
-  const MENU_COMMANDS = new Set(['start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero']);
+  const MENU_COMMANDS = new Set(['chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero']);
 
   // Erlaubte Befehle je Bildschirm.
   const COMMANDS = {
     title: { start, setSetting, resetSave },
     grade: { chooseGrade },
     heroCreate: { createHero },
-    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem },
-    logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem, editHero },
+    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent },
+    logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem, editHero, chooseTalent },
     heroEdit: { changeHero, cancelHeroEdit },
     map: { enterRoom, surface },
     reward: { pickReward },
     shop: { buyCard, buyItem, removeCard, leaveShop },
+    event: { chooseEventOption }, // Phase 9
     areaCleared: { surface },
   };
 
@@ -649,12 +813,13 @@ export function createGame({ config, save, seed }) {
     const open = reachable();
     return {
       areaId: l.gebiet,
+      depth: l.tiefe, // Phase 9
       current: state.save.stroemung,
       position: l.position,
       reachable: open,
       rooms: currentMap().rooms.map((r) => ({
         id: r.id, layer: r.layer, slot: r.slot, type: r.type, next: r.next.slice(),
-        enemies: r.enemies?.slice() ?? null,
+        enemies: r.type === 'event' ? null : r.enemies?.slice() ?? null, // Ereignis bleibt eine Überraschung
         done: l.erledigt.includes(r.id),
         reachable: open.includes(r.id),
       })),
@@ -687,8 +852,9 @@ export function createGame({ config, save, seed }) {
         reward: state.reward ? clone(state.reward) : null,
         map: state.screen === 'map' ? mapView() : null,
         shop: state.screen === 'shop' ? shopView() : null,
+        event: state.screen === 'event' ? eventView() : null,
         cleared: state.cleared ? { ...state.cleared } : null,
-        run: l ? { areaId: l.gebiet } : null,
+        run: l ? { areaId: l.gebiet, depth: l.tiefe } : null,
         logbook: state.screen === 'logbook' ? { page: state.logbookPage } : null,
         grade: state.grade,
         profile: profileView(),

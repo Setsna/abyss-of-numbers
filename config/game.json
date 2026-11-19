@@ -81,14 +81,16 @@
   },
   "cardLevels": [
     15,
-    40
+    40,
+    90,
+    160
   ],
   "current": {
     "recentAnswers": 10,
     "minAnswers": 6,
     "step": 0.1,
     "min": 0.9,
-    "max": 1.4,
+    "max": 1.2,
     "upAccuracy": 0.9,
     "upFastShare": 0.5,
     "downAccuracy": 0.75

@@ -642,3 +642,14 @@
   background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.65) 0 9%, rgba(143, 211, 255, 0.28) 14% 70%, rgba(143, 211, 255, 0.5) 100%);
   box-shadow: 0 0 calc(18 * var(--u)) rgba(143, 211, 255, 0.7);
 }
+
+/* Elitegegner (Phase 9, Etappe 2): goldener Schimmer, ohne neues Bild */
+.foe.is-elite .foe-art { filter: drop-shadow(0 0 calc(3 * var(--u)) #ffd23f) drop-shadow(0 0 calc(3 * var(--u)) #ffd23f) drop-shadow(0 0 calc(16 * var(--u)) rgb(255 210 63 / 0.8)); }
+.foe.is-elite .foe-name { box-shadow: 0 0 0 calc(4 * var(--u)) #f2a900; }
+@media (prefers-reduced-motion: no-preference) {
+  body:not(.is-calm) .foe.is-elite .foe-art { animation: elite-glow 2.4s ease-in-out infinite; }
+}
+@keyframes elite-glow { 50% { filter: drop-shadow(0 0 calc(4 * var(--u)) #ffd23f) drop-shadow(0 0 calc(4 * var(--u)) #ffd23f) drop-shadow(0 0 calc(24 * var(--u)) rgb(255 210 63 / 0.95)); } }
+.foe.is-elite .foe-name { display: inline-flex; align-items: center; gap: calc(4 * var(--u)); }
+.foe-star { display: inline-flex; }
+.foe-star svg { width: 1.15em; height: 1.15em; display: block; }

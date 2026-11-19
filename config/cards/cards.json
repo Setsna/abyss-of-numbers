@@ -11,6 +11,12 @@
       },
       {
         "amount": 10
+      },
+      {
+        "amount": 12
+      },
+      {
+        "amount": 14
       }
     ],
     "task": {
@@ -32,6 +38,12 @@
       },
       {
         "amount": 10
+      },
+      {
+        "amount": 12
+      },
+      {
+        "amount": 14
       }
     ],
     "task": {
@@ -53,6 +65,12 @@
       },
       {
         "amount": 20
+      },
+      {
+        "amount": 23
+      },
+      {
+        "amount": 26
       }
     ],
     "task": {
@@ -74,6 +92,12 @@
       },
       {
         "amount": 20
+      },
+      {
+        "amount": 23
+      },
+      {
+        "amount": 26
       }
     ],
     "task": {
@@ -95,6 +119,12 @@
       },
       {
         "amount": 10
+      },
+      {
+        "amount": 12
+      },
+      {
+        "amount": 14
       }
     ],
     "task": {
@@ -115,6 +145,12 @@
       },
       {
         "amount": 9
+      },
+      {
+        "amount": 11
+      },
+      {
+        "amount": 13
       }
     ],
     "exhaust": true,
@@ -147,6 +183,12 @@
       },
       {
         "amount": 22
+      },
+      {
+        "amount": 25
+      },
+      {
+        "amount": 28
       }
     ],
     "task": {
@@ -168,6 +210,12 @@
       },
       {
         "amount": 4
+      },
+      {
+        "amount": 5
+      },
+      {
+        "amount": 6
       }
     ],
     "exhaust": true,
@@ -189,6 +237,12 @@
       },
       {
         "amount": 16
+      },
+      {
+        "amount": 18
+      },
+      {
+        "amount": 20
       }
     ],
     "exhaust": true,
@@ -210,6 +264,12 @@
       },
       {
         "turns": 5
+      },
+      {
+        "turns": 6
+      },
+      {
+        "turns": 7
       }
     ],
     "task": {
@@ -231,6 +291,12 @@
       },
       {
         "amount": 6
+      },
+      {
+        "amount": 7
+      },
+      {
+        "amount": 8
       }
     ],
     "task": {
@@ -252,6 +318,12 @@
       },
       {
         "amount": 34
+      },
+      {
+        "amount": 38
+      },
+      {
+        "amount": 42
       }
     ],
     "task": {
@@ -270,6 +342,12 @@
     "upgrades": [
       {
         "amount": 2
+      },
+      {
+        "amount": 3
+      },
+      {
+        "amount": 3
       },
       {
         "amount": 3
@@ -296,6 +374,12 @@
       },
       {
         "amount": 5
+      },
+      {
+        "amount": 6
+      },
+      {
+        "amount": 7
       }
     ],
     "task": {

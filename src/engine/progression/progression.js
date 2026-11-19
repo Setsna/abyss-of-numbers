@@ -28,6 +28,7 @@ export function rollRewardCards(save, areaId, rng, config) {
 
 export function addCardToDeck(save, cardId) {
   save.deck[cardId] = (save.deck[cardId] ?? 0) + 1;
+  if (Array.isArray(save.gefunden) && !save.gefunden.includes(cardId)) save.gefunden.push(cardId); // Kartenalbum (Phase 9)
 }
 
 export function deckList(save) {

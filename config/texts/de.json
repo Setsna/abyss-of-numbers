@@ -93,16 +93,20 @@
   },
   "enemies": {
     "crab": {
-      "name": "Krabbe"
+      "name": "Krabbe",
+      "book": "Sie trägt ein Haus aus Ziegelsteinen, gestapelt wie eine Zahlenmauer."
     },
     "puffer": {
-      "name": "Kugelfisch"
+      "name": "Kugelfisch",
+      "book": "Auf seinem Bauch sind Punkte wie auf einem Würfel."
     },
     "jelly": {
-      "name": "Qualle"
+      "name": "Qualle",
+      "book": "Auf ihrem Schirm sind weiße Punkte ordentlich in Reihen."
     },
     "urchin": {
-      "name": "Seeigel"
+      "name": "Seeigel",
+      "book": "Seine Stacheln sehen aus wie Zehnerstangen aus Rechenmaterial."
     },
     "krakenArmAdd": {
       "name": "Krakenarm"
@@ -114,52 +118,68 @@
       "name": "Krakenarm"
     },
     "krakenBody": {
-      "name": "Riffkrake"
+      "name": "Riffkrake",
+      "book": "Er trägt eine Krone aus Korallen und hat drei starke Arme."
     },
     "lanternFish": {
-      "name": "Laternenfisch"
+      "name": "Laternenfisch",
+      "book": "Seine Laterne ist eine Hunderterplatte aus kleinen Quadraten."
     },
     "stoneFish": {
-      "name": "Steinfisch"
+      "name": "Steinfisch",
+      "book": "Sein Rücken ist aus Hunderterplatten, Zehnerstangen und Einerwürfeln gebaut."
     },
     "caveIsopod": {
-      "name": "Höhlenassel"
+      "name": "Höhlenassel",
+      "book": "Auf seinem Panzer liegen rote und blaue Wendeplättchen."
     },
     "snakeEel": {
-      "name": "Schlangenaal"
+      "name": "Schlangenaal",
+      "book": "Auf seinem Rücken sitzen glänzende Muggelsteine in einer Reihe."
     },
     "armorCrab": {
-      "name": "Panzerkrebs"
+      "name": "Panzerkrebs",
+      "book": "Auf seinem Panzer sind Punkte in Reihen und Spalten, wie ein Punktefeld."
     },
     "shellWarden": {
-      "name": "Muschelwächter"
+      "name": "Muschelwächter",
+      "book": "Er hält eine kleine Balkenwaage zum Vergleichen."
     },
     "statueFish": {
-      "name": "Statuenfisch"
+      "name": "Statuenfisch",
+      "book": "Sein Körper ist ein Mosaik aus Tangram-Teilen."
     },
     "seahorseKnight": {
-      "name": "Seepferd-Ritter"
+      "name": "Seepferd-Ritter",
+      "book": "Seine Lanze ist ein langes Lineal mit Strichen."
     },
     "anglerFish": {
-      "name": "Anglerfisch"
+      "name": "Anglerfisch",
+      "book": "Seine Angel ist eine Rechenkette mit roten und weißen Perlen."
     },
     "deepJelly": {
-      "name": "Tiefseequalle"
+      "name": "Tiefseequalle",
+      "book": "Auf ihrem Schirm leuchtet ein Zwanzigerfeld aus blauen Punkten."
     },
     "giantIsopod": {
-      "name": "Riesenassel"
+      "name": "Riesenassel",
+      "book": "Sein Panzer sieht aus wie Rechenschiffchen mit runden Mulden."
     },
     "vampireSquid": {
-      "name": "Vampirkalmar"
+      "name": "Vampirkalmar",
+      "book": "Sein Umhang ist ein Geobrett mit kleinen Stiften."
     },
     "caveMoray": {
-      "name": "Höhlenmuräne"
+      "name": "Höhlenmuräne",
+      "book": "Auf ihrem Körper läuft ein Zahlenstrahl mit langen und kurzen Strichen."
     },
     "cityWarden": {
-      "name": "Wächter der Stadt"
+      "name": "Wächter der Stadt",
+      "book": "Sein Körper ist aus Steinblöcken gebaut, wie eine Zahlenmauer."
     },
     "trenchLord": {
-      "name": "Herr des Grabens"
+      "name": "Herr des Grabens",
+      "book": "Er trägt eine Krone aus Stellenwertmaterial."
     }
   },
   "hero": {
@@ -278,7 +298,8 @@
     "practice": "Diese Aufgaben kannst du noch üben:",
     "lightning": "Blitzschnell-Treffer: {n}",
     "treasureWord": "Schatz!",
-    "cardLevelUp": "{name} ist stärker geworden!"
+    "cardLevelUp": "{name} ist stärker geworden!",
+    "eventWord": "Neue Karte!"
   },
   "learning": {
     "up": {
@@ -385,7 +406,9 @@
       "rest": "Ruheplatz",
       "boss": "Boss",
       "treasure": "Schatz",
-      "shop": "Händler"
+      "shop": "Händler",
+      "elite": "Starker Gegner",
+      "event": "Überraschung"
     },
     "done": "geschafft",
     "roomLabel": "{type}, {state}",
@@ -399,7 +422,11 @@
   "cleared": {
     "word": "Gebiet geschafft!",
     "next": "Neues Gebiet: {area}",
-    "soon": "kommt bald"
+    "soon": "kommt bald",
+    "star": "Du hast einen Seestern gefunden! Jetzt hast du {n}.",
+    "starFirst": "Du hast deinen ersten Seestern gefunden!",
+    "starAgain": "Geschafft! Diese Tiefe kennst du schon.",
+    "unlockedOne": "Neues Gebiet offen: {area}"
   },
   "base": {
     "title": "Station",
@@ -415,7 +442,17 @@
     "switchYes": "Ja, tauchen",
     "switchNo": "Nein",
     "logoutAsk": "Bist du nicht {name}? Dann melde dich ab. Dein Spielstand bleibt gespeichert.",
-    "logoutNo": "Zurück"
+    "logoutNo": "Zurück",
+    "stars": "{n} Seesterne",
+    "starsOne": "1 Seestern",
+    "missing": "Noch {n} Seesterne",
+    "missingOne": "Noch 1 Seestern",
+    "depth": "Tiefe {n}",
+    "depthGo": "Tiefe {n} tauchen",
+    "depthBack": "Zurück",
+    "easier": "Leichter tauchen:",
+    "talentNew": "Neues Talent!",
+    "restart": "Neu tauchen in Tiefe:"
   },
   "figures": {
     "diver": {
@@ -455,7 +492,9 @@
       "deck": "Deck",
       "rules": "Regeln",
       "practice": "Übungsliste",
-      "gear": "Ausrüstung"
+      "gear": "Ausrüstung",
+      "talents": "Talente",
+      "collection": "Sammlung"
     },
     "stat": {
       "kraft": "Kraft",
@@ -487,7 +526,8 @@
       "Rechne und tippe das Ergebnis an.",
       "Schnell rechnen macht die Karte stärker.",
       "Eine falsche Antwort kostet {n} Leben.",
-      "Keine Karte mehr? Tippe auf „Zug beenden“."
+      "Keine Karte mehr? Tippe auf „Zug beenden“.",
+      "Besiegst du einen Boss zum ersten Mal, bekommst du einen Seestern. Seesterne öffnen neue Gebiete."
     ],
     "practiceText": "Diese Aufgaben kannst du noch üben:",
     "practiceEmpty": "Noch keine Aufgaben zum Üben. Prima!"
@@ -659,5 +699,103 @@
     "100000": "den Hunderttausender",
     "1000000": "die Million",
     "next": "die nächste Stelle"
+  },
+  "elite": {
+    "guard": "{name} ist ein starker Gegner: Jede zweite Runde schützt er sich zusätzlich.",
+    "regen": "{name} ist ein starker Gegner: Nach jeder Runde heilt er sich ein bisschen.",
+    "rage": "{name} ist ein starker Gegner: Er wird jede Runde wütender und greift stärker an."
+  },
+  "events": {
+    "title": "Überraschung!",
+    "giantShell": {
+      "text": "Eine riesige Muschel klemmt fest. Wenn du sie aufziehst, kostet das 5 Leben. Vielleicht liegt eine Karte darin.",
+      "open": "Aufziehen",
+      "leave": "Weiterschwimmen"
+    },
+    "warmSpring": {
+      "text": "Aus dem Boden sprudelt eine warme Quelle. Hier kannst du dich ausruhen oder Perlen sammeln.",
+      "rest": "Ausruhen",
+      "collect": "Perlen sammeln"
+    },
+    "smallWreck": {
+      "text": "Ein kleines Wrack liegt im Sand. Drinnen rumpelt es. Vielleicht wartet dort ein Schatz.",
+      "search": "Nachsehen",
+      "leave": "Weiterschwimmen"
+    },
+    "tradingOctopus": {
+      "text": "Ein freundlicher Krake möchte tauschen: 8 Perlen gegen eine Karte.",
+      "trade": "Tauschen",
+      "leave": "Nein, danke"
+    },
+    "strongCurrent": {
+      "text": "Eine starke Strömung zieht zu einer Kiste. Hinschwimmen kostet 4 Leben.",
+      "swim": "Hinschwimmen",
+      "leave": "Hierbleiben"
+    },
+    "pearlBed": {
+      "text": "Hier liegen viele Perlen. Ein Seeigel passt auf. Sammeln kostet 3 Leben.",
+      "collect": "Sammeln",
+      "leave": "Weiterschwimmen"
+    },
+    "lostBag": {
+      "text": "Ein Taucher hat seine Tasche verloren. Du findest sie und bringst sie ihm.",
+      "help": "Tasche bringen",
+      "leave": "Weiterschwimmen"
+    },
+    "jellyField": {
+      "text": "Vor dir schwebt ein Feld aus Quallen. Kämpfst du dich durch? Außen herum kostet es 3 Leben.",
+      "fight": "Kämpfen",
+      "around": "Außen herum"
+    },
+    "cost": "{n} Perlen",
+    "noPearls": "Du hast zu wenig Perlen."
+  },
+  "talents": {
+    "title": "Talente",
+    "pick": "Wähle ein Talent. Du kannst es jederzeit wechseln.",
+    "from": "ab Stufe {n}",
+    "chosen": "gewählt",
+    "thickSkin": {
+      "name": "Dicke Haut",
+      "text": "Jeder Kampf beginnt mit 4 Schutz."
+    },
+    "quickStart": {
+      "name": "Frühstart",
+      "text": "Im ersten Zug hast du 1 Energie mehr."
+    },
+    "provisions": {
+      "name": "Proviant",
+      "text": "Nach jedem gewonnenen Kampf bekommst du 3 Leben zurück."
+    },
+    "pearlEye": {
+      "name": "Perlenauge",
+      "text": "Jeder Gegner gibt 1 Perle mehr."
+    },
+    "longStreak": {
+      "name": "Lange Serie",
+      "text": "Deine Serie bringt bis zu 3 Schaden mehr statt 2."
+    },
+    "deepRest": {
+      "name": "Tiefe Ruhe",
+      "text": "Der Ruheplatz heilt alle Leben."
+    },
+    "secondWind": {
+      "name": "Zweite Luft",
+      "text": "Einmal je Tauchgang kämpfst du mit 10 Leben weiter, statt zu verlieren."
+    },
+    "bigHand": {
+      "name": "Große Hand",
+      "text": "Du hast 6 statt 5 Karten auf der Hand."
+    },
+    "secondWindBoom": "Zweite Luft!"
+  },
+  "collection": {
+    "album": "Karten {n} von {max}",
+    "book": "Meeresbuch {n} von {max}",
+    "notFound": "noch nicht gefunden",
+    "unknownCard": "Karte noch nicht gefunden",
+    "unknownName": "???",
+    "count": "{n}× besiegt",
+    "countElite": "{n}× besiegt, {e}× als starker Gegner"
   }
 }

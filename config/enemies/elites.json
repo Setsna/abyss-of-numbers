@@ -1,0 +1,10 @@
+{
+  "fromDepth": 3,
+  "hpFactor": 1.6,
+  "rules": {
+    "guard": { "block": 6, "every": 2 },
+    "regen": { "heal": 3 },
+    "rage": { "plus": 2, "max": 6 }
+  },
+  "rewardPearls": 12
+}

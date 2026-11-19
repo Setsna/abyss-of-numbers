@@ -5,7 +5,15 @@
 export const STATS = ['kraft', 'ruhe', 'leben'];
 export const SLOTS = ['kopf', 'koerper', 'hand'];
 // Wirkungsschlüssel aus heroes.json (perk) und items.json (effect)
-export const EFFECT_KEYS = ['maxHp', 'strength', 'calmMs', 'startBlock', 'healBonus', 'discards', 'extraPearls'];
+export const EFFECT_KEYS = ['maxHp', 'strength', 'calmMs', 'startBlock', 'healBonus', 'discards', 'extraPearls',
+  // Talente (Phase 9, Etappe 3)
+  'firstTurnEnergy', 'healAfterWin', 'streakMaxBonus', 'restHealShare', 'secondWind', 'handSize'];
+export const TALENT_LEVELS = ['5', '10', '15', '20'];
+
+// Wirkung eines gewählten Talents (oder null).
+export function talentEffect(level, id, config) {
+  return config.talents?.[level]?.find((x) => x.id === id)?.effect ?? null;
+}
 
 export function heroStats(save, config) {
   const g = config.game;
@@ -13,6 +21,7 @@ export function heroStats(save, config) {
   const add = (effect) => { for (const [k, v] of Object.entries(effect ?? {})) bonus[k] += v; };
   add(config.heroes.figures[save.held.figur]?.perk);
   for (const id of Object.values(save.ausruestung?.angelegt ?? {})) if (id) add(config.items?.[id]?.effect);
+  for (const [level, id] of Object.entries(save.talente ?? {})) if (id && save.stufe >= Number(level)) add(talentEffect(level, id, config));
   return {
     maxHp: g.hero.maxHp + save.punkte.leben * g.stats.hpPerPoint + bonus.maxHp,
     strength: save.punkte.kraft + bonus.strength,
@@ -22,6 +31,12 @@ export function heroStats(save, config) {
     healBonus: bonus.healBonus,
     discards: g.hero.discardsPerTurn + bonus.discards,
     extraPearls: bonus.extraPearls,
+    firstTurnEnergy: bonus.firstTurnEnergy,
+    healAfterWin: bonus.healAfterWin,
+    streakMaxBonus: bonus.streakMaxBonus,
+    restHealShare: Math.min(1, bonus.restHealShare),
+    secondWind: bonus.secondWind,
+    handSize: g.hero.handSize + bonus.handSize,
   };
 }
 
@@ -37,6 +52,7 @@ export function freePoints(save, config) {
 
 export function spendPoint(save, stat, config) {
   if (!STATS.includes(stat) || freePoints(save, config) <= 0) return false;
+  if (save.punkte[stat] >= (config.levels.maxPointsPerStat ?? Infinity)) return false; // Deckel (Phase 9, Konzept 10)
   save.punkte[stat] += 1;
   return true;
 }

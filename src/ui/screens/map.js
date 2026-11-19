@@ -3,11 +3,11 @@
 // zeigen kleine Bilder die Gegner, damit die Wahl des Wegs eine Entscheidung ist.
 // Oben: Leben, Stufe, Perlen und „Auftauchen“. Ruheplatz: kurze Meldung „+25 Leben“.
 // Seit Phase 5, Etappe 2 auch Schatz und Händler (eigene Bildschirme: Beute bzw. Laden).
-import { ICON } from '../icons.js?v=03719b61';
-import { renderAsset, assetUrl } from '../assets.js?v=03719b61';
-import { worldLayer, bossOfArea } from '../components/world.js?v=03719b61';
+import { ICON } from '../icons.js?v=ad3e5b3d';
+import { renderAsset, assetUrl } from '../assets.js?v=ad3e5b3d';
+import { worldLayer, bossOfArea } from '../components/world.js?v=ad3e5b3d';
 
-const ROOM_ICON = { combat: ICON.attack, rest: ICON.rest, boss: ICON.boss, treasure: ICON.treasure, shop: ICON.shop };
+const ROOM_ICON = { combat: ICON.attack, rest: ICON.rest, boss: ICON.boss, treasure: ICON.treasure, shop: ICON.shop, elite: ICON.star, event: ICON.dice }; // elite, event: Phase 9
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export function mountMap(root, { t, config, game, onEnter, onSurface, onExplain }) {
@@ -111,7 +111,7 @@ export function mountMap(root, { t, config, game, onEnter, onSurface, onExplain 
     const v = game.view();
     const view = v.map;
     const h = v.hero;
-    ref.title.textContent = t(`areas.${view.areaId}.name`);
+    ref.title.textContent = `${t(`areas.${view.areaId}.name`)} · ${t('base.depth', { n: view.depth ?? 1 })}`; // Tiefe (Phase 9)
     ref.hud.innerHTML = `
       <span class="chip" aria-label="${t('hud.hp', { n: h.hp, max: h.maxHp })}">${ICON.heart}<span>${h.hp}/${h.maxHp}</span></span>
       <span class="chip">${t('hud.level', { n: h.stufe })}</span>
@@ -212,13 +212,17 @@ export function mountAreaCleared(root, { t, config, cleared, profile, onDone }) 
   }
   ref.word.textContent = t('cleared.word');
   ref.text.textContent = t(`areas.${cleared.areaId}.bossDefeated`);
-  if (cleared.unlocked) {
-    ref.nextPanel.prepend(worldLayer(`area.${cleared.unlocked}`, 'scene-bg'));
-    ref.next.hidden = false;
-    const soon = config.areas.areas[cleared.unlocked]?.comingSoon;
-    ref.next.innerHTML = '<span></span><span class="soon-tag"></span>';
-    ref.next.firstChild.textContent = t('cleared.next', { area: t(`areas.${cleared.unlocked}.name`) });
-    if (soon) ref.next.lastChild.textContent = t('cleared.soon'); else ref.next.lastChild.remove();
+  // Seestern und neue Gebiete (Phase 9, Konzept 9)
+  const unlocked = cleared.unlocked ?? [];
+  ref.next.hidden = false;
+  ref.next.innerHTML = `<span class="cleared-star">${cleared.star ? ICON.star : ''}<span></span></span>`;
+  ref.next.querySelector('.cleared-star > span').textContent = !cleared.star ? t('cleared.starAgain')
+    : cleared.stars === 1 ? t('cleared.starFirst') : t('cleared.star', { n: cleared.stars });
+  if (unlocked.length) {
+    ref.nextPanel.prepend(worldLayer(`area.${unlocked[0]}`, 'scene-bg'));
+    const line = document.createElement('span');
+    line.textContent = t('cleared.unlockedOne', { area: unlocked.map((id) => t(`areas.${id}.name`)).join(', ') });
+    ref.next.append(line);
   }
   ref.done.textContent = t('btn.toBase');
   ref.done.addEventListener('click', () => { ref.done.disabled = true; onDone(); }, { once: true });

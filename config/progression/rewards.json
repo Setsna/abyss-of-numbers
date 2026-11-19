@@ -15,6 +15,5 @@
   "shopCards": 3,
   "removePrice": 6,
   "minDeckSize": 8,
-  "itemChance": 0.35,
-  "repeatBossPearlsFactor": 0.5
+  "itemChance": 0.35
 }

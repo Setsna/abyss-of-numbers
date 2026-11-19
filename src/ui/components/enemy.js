@@ -1,13 +1,13 @@
 // Gegner im Szenenpanel: Absicht, Immunität, Bild, Name, Leben, Schutz, Lebensbalken.
-import { ICON, OP_ICON } from '../icons.js?v=03719b61';
-import { renderAsset } from '../assets.js?v=03719b61';
-import { OPERATOR_SIGN } from '../../engine/math/format.js?v=03719b61';
+import { ICON, OP_ICON } from '../icons.js?v=ad3e5b3d';
+import { renderAsset } from '../assets.js?v=ad3e5b3d';
+import { OPERATOR_SIGN } from '../../engine/math/format.js?v=ad3e5b3d';
 
 export function renderEnemy(e, { t, selected }) {
   const name = t(`enemies.${e.typeId}.name`);
   const b = document.createElement('button');
   b.type = 'button';
-  b.className = 'foe' + (e.alive ? '' : ' is-dead') + (e.rule === 'hidden' && e.alive ? ' is-hidden' : '');
+  b.className = 'foe' + (e.alive ? '' : ' is-dead') + (e.rule === 'hidden' && e.alive ? ' is-hidden' : '') + (e.elite ? ' is-elite' : '');
   b.dataset.uid = e.uid;
   b.disabled = !e.alive;
   b.setAttribute('aria-pressed', String(selected && e.alive));
@@ -18,6 +18,7 @@ export function renderEnemy(e, { t, selected }) {
   if (e.immune) parts.push(broken ? t('hud.immuneBroken', { op: OPERATOR_SIGN[e.immune], n: e.immuneBroken }) : t('hud.immune', { op: OPERATOR_SIGN[e.immune] }));
   if (e.shielded) parts.push(t('hud.shielded'));
   if (e.rule === 'hidden') parts.push(t('hud.hidden'));
+  if (e.elite) parts.push(t(`elite.${e.elite}`, { name }));
   if (e.weakTurns > 0) parts.push(t('hud.weak', { n: e.weakTurns }));
   b.setAttribute('aria-label', parts.join(', '));
 
@@ -41,6 +42,11 @@ export function renderEnemy(e, { t, selected }) {
   const label = document.createElement('span');
   label.className = 'foe-name';
   label.textContent = name;
+  // Elitegegner (Ingo, 19.11.2026): Stern vor und hinter dem Namen, damit man ihn sofort erkennt
+  if (e.elite) {
+    label.insertAdjacentHTML('afterbegin', `<span class="foe-star">${ICON.star}</span>`);
+    label.insertAdjacentHTML('beforeend', `<span class="foe-star">${ICON.star}</span>`);
+  }
 
   const plate = document.createElement('div');
   plate.className = 'plate';

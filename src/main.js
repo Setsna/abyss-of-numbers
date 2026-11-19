@@ -4,29 +4,30 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=03719b61';
-import { createStorage, STORAGE_KEY } from './platform/storage.js?v=03719b61';
-import { createAccount, accountBackend } from './platform/account.js?v=03719b61';
-import { FIREBASE } from './platform/firebase-config.js?v=03719b61';
-import { createAudio } from './platform/audio.js?v=03719b61';
-import { validateConfig } from './engine/config/validate.js?v=03719b61';
-import { createSave } from './engine/save/save.js?v=03719b61';
-import { createGame } from './engine/game.js?v=03719b61';
-import { setTexts, t } from './ui/text.js?v=03719b61';
-import { setManifest } from './ui/assets.js?v=03719b61';
-import { isLocalHost } from './ui/app.js?v=03719b61';
-import { mountCombat } from './ui/screens/combat.js?v=03719b61';
-import { mountReward } from './ui/screens/reward.js?v=03719b61';
-import { mountShop } from './ui/screens/shop.js?v=03719b61';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=03719b61';
-import { mountBase } from './ui/screens/base.js?v=03719b61';
-import { mountTitle } from './ui/screens/title.js?v=03719b61';
-import { mountLogin } from './ui/screens/login.js?v=03719b61';
-import { mountGrade } from './ui/screens/grade.js?v=03719b61';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=03719b61';
-import { mountLogbook } from './ui/screens/logbook.js?v=03719b61';
-import { mountAdult } from './ui/screens/adult.js?v=03719b61';
-import { createRng } from './engine/rng.js?v=03719b61';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=ad3e5b3d';
+import { createStorage, STORAGE_KEY } from './platform/storage.js?v=ad3e5b3d';
+import { createAccount, accountBackend } from './platform/account.js?v=ad3e5b3d';
+import { FIREBASE } from './platform/firebase-config.js?v=ad3e5b3d';
+import { createAudio } from './platform/audio.js?v=ad3e5b3d';
+import { validateConfig } from './engine/config/validate.js?v=ad3e5b3d';
+import { createSave } from './engine/save/save.js?v=ad3e5b3d';
+import { createGame } from './engine/game.js?v=ad3e5b3d';
+import { setTexts, t } from './ui/text.js?v=ad3e5b3d';
+import { setManifest } from './ui/assets.js?v=ad3e5b3d';
+import { isLocalHost } from './ui/app.js?v=ad3e5b3d';
+import { mountCombat } from './ui/screens/combat.js?v=ad3e5b3d';
+import { mountReward } from './ui/screens/reward.js?v=ad3e5b3d';
+import { mountShop } from './ui/screens/shop.js?v=ad3e5b3d';
+import { mountEvent } from './ui/screens/event.js?v=ad3e5b3d';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=ad3e5b3d';
+import { mountBase } from './ui/screens/base.js?v=ad3e5b3d';
+import { mountTitle } from './ui/screens/title.js?v=ad3e5b3d';
+import { mountLogin } from './ui/screens/login.js?v=ad3e5b3d';
+import { mountGrade } from './ui/screens/grade.js?v=ad3e5b3d';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=ad3e5b3d';
+import { mountLogbook } from './ui/screens/logbook.js?v=ad3e5b3d';
+import { mountAdult } from './ui/screens/adult.js?v=ad3e5b3d';
+import { createRng } from './engine/rng.js?v=ad3e5b3d';
 
 const app = document.getElementById('app');
 
@@ -116,7 +117,8 @@ function runDevCombats(config, params) {
     game.setNow(Date.now());
     // &area=caves usw. wählt auch die Aufgaben des Gebiets (Phase 6b, Gebietsfenster)
     const area = config.class3.areas[params.get('area')] ? params.get('area') : 'reef';
-    game.startCombat(enemies.length ? enemies : ['crab'], level, { enemyPower: Number(params.get('stroemung') || 1), areaId: area });
+    const elite = config.elites.rules[params.get('elite')] ? params.get('elite') : null; // &elite=guard|regen|rage (Phase 9)
+    game.startCombat(enemies.length ? enemies : ['crab'], level, { enemyPower: Number(params.get('stroemung') || 1), areaId: area, elite });
     show(mountCombat(app, {
       config, t, game, audio,
       onWon: () => {
@@ -219,7 +221,7 @@ function runGame(config, session = null) {
     } else if (v.screen === 'base') {
       show(mountBase(app, {
         t, config, game,
-        onDive: (areaId, { abandon = false } = {}) => { act({ type: 'dive', areaId, abandon }); route(); },
+        onDive: (areaId, { abandon = false, depth } = {}) => { act(depth === undefined ? { type: 'dive', areaId, abandon } : { type: 'dive', areaId, abandon, depth }); route(); },
         onLogbook: (page) => { act({ type: 'openLogbook', page }); route(); },
         account: session?.title ?? null,
       }));
@@ -265,6 +267,12 @@ function runGame(config, session = null) {
         t, config, game,
         onCommand: (command) => act(command),
         onLeave: () => { act({ type: 'leaveShop' }); route(); },
+      }));
+    } else if (v.screen === 'event') {
+      // Ereignisraum (Phase 9, Etappe 2)
+      show(mountEvent(app, {
+        t, game,
+        onChoose: (optionId) => { act({ type: 'chooseEventOption', optionId }); route(); },
       }));
     } else if (v.screen === 'areaCleared') {
       show(mountAreaCleared(app, {

@@ -3,17 +3,17 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=03719b61';
-import { ICON } from '../icons.js?v=03719b61';
-import { renderAsset } from '../assets.js?v=03719b61';
-import { renderCard } from '../components/card.js?v=03719b61';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=03719b61';
+import { wayText } from '../text.js?v=ad3e5b3d';
+import { ICON } from '../icons.js?v=ad3e5b3d';
+import { renderAsset } from '../assets.js?v=ad3e5b3d';
+import { renderCard } from '../components/card.js?v=ad3e5b3d';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=ad3e5b3d';
 
-const PAGES = ['hero', 'deck', 'gear', 'rules', 'practice'];
+const PAGES = ['hero', 'talents', 'deck', 'collection', 'gear', 'rules', 'practice']; // talents, collection: Phase 9
 const SLOTS = ['kopf', 'koerper', 'hand'];
 const STATS = ['kraft', 'ruhe', 'leben'];
 const STAT_ICON = { kraft: ICON.attack, ruhe: ICON.bolt, leben: ICON.heart };
-const RULE_ICON = [ICON.attack, ICON.deck, ICON.check, ICON.bolt, ICON.heart, ICON.next];
+const RULE_ICON = [ICON.attack, ICON.deck, ICON.check, ICON.bolt, ICON.heart, ICON.next, ICON.star]; // Seesterne (Phase 9)
 
 export function mountLogbook(root, { t, config, game, onCommand, onClose, onEditHero = () => {} }) {
   root.innerHTML = `
@@ -80,7 +80,7 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose, onEdit
       li.querySelector('.lb-stat-value').textContent = String(p.punkte[stat]);
       const plus = li.querySelector('.lb-plus');
       plus.setAttribute('aria-label', t('logbook.add', { stat: t(`logbook.stat.${stat}`) }));
-      plus.disabled = p.freePoints === 0;
+      plus.disabled = p.freePoints === 0 || p.punkte[stat] >= config.levels.maxPointsPerStat; // Deckel (Phase 9)
       plus.addEventListener('click', () => { onCommand({ type: 'spendPoint', stat }); render(); });
       return li;
     }));
@@ -95,6 +95,111 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose, onEdit
     const change = wrap.querySelector('.lb-change');
     change.textContent = t('logbook.changeHero');
     change.addEventListener('click', () => onEditHero());
+    return wrap;
+  }
+
+  // Talente (Phase 9, Konzept 10): je Stufe 5, 10, 15, 20 eins von zwei; antippen wählt, jederzeit umwählbar
+  function talentsPage(p) {
+    const wrap = document.createElement('div');
+    wrap.className = 'lb-talents';
+    const head = document.createElement('p');
+    head.className = 'lb-quiet';
+    head.textContent = t('talents.pick');
+    wrap.append(head);
+    for (const row of p.talents) {
+      const sec = document.createElement('section');
+      sec.className = 'lb-talent-row' + (row.available ? '' : ' is-locked');
+      const lv = document.createElement('h3');
+      lv.className = 'lb-talent-level';
+      lv.textContent = row.available ? t('logbook.level', { n: row.level }) : t('talents.from', { n: row.level });
+      sec.append(lv);
+      for (const id of row.options) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        const on = row.chosen === id;
+        b.className = 'lb-talent' + (on ? ' is-chosen' : '');
+        b.disabled = !row.available;
+        b.setAttribute('aria-pressed', String(on));
+        b.innerHTML = '<b></b><small></small>';
+        b.querySelector('b').textContent = t(`talents.${id}.name`) + (on ? ` · ${t('talents.chosen')}` : '');
+        b.querySelector('small').textContent = t(`talents.${id}.text`);
+        b.addEventListener('click', () => { onCommand({ type: 'chooseTalent', level: row.level, talentId: id }); render(); });
+        sec.append(b);
+      }
+      wrap.append(sec);
+    }
+    return wrap;
+  }
+
+  // Sammlung (Phase 9, Etappe 4; Konzept 12): Kartenalbum und Meeresbuch auf einer Seite, oben umschaltbar.
+  // Was das Kind noch nicht gefunden oder besiegt hat, erscheint als Schatten.
+  let collectionPart = 'album';
+  function collectionPage(p) {
+    const wrap = document.createElement('div');
+    wrap.className = 'lb-collection';
+    const found = p.album.filter((a) => a.found).length;
+    const seen = p.book.filter((b) => b.count + b.eliteCount > 0).length;
+    const switcher = document.createElement('div');
+    switcher.className = 'lb-switch';
+    switcher.setAttribute('role', 'group');
+    for (const [part, label] of [['album', t('collection.album', { n: found, max: p.album.length })], ['book', t('collection.book', { n: seen, max: p.book.length })]]) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn btn-quiet lb-switch-btn';
+      b.setAttribute('aria-pressed', String(collectionPart === part));
+      b.textContent = label;
+      b.addEventListener('click', () => { collectionPart = part; render(); });
+      switcher.append(b);
+    }
+    wrap.append(switcher);
+    if (collectionPart === 'album') {
+      const grid = document.createElement('div');
+      grid.className = 'lb-deck-grid lb-album';
+      grid.replaceChildren(...p.album.map(({ cardId, found: has, level, toNext }, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'lb-deck-cell' + (has ? '' : ' is-unknown');
+        const card = renderCard({ uid: `a${i}`, cardId, level: has ? level : 1 }, config.cards[cardId], { t, why: null });
+        card.disabled = true;
+        card.tabIndex = -1;
+        if (!has) card.setAttribute('aria-label', t('collection.unknownCard'));
+        cell.append(card);
+        const next = document.createElement('p');
+        next.className = 'lb-next';
+        next.textContent = !has ? t('collection.notFound') : toNext !== null ? t('logbook.deckNext', { n: toNext }) : level > 1 ? t('logbook.deckMax') : '';
+        if (next.textContent) cell.append(next);
+        return cell;
+      }));
+      wrap.append(grid);
+      return wrap;
+    }
+    for (const areaId of [...new Set(p.book.map((b) => b.areaId))]) {
+      const sec = document.createElement('section');
+      sec.className = 'lb-book-area';
+      const h = document.createElement('h3');
+      h.className = 'lb-slot-title';
+      h.textContent = t(`areas.${areaId}.name`);
+      const row = document.createElement('div');
+      row.className = 'lb-book-row';
+      row.replaceChildren(...p.book.filter((b) => b.areaId === areaId).map((b) => {
+        const known = b.count + b.eliteCount > 0;
+        const cell = document.createElement('article');
+        cell.className = 'lb-book-entry' + (known ? '' : ' is-unknown') + (b.boss || b.eliteCount > 0 ? ' is-gold' : '');
+        const pic = document.createElement('div');
+        pic.className = 'lb-book-pic';
+        pic.append(renderAsset(`enemy.${b.typeId}`, known ? t(`enemies.${b.typeId}.name`) : ''));
+        const name = document.createElement('b');
+        name.textContent = known ? t(`enemies.${b.typeId}.name`) : t('collection.unknownName');
+        const text = document.createElement('small');
+        text.textContent = known ? t(`enemies.${b.typeId}.book`) : '';
+        const count = document.createElement('span');
+        count.className = 'lb-book-count';
+        count.textContent = known ? (b.eliteCount ? t('collection.countElite', { n: b.count, e: b.eliteCount }) : t('collection.count', { n: b.count })) : '';
+        cell.append(pic, name, text, count);
+        return cell;
+      }));
+      sec.append(h, row);
+      wrap.append(sec);
+    }
     return wrap;
   }
 
@@ -213,7 +318,7 @@ export function mountLogbook(root, { t, config, game, onCommand, onClose, onEdit
     const page = v.logbook?.page ?? 'hero';
     for (const b of ref.tabs.children) b.setAttribute('aria-pressed', String(b.dataset.page === page));
     const p = v.profile;
-    const content = page === 'hero' ? heroPage(p) : page === 'deck' ? deckPage(p) : page === 'gear' ? gearPage(p) : page === 'rules' ? rulesPage() : practicePage(p);
+    const content = page === 'hero' ? heroPage(p) : page === 'talents' ? talentsPage(p) : page === 'collection' ? collectionPage(p) : page === 'deck' ? deckPage(p) : page === 'gear' ? gearPage(p) : page === 'rules' ? rulesPage() : practicePage(p);
     ref.page.replaceChildren(content);
   }
   render();

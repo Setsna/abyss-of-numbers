@@ -754,3 +754,121 @@
 .gain-item { display: inline-flex; align-items: center; gap: calc(8 * var(--u)); }
 .gain-item[hidden] { display: none; }
 .gain-item img { width: calc(48 * var(--u)); height: calc(48 * var(--u)); object-fit: contain; margin-block: calc(-8 * var(--u)); }
+
+/* Tiefen und Seesterne (Phase 9, Jahresausbau Etappe 1) */
+.porthole-label { gap: calc(2 * var(--u)); }
+.porthole-name { display: block; }
+.porthole-sub {
+  display: inline-flex; align-items: center; justify-content: center; gap: calc(4 * var(--u));
+  font-size: max(1rem, 0.82em); font-weight: 700;
+}
+.porthole-sub svg { width: 1.1em; height: 1.1em; flex: none; }
+.porthole.is-locked .porthole-window { filter: grayscale(0.85) brightness(0.55); }
+.porthole.is-locked .porthole-label { background: var(--paper); color: var(--ink); }
+.chip-stars svg { color: var(--sun); }
+.station-depths { display: flex; align-items: center; gap: calc(12 * var(--u)); flex-wrap: wrap; justify-content: center; }
+.station-depths[hidden] { display: none; }
+.station-depths-label {
+  color: var(--paper); font-weight: 700; font-size: calc(24 * var(--u));
+}
+.station-depths-btns { display: flex; gap: calc(10 * var(--u)); flex-wrap: wrap; justify-content: center; }
+.station-depth {
+  min-width: calc(64 * var(--u)); min-height: calc(64 * var(--u));
+  background: var(--paper); font-size: calc(26 * var(--u));
+}
+.cleared-next { flex-direction: column; }
+.cleared-star { display: inline-flex; align-items: center; gap: calc(8 * var(--u)); }
+.cleared-star svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); flex: none; }
+
+/* Eliteraum auf der Seekarte (Phase 9, Etappe 2): goldener Rand */
+.room-elite { border-color: #c99a00; box-shadow: 0 0 0 calc(3 * var(--u)) #ffd23f; }
+.room-elite.is-done { box-shadow: none; }
+
+/* Ereignisraum (Phase 9, Etappe 2; überarbeitet nach Ingos Rückmeldung 19.11.2026): Bild oben; unten tiefes
+   Meer mit Lichtschein, darin eine Sprechblase aus Papier, deren Spitze nach oben ins Bild zeigt, und große Knöpfe. */
+.event-screen .comic-page { grid-template-rows: minmax(0, 55fr) minmax(0, 45fr); }
+.event-scene { position: relative; overflow: hidden; }
+.event-scene .event-word {
+  /* Ingo 19.11.2026: auf buntem Gebietsbild schwer lesbar → kleiner auf einem dunklen Schild */
+  position: absolute; z-index: 3; top: 8%; left: 50%; transform: translateX(-50%) rotate(-3deg); margin: 0;
+  font-size: calc(76 * var(--u)); white-space: nowrap;
+  background: var(--sea-deep); border: var(--line) solid var(--ink); border-radius: calc(14 * var(--u));
+  padding: calc(6 * var(--u)) calc(28 * var(--u)) calc(2 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgb(8 42 66 / 0.55);
+}
+.event-body {
+  position: relative;
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 0%, rgb(143 211 255 / 0.28), transparent 70%),
+    linear-gradient(180deg, var(--sea) 0%, var(--sea-deep) 75%, var(--sea-night) 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: calc(22 * var(--u)); padding: calc(26 * var(--u)) calc(28 * var(--u)) calc(22 * var(--u));
+}
+.event-text {
+  position: relative; margin: 0; max-width: calc(820 * var(--u));
+  background: var(--paper); border: var(--line) solid var(--ink); border-radius: calc(22 * var(--u));
+  padding: calc(16 * var(--u)) calc(28 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgb(8 42 66 / 0.45);
+  font-weight: 700; font-size: calc(30 * var(--u)); line-height: 1.35; text-align: center;
+}
+/* Spitze der Sprechblase: zeigt nach oben ins Bild */
+.event-text::before, .event-text::after {
+  content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+  border-style: solid; border-color: transparent; border-top: 0;
+}
+.event-text::before { top: calc(-30 * var(--u)); border-width: 0 calc(22 * var(--u)) calc(30 * var(--u)); border-bottom-color: var(--ink); }
+.event-text::after { top: calc(-21 * var(--u)); border-width: 0 calc(15 * var(--u)) calc(22 * var(--u)); border-bottom-color: var(--paper); }
+.event-btns { display: flex; gap: calc(20 * var(--u)); flex-wrap: wrap; justify-content: center; }
+.event-btn {
+  min-width: calc(260 * var(--u)); min-height: calc(76 * var(--u));
+  font-size: calc(30 * var(--u));
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(2 * var(--u));
+  box-shadow: 0 calc(5 * var(--u)) calc(10 * var(--u)) rgb(8 42 66 / 0.5);
+}
+.event-btn:not(.btn-go) { background: var(--paper); }
+.event-btn:disabled { background: var(--disabled-fill); color: var(--disabled-text); box-shadow: none; }
+.event-cost { display: inline-flex; align-items: center; gap: calc(6 * var(--u)); font-size: max(1rem, 0.62em); font-weight: 700; }
+.event-cost svg { width: 1.1em; height: 1.1em; }
+/* Gebiet geschafft mit Seestern und neuem Gebiet (Phase 9): zwei Zeilen, damit der Knopf im Bild bleibt */
+.comic-next { gap: calc(10 * var(--u)); padding: calc(12 * var(--u)); }
+.comic-next .cleared-next { font-size: calc(23 * var(--u)); padding: calc(6 * var(--u)) calc(12 * var(--u)); gap: calc(4 * var(--u)); line-height: 1.25; }
+
+/* Talente (Phase 9, Etappe 3): je Stufe eine Reihe mit zwei Karten zum Antippen */
+.lb-talents { display: flex; flex-direction: column; gap: calc(12 * var(--u)); }
+.lb-talent-row { display: grid; grid-template-columns: calc(150 * var(--u)) 1fr 1fr; gap: calc(12 * var(--u)); align-items: stretch; }
+.lb-talent-level { margin: 0; align-self: center; font-size: calc(24 * var(--u)); }
+.lb-talent {
+  display: flex; flex-direction: column; align-items: flex-start; gap: calc(4 * var(--u)); text-align: left;
+  background: var(--sand-light); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
+  padding: calc(10 * var(--u)) calc(14 * var(--u)); color: var(--ink);
+}
+.lb-talent b { font-size: calc(22 * var(--u)); }
+.lb-talent small { font-size: max(1rem, calc(18 * var(--u))); line-height: 1.3; }
+.lb-talent.is-chosen { background: var(--sun); box-shadow: 0 0 0 calc(3 * var(--u)) var(--ink); }
+.lb-talent:active:not(:disabled) { transform: scale(0.98); }
+.lb-talent-row.is-locked .lb-talent { background: var(--disabled-fill); color: var(--disabled-text); }
+@media (orientation: portrait) {
+  .lb-talent-row { grid-template-columns: 1fr 1fr; }
+  .lb-talent-level { grid-column: 1 / -1; }
+}
+
+/* Sammlung (Phase 9, Etappe 4): Kartenalbum und Meeresbuch */
+.lb-collection { display: flex; flex-direction: column; gap: calc(12 * var(--u)); }
+.lb-switch { display: flex; gap: calc(10 * var(--u)); flex-wrap: wrap; }
+.lb-switch-btn[aria-pressed="true"] { background: var(--sun); }
+.lb-deck-cell.is-unknown .card { filter: brightness(0) invert(0.75) opacity(0.45); } /* heller Schatten auf dem dunklen Raster */
+.lb-book-area { display: flex; flex-direction: column; gap: calc(8 * var(--u)); }
+.lb-book-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(190 * var(--u)), 1fr)); gap: calc(10 * var(--u)); }
+.lb-book-entry {
+  display: flex; flex-direction: column; align-items: center; gap: calc(4 * var(--u)); text-align: center;
+  background: var(--sand-light); border: var(--line-thin) solid var(--ink); border-radius: var(--radius);
+  padding: calc(8 * var(--u)) calc(10 * var(--u));
+}
+.lb-book-entry.is-gold { box-shadow: 0 0 0 calc(4 * var(--u)) #f2a900; }
+.lb-book-pic { width: calc(120 * var(--u)); height: calc(110 * var(--u)); display: grid; place-items: center; overflow: hidden; }
+.lb-book-pic img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.lb-book-entry b { font-size: calc(21 * var(--u)); }
+.lb-book-entry small { font-size: max(1rem, calc(17 * var(--u))); line-height: 1.3; }
+.lb-book-count { font-weight: 700; font-size: max(1rem, calc(17 * var(--u))); color: var(--sea-deep); }
+.lb-book-entry.is-unknown .lb-book-pic img { filter: brightness(0) opacity(0.3); }
+.lb-book-entry.is-unknown { background: var(--disabled-fill); box-shadow: none; }

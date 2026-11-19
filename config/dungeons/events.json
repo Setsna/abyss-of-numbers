@@ -1,0 +1,50 @@
+{
+  "giantShell": {
+    "options": [
+      { "id": "open", "effects": [{ "type": "hp", "amount": -5 }, { "type": "card" }] },
+      { "id": "leave", "effects": [] }
+    ]
+  },
+  "warmSpring": {
+    "options": [
+      { "id": "rest", "effects": [{ "type": "heal", "share": 0.3 }] },
+      { "id": "collect", "effects": [{ "type": "pearls", "amount": 6 }] }
+    ]
+  },
+  "smallWreck": {
+    "options": [
+      { "id": "search", "effects": [{ "type": "fight", "bonusPearls": 10 }] },
+      { "id": "leave", "effects": [] }
+    ]
+  },
+  "tradingOctopus": {
+    "options": [
+      { "id": "trade", "effects": [{ "type": "pearls", "amount": -8 }, { "type": "card" }] },
+      { "id": "leave", "effects": [] }
+    ]
+  },
+  "strongCurrent": {
+    "options": [
+      { "id": "swim", "effects": [{ "type": "hp", "amount": -4 }, { "type": "item" }] },
+      { "id": "leave", "effects": [] }
+    ]
+  },
+  "pearlBed": {
+    "options": [
+      { "id": "collect", "effects": [{ "type": "hp", "amount": -3 }, { "type": "pearls", "amount": 10 }] },
+      { "id": "leave", "effects": [] }
+    ]
+  },
+  "lostBag": {
+    "options": [
+      { "id": "help", "effects": [{ "type": "pearls", "amount": 5 }, { "type": "heal", "share": 0.2 }] },
+      { "id": "leave", "effects": [] }
+    ]
+  },
+  "jellyField": {
+    "options": [
+      { "id": "fight", "effects": [{ "type": "fight", "bonusPearls": 8 }] },
+      { "id": "around", "effects": [{ "type": "hp", "amount": -3 }] }
+    ]
+  }
+}

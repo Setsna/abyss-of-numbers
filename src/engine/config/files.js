@@ -9,10 +9,14 @@ export const CONFIG_FILES = {
   decks: 'cards/decks.json',
   enemies: 'enemies/enemies.json',
   bosses: 'enemies/bosses.json',
+  elites: 'enemies/elites.json', // Elitegegner (Phase 9, Etappe 2)
   areas: 'dungeons/areas.json',
+  events: 'dungeons/events.json', // Ereignisräume (Phase 9, Etappe 2)
   levels: 'progression/levels.json',
   rewards: 'progression/rewards.json',
+  depths: 'progression/depths.json', // Jahresausbau (Phase 9)
   heroes: 'heroes/heroes.json',
+  talents: 'heroes/talents.json', // Talente (Phase 9, Etappe 3)
   items: 'items/items.json',
   sounds: 'audio/sounds.json',
 };

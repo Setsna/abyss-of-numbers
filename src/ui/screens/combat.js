@@ -1,18 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=03719b61';
-import { combatView } from '../../engine/combat/combat.js?v=03719b61';
-import { ICON } from '../icons.js?v=03719b61';
-import { renderAsset, assetUrl } from '../assets.js?v=03719b61';
-import { poseBox, dashDistance } from '../components/pose.js?v=03719b61';
-import { playEvents, wait, isCalm } from '../app.js?v=03719b61';
-import { bindKeys } from '../input.js?v=03719b61';
-import { renderEnemy } from '../components/enemy.js?v=03719b61';
-import { renderCard, emptySlot } from '../components/card.js?v=03719b61';
-import { createTaskPanel } from '../components/task-panel.js?v=03719b61';
-import { startTimerBar } from '../components/timer-bar.js?v=03719b61';
-import { createTutorial } from '../tutorial.js?v=03719b61';
+import { wayText, hintAsk } from '../text.js?v=ad3e5b3d';
+import { combatView } from '../../engine/combat/combat.js?v=ad3e5b3d';
+import { ICON } from '../icons.js?v=ad3e5b3d';
+import { renderAsset, assetUrl } from '../assets.js?v=ad3e5b3d';
+import { poseBox, dashDistance } from '../components/pose.js?v=ad3e5b3d';
+import { playEvents, wait, isCalm } from '../app.js?v=ad3e5b3d';
+import { bindKeys } from '../input.js?v=ad3e5b3d';
+import { renderEnemy } from '../components/enemy.js?v=ad3e5b3d';
+import { renderCard, emptySlot } from '../components/card.js?v=ad3e5b3d';
+import { createTaskPanel } from '../components/task-panel.js?v=ad3e5b3d';
+import { startTimerBar } from '../components/timer-bar.js?v=ad3e5b3d';
+import { createTutorial } from '../tutorial.js?v=ad3e5b3d';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -75,6 +75,9 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
   const ruleBoss = game.combat.enemies.find((e) => e.rule && !explained[`boss.${e.typeId}`]);
   let ruleText = ruleBoss ? t(`boss.rule.${ruleBoss.typeId}`) : null;
   if (ruleBoss) onExplain(`boss.${ruleBoss.typeId}`);
+  // Elitegegner (Phase 9, Etappe 2): seine Regel in einem Satz, jedes Mal (die Regel wechselt je Raum)
+  const elite = game.combat.enemies.find((e) => e.elite);
+  if (!ruleText && elite) ruleText = t(`elite.${elite.elite.rule}`, { name: t(`enemies.${elite.typeId}.name`) });
 
   const panel = createTaskPanel($('bubble'), { t, onAnswer: (k) => answer(k), onNext: () => next() });
   // Satz zur Kartenart: oben in der Sprechblase, damit er die Aufgabe nie verdeckt
@@ -373,6 +376,10 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     stepOpened(e) { task = e.task; },
     async bossPhase() {
       showBoom(t('boss.phase2'));
+      await wait(700);
+    },
+    async secondWind() { // Talent Zweite Luft (Phase 9)
+      showBoom(t('talents.secondWindBoom'));
       await wait(700);
     },
     weakened(e) {

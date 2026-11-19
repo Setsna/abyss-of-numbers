@@ -7,6 +7,7 @@
   ],
   "areas": {
     "reef": {
+      "price": 0,
       "curriculum": "reef",
       "layers": [
         {
@@ -37,7 +38,43 @@
                   "crab"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "crab",
+                      "urchin"
+                    ],
+                    [
+                      "puffer",
+                      "jelly",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "crab",
+                      "puffer",
+                      "jelly"
+                    ],
+                    [
+                      "urchin",
+                      "jelly",
+                      "puffer"
+                    ],
+                    [
+                      "crab",
+                      "urchin",
+                      "puffer"
+                    ]
+                  ]
+                }
+              ]
             },
             {
               "type": "combat",
@@ -51,7 +88,43 @@
                   "crab"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "crab",
+                      "urchin"
+                    ],
+                    [
+                      "puffer",
+                      "jelly",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "crab",
+                      "puffer",
+                      "jelly"
+                    ],
+                    [
+                      "urchin",
+                      "jelly",
+                      "puffer"
+                    ],
+                    [
+                      "crab",
+                      "urchin",
+                      "puffer"
+                    ]
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -60,7 +133,8 @@
             {
               "choices": [
                 "treasure",
-                "combat"
+                "combat",
+                "event"
               ],
               "pool": [
                 [
@@ -72,10 +146,47 @@
                   "crab"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "crab",
+                      "urchin"
+                    ],
+                    [
+                      "puffer",
+                      "jelly",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "crab",
+                      "puffer",
+                      "jelly"
+                    ],
+                    [
+                      "urchin",
+                      "jelly",
+                      "puffer"
+                    ],
+                    [
+                      "crab",
+                      "urchin",
+                      "puffer"
+                    ]
+                  ]
+                }
+              ]
             },
             {
-              "type": "combat",
+              "type": "elite",
+              "fromDepth": 3,
               "pool": [
                 [
                   "jelly",
@@ -86,7 +197,93 @@
                   "urchin"
                 ]
               ],
-              "level": 2
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "crab",
+                      "urchin"
+                    ],
+                    [
+                      "puffer",
+                      "jelly",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "crab",
+                      "puffer",
+                      "jelly"
+                    ],
+                    [
+                      "urchin",
+                      "jelly",
+                      "puffer"
+                    ],
+                    [
+                      "crab",
+                      "urchin",
+                      "puffer"
+                    ]
+                  ]
+                }
+              ],
+              "level": 2,
+              "fallback": {
+                "type": "combat",
+                "pool": [
+                  [
+                    "jelly",
+                    "puffer"
+                  ],
+                  [
+                    "crab",
+                    "urchin"
+                  ]
+                ],
+                "level": 2,
+                "deepPools": [
+                  {
+                    "fromDepth": 2,
+                    "groups": [
+                      [
+                        "crab",
+                        "urchin"
+                      ],
+                      [
+                        "puffer",
+                        "jelly",
+                        "crab"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 3,
+                    "groups": [
+                      [
+                        "crab",
+                        "puffer",
+                        "jelly"
+                      ],
+                      [
+                        "urchin",
+                        "jelly",
+                        "puffer"
+                      ],
+                      [
+                        "crab",
+                        "urchin",
+                        "puffer"
+                      ]
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -110,9 +307,567 @@
           ]
         }
       ],
-      "background": "area.reef"
+      "background": "area.reef",
+      "moreLayouts": [
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "crab"
+                    ]
+                  ],
+                  "level": 1,
+                  "tutorial": true
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "shop"
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "puffer",
+                      "jelly"
+                    ],
+                    [
+                      "jelly",
+                      "crab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "urchin",
+                      "puffer"
+                    ],
+                    [
+                      "urchin",
+                      "crab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "choices": [
+                    "treasure",
+                    "combat",
+                    "event"
+                  ],
+                  "pool": [
+                    [
+                      "urchin",
+                      "jelly"
+                    ],
+                    [
+                      "puffer",
+                      "crab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "jelly",
+                      "puffer"
+                    ],
+                    [
+                      "crab",
+                      "urchin"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "jelly",
+                        "puffer"
+                      ],
+                      [
+                        "crab",
+                        "urchin"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "crab",
+                            "urchin"
+                          ],
+                          [
+                            "puffer",
+                            "jelly",
+                            "crab"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "crab",
+                            "puffer",
+                            "jelly"
+                          ],
+                          [
+                            "urchin",
+                            "jelly",
+                            "puffer"
+                          ],
+                          [
+                            "crab",
+                            "urchin",
+                            "puffer"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "reefKraken",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "crab"
+                    ]
+                  ],
+                  "level": 1,
+                  "tutorial": true
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "puffer",
+                      "jelly"
+                    ],
+                    [
+                      "jelly",
+                      "crab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "urchin",
+                      "puffer"
+                    ],
+                    [
+                      "urchin",
+                      "crab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "urchin",
+                      "jelly"
+                    ],
+                    [
+                      "puffer",
+                      "crab"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "crab",
+                          "urchin"
+                        ],
+                        [
+                          "puffer",
+                          "jelly",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "crab",
+                          "puffer",
+                          "jelly"
+                        ],
+                        [
+                          "urchin",
+                          "jelly",
+                          "puffer"
+                        ],
+                        [
+                          "crab",
+                          "urchin",
+                          "puffer"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "urchin",
+                        "jelly"
+                      ],
+                      [
+                        "puffer",
+                        "crab"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "crab",
+                            "urchin"
+                          ],
+                          [
+                            "puffer",
+                            "jelly",
+                            "crab"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "crab",
+                            "puffer",
+                            "jelly"
+                          ],
+                          [
+                            "urchin",
+                            "jelly",
+                            "puffer"
+                          ],
+                          [
+                            "crab",
+                            "urchin",
+                            "puffer"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "shop"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "choices": [
+                    "treasure",
+                    "event"
+                  ]
+                },
+                {
+                  "type": "rest"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "reefKraken",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     "caves": {
+      "price": 3,
       "curriculum": "caves",
       "background": "area.caves",
       "intro": "areas.caves.intro",
@@ -144,7 +899,46 @@
                   "lanternFish"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "lanternFish",
+                      "jelly"
+                    ],
+                    [
+                      "stoneFish",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "stoneFish",
+                      "caveIsopod",
+                      "lanternFish"
+                    ],
+                    [
+                      "lanternFish",
+                      "urchin",
+                      "stoneFish"
+                    ],
+                    [
+                      "caveIsopod",
+                      "crab",
+                      "snakeEel"
+                    ]
+                  ]
+                }
+              ]
             },
             {
               "type": "combat",
@@ -158,7 +952,46 @@
                   "lanternFish"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "lanternFish",
+                      "jelly"
+                    ],
+                    [
+                      "stoneFish",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "stoneFish",
+                      "caveIsopod",
+                      "lanternFish"
+                    ],
+                    [
+                      "lanternFish",
+                      "urchin",
+                      "stoneFish"
+                    ],
+                    [
+                      "caveIsopod",
+                      "crab",
+                      "snakeEel"
+                    ]
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -167,7 +1000,8 @@
             {
               "choices": [
                 "treasure",
-                "combat"
+                "combat",
+                "event"
               ],
               "pool": [
                 [
@@ -179,10 +1013,50 @@
                   "lanternFish"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "lanternFish",
+                      "jelly"
+                    ],
+                    [
+                      "stoneFish",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "stoneFish",
+                      "caveIsopod",
+                      "lanternFish"
+                    ],
+                    [
+                      "lanternFish",
+                      "urchin",
+                      "stoneFish"
+                    ],
+                    [
+                      "caveIsopod",
+                      "crab",
+                      "snakeEel"
+                    ]
+                  ]
+                }
+              ]
             },
             {
-              "type": "combat",
+              "type": "elite",
+              "fromDepth": 3,
               "pool": [
                 [
                   "caveIsopod",
@@ -193,7 +1067,99 @@
                   "snakeEel"
                 ]
               ],
-              "level": 2
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "lanternFish",
+                      "jelly"
+                    ],
+                    [
+                      "stoneFish",
+                      "crab"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "stoneFish",
+                      "caveIsopod",
+                      "lanternFish"
+                    ],
+                    [
+                      "lanternFish",
+                      "urchin",
+                      "stoneFish"
+                    ],
+                    [
+                      "caveIsopod",
+                      "crab",
+                      "snakeEel"
+                    ]
+                  ]
+                }
+              ],
+              "level": 2,
+              "fallback": {
+                "type": "combat",
+                "pool": [
+                  [
+                    "caveIsopod",
+                    "stoneFish"
+                  ],
+                  [
+                    "lanternFish",
+                    "snakeEel"
+                  ]
+                ],
+                "level": 2,
+                "deepPools": [
+                  {
+                    "fromDepth": 2,
+                    "groups": [
+                      [
+                        "snakeEel",
+                        "puffer"
+                      ],
+                      [
+                        "lanternFish",
+                        "jelly"
+                      ],
+                      [
+                        "stoneFish",
+                        "crab"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 3,
+                    "groups": [
+                      [
+                        "stoneFish",
+                        "caveIsopod",
+                        "lanternFish"
+                      ],
+                      [
+                        "lanternFish",
+                        "urchin",
+                        "stoneFish"
+                      ],
+                      [
+                        "caveIsopod",
+                        "crab",
+                        "snakeEel"
+                      ]
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -217,9 +1183,592 @@
           ]
         }
       ],
-      "intro4": "areas.caves.intro4"
+      "intro4": "areas.caves.intro4",
+      "moreLayouts": [
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "caveIsopod"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "shop"
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "stoneFish",
+                      "caveIsopod"
+                    ],
+                    [
+                      "caveIsopod",
+                      "lanternFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "snakeEel",
+                      "stoneFish"
+                    ],
+                    [
+                      "snakeEel",
+                      "lanternFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "choices": [
+                    "treasure",
+                    "combat",
+                    "event"
+                  ],
+                  "pool": [
+                    [
+                      "snakeEel",
+                      "caveIsopod"
+                    ],
+                    [
+                      "stoneFish",
+                      "lanternFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "caveIsopod",
+                      "stoneFish"
+                    ],
+                    [
+                      "lanternFish",
+                      "snakeEel"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "caveIsopod",
+                        "stoneFish"
+                      ],
+                      [
+                        "lanternFish",
+                        "snakeEel"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "snakeEel",
+                            "puffer"
+                          ],
+                          [
+                            "lanternFish",
+                            "jelly"
+                          ],
+                          [
+                            "stoneFish",
+                            "crab"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "stoneFish",
+                            "caveIsopod",
+                            "lanternFish"
+                          ],
+                          [
+                            "lanternFish",
+                            "urchin",
+                            "stoneFish"
+                          ],
+                          [
+                            "caveIsopod",
+                            "crab",
+                            "snakeEel"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "cavesBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "caveIsopod"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "stoneFish",
+                      "caveIsopod"
+                    ],
+                    [
+                      "caveIsopod",
+                      "lanternFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "snakeEel",
+                      "stoneFish"
+                    ],
+                    [
+                      "snakeEel",
+                      "lanternFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "snakeEel",
+                      "caveIsopod"
+                    ],
+                    [
+                      "stoneFish",
+                      "lanternFish"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "lanternFish",
+                          "jelly"
+                        ],
+                        [
+                          "stoneFish",
+                          "crab"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "stoneFish",
+                          "caveIsopod",
+                          "lanternFish"
+                        ],
+                        [
+                          "lanternFish",
+                          "urchin",
+                          "stoneFish"
+                        ],
+                        [
+                          "caveIsopod",
+                          "crab",
+                          "snakeEel"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "snakeEel",
+                        "caveIsopod"
+                      ],
+                      [
+                        "stoneFish",
+                        "lanternFish"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "snakeEel",
+                            "puffer"
+                          ],
+                          [
+                            "lanternFish",
+                            "jelly"
+                          ],
+                          [
+                            "stoneFish",
+                            "crab"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "stoneFish",
+                            "caveIsopod",
+                            "lanternFish"
+                          ],
+                          [
+                            "lanternFish",
+                            "urchin",
+                            "stoneFish"
+                          ],
+                          [
+                            "caveIsopod",
+                            "crab",
+                            "snakeEel"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "shop"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "choices": [
+                    "treasure",
+                    "event"
+                  ]
+                },
+                {
+                  "type": "rest"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "cavesBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     "city": {
+      "price": 8,
       "curriculum": "city",
       "background": "area.city",
       "intro": "areas.city.intro",
@@ -251,7 +1800,46 @@
                   "armorCrab"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "seahorseKnight",
+                      "lanternFish"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel"
+                    ],
+                    [
+                      "armorCrab",
+                      "puffer"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "shellWarden",
+                      "statueFish",
+                      "armorCrab"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "armorCrab",
+                      "stoneFish",
+                      "seahorseKnight"
+                    ]
+                  ]
+                }
+              ]
             },
             {
               "type": "combat",
@@ -265,7 +1853,46 @@
                   "armorCrab"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "seahorseKnight",
+                      "lanternFish"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel"
+                    ],
+                    [
+                      "armorCrab",
+                      "puffer"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "shellWarden",
+                      "statueFish",
+                      "armorCrab"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "armorCrab",
+                      "stoneFish",
+                      "seahorseKnight"
+                    ]
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -274,7 +1901,8 @@
             {
               "choices": [
                 "treasure",
-                "combat"
+                "combat",
+                "event"
               ],
               "pool": [
                 [
@@ -286,10 +1914,50 @@
                   "armorCrab"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "seahorseKnight",
+                      "lanternFish"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel"
+                    ],
+                    [
+                      "armorCrab",
+                      "puffer"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "shellWarden",
+                      "statueFish",
+                      "armorCrab"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "armorCrab",
+                      "stoneFish",
+                      "seahorseKnight"
+                    ]
+                  ]
+                }
+              ]
             },
             {
-              "type": "combat",
+              "type": "elite",
+              "fromDepth": 3,
               "pool": [
                 [
                   "statueFish",
@@ -300,7 +1968,99 @@
                   "seahorseKnight"
                 ]
               ],
-              "level": 2
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "seahorseKnight",
+                      "lanternFish"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel"
+                    ],
+                    [
+                      "armorCrab",
+                      "puffer"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "shellWarden",
+                      "statueFish",
+                      "armorCrab"
+                    ],
+                    [
+                      "statueFish",
+                      "snakeEel",
+                      "puffer"
+                    ],
+                    [
+                      "armorCrab",
+                      "stoneFish",
+                      "seahorseKnight"
+                    ]
+                  ]
+                }
+              ],
+              "level": 2,
+              "fallback": {
+                "type": "combat",
+                "pool": [
+                  [
+                    "statueFish",
+                    "shellWarden"
+                  ],
+                  [
+                    "armorCrab",
+                    "seahorseKnight"
+                  ]
+                ],
+                "level": 2,
+                "deepPools": [
+                  {
+                    "fromDepth": 2,
+                    "groups": [
+                      [
+                        "seahorseKnight",
+                        "lanternFish"
+                      ],
+                      [
+                        "statueFish",
+                        "snakeEel"
+                      ],
+                      [
+                        "armorCrab",
+                        "puffer"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 3,
+                    "groups": [
+                      [
+                        "shellWarden",
+                        "statueFish",
+                        "armorCrab"
+                      ],
+                      [
+                        "statueFish",
+                        "snakeEel",
+                        "puffer"
+                      ],
+                      [
+                        "armorCrab",
+                        "stoneFish",
+                        "seahorseKnight"
+                      ]
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -324,9 +2084,592 @@
           ]
         }
       ],
-      "intro4": "areas.city.intro4"
+      "intro4": "areas.city.intro4",
+      "moreLayouts": [
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "statueFish"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "shop"
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "shellWarden",
+                      "statueFish"
+                    ],
+                    [
+                      "statueFish",
+                      "armorCrab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "seahorseKnight",
+                      "shellWarden"
+                    ],
+                    [
+                      "seahorseKnight",
+                      "armorCrab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "choices": [
+                    "treasure",
+                    "combat",
+                    "event"
+                  ],
+                  "pool": [
+                    [
+                      "seahorseKnight",
+                      "statueFish"
+                    ],
+                    [
+                      "shellWarden",
+                      "armorCrab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "statueFish",
+                      "shellWarden"
+                    ],
+                    [
+                      "armorCrab",
+                      "seahorseKnight"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "statueFish",
+                        "shellWarden"
+                      ],
+                      [
+                        "armorCrab",
+                        "seahorseKnight"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "seahorseKnight",
+                            "lanternFish"
+                          ],
+                          [
+                            "statueFish",
+                            "snakeEel"
+                          ],
+                          [
+                            "armorCrab",
+                            "puffer"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "shellWarden",
+                            "statueFish",
+                            "armorCrab"
+                          ],
+                          [
+                            "statueFish",
+                            "snakeEel",
+                            "puffer"
+                          ],
+                          [
+                            "armorCrab",
+                            "stoneFish",
+                            "seahorseKnight"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "cityBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "statueFish"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "shellWarden",
+                      "statueFish"
+                    ],
+                    [
+                      "statueFish",
+                      "armorCrab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "seahorseKnight",
+                      "shellWarden"
+                    ],
+                    [
+                      "seahorseKnight",
+                      "armorCrab"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "seahorseKnight",
+                      "statueFish"
+                    ],
+                    [
+                      "shellWarden",
+                      "armorCrab"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "seahorseKnight",
+                          "lanternFish"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel"
+                        ],
+                        [
+                          "armorCrab",
+                          "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "shellWarden",
+                          "statueFish",
+                          "armorCrab"
+                        ],
+                        [
+                          "statueFish",
+                          "snakeEel",
+                          "puffer"
+                        ],
+                        [
+                          "armorCrab",
+                          "stoneFish",
+                          "seahorseKnight"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "seahorseKnight",
+                        "statueFish"
+                      ],
+                      [
+                        "shellWarden",
+                        "armorCrab"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "seahorseKnight",
+                            "lanternFish"
+                          ],
+                          [
+                            "statueFish",
+                            "snakeEel"
+                          ],
+                          [
+                            "armorCrab",
+                            "puffer"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "shellWarden",
+                            "statueFish",
+                            "armorCrab"
+                          ],
+                          [
+                            "statueFish",
+                            "snakeEel",
+                            "puffer"
+                          ],
+                          [
+                            "armorCrab",
+                            "stoneFish",
+                            "seahorseKnight"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "shop"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "choices": [
+                    "treasure",
+                    "event"
+                  ]
+                },
+                {
+                  "type": "rest"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "cityBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     "trench": {
+      "price": 15,
       "curriculum": "trench",
       "background": "area.trench",
       "intro": "areas.trench.intro",
@@ -358,7 +2701,46 @@
                   "anglerFish"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "vampireSquid",
+                      "shellWarden"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod"
+                    ],
+                    [
+                      "deepJelly",
+                      "statueFish"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "deepJelly",
+                      "giantIsopod",
+                      "anglerFish"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod",
+                      "urchin"
+                    ],
+                    [
+                      "giantIsopod",
+                      "seahorseKnight",
+                      "deepJelly"
+                    ]
+                  ]
+                }
+              ]
             },
             {
               "type": "combat",
@@ -372,7 +2754,46 @@
                   "anglerFish"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "vampireSquid",
+                      "shellWarden"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod"
+                    ],
+                    [
+                      "deepJelly",
+                      "statueFish"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "deepJelly",
+                      "giantIsopod",
+                      "anglerFish"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod",
+                      "urchin"
+                    ],
+                    [
+                      "giantIsopod",
+                      "seahorseKnight",
+                      "deepJelly"
+                    ]
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -381,7 +2802,8 @@
             {
               "choices": [
                 "treasure",
-                "combat"
+                "combat",
+                "event"
               ],
               "pool": [
                 [
@@ -393,10 +2815,50 @@
                   "anglerFish"
                 ]
               ],
-              "level": 2
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "vampireSquid",
+                      "shellWarden"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod"
+                    ],
+                    [
+                      "deepJelly",
+                      "statueFish"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "deepJelly",
+                      "giantIsopod",
+                      "anglerFish"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod",
+                      "urchin"
+                    ],
+                    [
+                      "giantIsopod",
+                      "seahorseKnight",
+                      "deepJelly"
+                    ]
+                  ]
+                }
+              ]
             },
             {
-              "type": "combat",
+              "type": "elite",
+              "fromDepth": 3,
               "pool": [
                 [
                   "giantIsopod",
@@ -407,7 +2869,99 @@
                   "vampireSquid"
                 ]
               ],
-              "level": 2
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "vampireSquid",
+                      "shellWarden"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod"
+                    ],
+                    [
+                      "deepJelly",
+                      "statueFish"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "deepJelly",
+                      "giantIsopod",
+                      "anglerFish"
+                    ],
+                    [
+                      "anglerFish",
+                      "caveIsopod",
+                      "urchin"
+                    ],
+                    [
+                      "giantIsopod",
+                      "seahorseKnight",
+                      "deepJelly"
+                    ]
+                  ]
+                }
+              ],
+              "level": 2,
+              "fallback": {
+                "type": "combat",
+                "pool": [
+                  [
+                    "giantIsopod",
+                    "deepJelly"
+                  ],
+                  [
+                    "anglerFish",
+                    "vampireSquid"
+                  ]
+                ],
+                "level": 2,
+                "deepPools": [
+                  {
+                    "fromDepth": 2,
+                    "groups": [
+                      [
+                        "vampireSquid",
+                        "shellWarden"
+                      ],
+                      [
+                        "anglerFish",
+                        "caveIsopod"
+                      ],
+                      [
+                        "deepJelly",
+                        "statueFish"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 3,
+                    "groups": [
+                      [
+                        "deepJelly",
+                        "giantIsopod",
+                        "anglerFish"
+                      ],
+                      [
+                        "anglerFish",
+                        "caveIsopod",
+                        "urchin"
+                      ],
+                      [
+                        "giantIsopod",
+                        "seahorseKnight",
+                        "deepJelly"
+                      ]
+                    ]
+                  }
+                ]
+              }
             }
           ]
         },
@@ -427,6 +2981,588 @@
               "type": "boss",
               "encounter": "trenchBoss",
               "level": 2
+            }
+          ]
+        }
+      ],
+      "moreLayouts": [
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "giantIsopod"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "shop"
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "deepJelly",
+                      "giantIsopod"
+                    ],
+                    [
+                      "giantIsopod",
+                      "anglerFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "vampireSquid",
+                      "deepJelly"
+                    ],
+                    [
+                      "vampireSquid",
+                      "anglerFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "choices": [
+                    "treasure",
+                    "combat",
+                    "event"
+                  ],
+                  "pool": [
+                    [
+                      "vampireSquid",
+                      "giantIsopod"
+                    ],
+                    [
+                      "deepJelly",
+                      "anglerFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "giantIsopod",
+                      "deepJelly"
+                    ],
+                    [
+                      "anglerFish",
+                      "vampireSquid"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "giantIsopod",
+                        "deepJelly"
+                      ],
+                      [
+                        "anglerFish",
+                        "vampireSquid"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "vampireSquid",
+                            "shellWarden"
+                          ],
+                          [
+                            "anglerFish",
+                            "caveIsopod"
+                          ],
+                          [
+                            "deepJelly",
+                            "statueFish"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "deepJelly",
+                            "giantIsopod",
+                            "anglerFish"
+                          ],
+                          [
+                            "anglerFish",
+                            "caveIsopod",
+                            "urchin"
+                          ],
+                          [
+                            "giantIsopod",
+                            "seahorseKnight",
+                            "deepJelly"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "trenchBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "giantIsopod"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "deepJelly",
+                      "giantIsopod"
+                    ],
+                    [
+                      "giantIsopod",
+                      "anglerFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "vampireSquid",
+                      "deepJelly"
+                    ],
+                    [
+                      "vampireSquid",
+                      "anglerFish"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "vampireSquid",
+                      "giantIsopod"
+                    ],
+                    [
+                      "deepJelly",
+                      "anglerFish"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "vampireSquid",
+                          "shellWarden"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod"
+                        ],
+                        [
+                          "deepJelly",
+                          "statueFish"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "deepJelly",
+                          "giantIsopod",
+                          "anglerFish"
+                        ],
+                        [
+                          "anglerFish",
+                          "caveIsopod",
+                          "urchin"
+                        ],
+                        [
+                          "giantIsopod",
+                          "seahorseKnight",
+                          "deepJelly"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "vampireSquid",
+                        "giantIsopod"
+                      ],
+                      [
+                        "deepJelly",
+                        "anglerFish"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "vampireSquid",
+                            "shellWarden"
+                          ],
+                          [
+                            "anglerFish",
+                            "caveIsopod"
+                          ],
+                          [
+                            "deepJelly",
+                            "statueFish"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "deepJelly",
+                            "giantIsopod",
+                            "anglerFish"
+                          ],
+                          [
+                            "anglerFish",
+                            "caveIsopod",
+                            "urchin"
+                          ],
+                          [
+                            "giantIsopod",
+                            "seahorseKnight",
+                            "deepJelly"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "shop"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "choices": [
+                    "treasure",
+                    "event"
+                  ]
+                },
+                {
+                  "type": "rest"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "trenchBoss",
+                  "level": 2
+                }
+              ]
             }
           ]
         }
