@@ -730,6 +730,11 @@
 .station-ask-btns .btn { min-width: calc(200 * var(--u)); font-size: calc(28 * var(--u)); }
 .station-ask-btns .btn:not(.btn-go) { background: var(--paper); }
 
+/* Station mit Konto (19.11.2026): wer angemeldet ist und „Abmelden“, oben rechts gegenüber der Überschrift
+   (unten links läge es auf Stufe und Perlen) */
+.station-who { z-index: 3; left: auto; bottom: auto; right: calc(14 * var(--u)); top: calc(12 * var(--u)); background: rgb(251 251 247 / 0.9); }
+.station-who[hidden] { display: none; }
+
 /* Held ändern (18.11.2026): Knopf unter dem Heldenbild, in der Heldenwahl „Zurück“ neben „Fertig“ */
 .lb-hero { flex-wrap: wrap; }
 .lb-change { flex: none; width: calc(280 * var(--u)); background: var(--paper); }

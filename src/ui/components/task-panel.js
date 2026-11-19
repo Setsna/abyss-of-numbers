@@ -4,8 +4,8 @@
 // (Frage oben, `task.display` als große Zeile).
 // Seit Etappe 4 mehrschrittig (Kette, Mauer, Zuordnen): Punkte zeigen den Fortschritt, nach einem
 // freien Fehlversuch bleibt der falsche Knopf gesperrt und ein Satz nennt die übrigen Versuche.
-import { renderNumberLine } from './number-line.js?v=2f0fe1f9';
-import { renderNumberWall } from './number-wall.js?v=2f0fe1f9';
+import { renderNumberLine } from './number-line.js?v=0bcb9d58';
+import { renderNumberWall } from './number-wall.js?v=0bcb9d58';
 
 const BUBBLE_HTML = `
   <div class="timer" data-ref="timer" aria-hidden="true"><i></i><i></i><i></i><b data-ref="fill"></b></div>

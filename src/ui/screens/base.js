@@ -3,12 +3,14 @@
 //   Bullaugen – je offenem Gebiet ein Fenster mit dem Gebietsbild und einem gelben Knopf (Abtauchen),
 //   Logbuch   – mit dem Schild „freie Punkte“,
 //   Ausrüstung – öffnet die Logbuch-Seite „Ausrüstung“.
+// Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
+// (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=2f0fe1f9';
-import { renderAsset, assetUrl } from '../assets.js?v=2f0fe1f9';
-import { homeAreaId, worldLayer } from '../components/world.js?v=2f0fe1f9';
+import { ICON } from '../icons.js?v=0bcb9d58';
+import { renderAsset, assetUrl } from '../assets.js?v=0bcb9d58';
+import { homeAreaId, worldLayer } from '../components/world.js?v=0bcb9d58';
 
-export function mountBase(root, { t, config, game, onDive, onLogbook }) {
+export function mountBase(root, { t, config, game, onDive, onLogbook, account = null }) {
   const v = game.view();
   const p = v.profile;
   root.innerHTML = `
@@ -24,6 +26,10 @@ export function mountBase(root, { t, config, game, onDive, onLogbook }) {
       <div class="station-tools">
         <button class="spot base-logbook" type="button" data-ref="logbook"></button>
         <button class="spot" type="button" data-ref="gear"></button>
+      </div>
+      <div class="title-who station-who" data-ref="who" hidden>
+        <span data-ref="whoName"></span>
+        <button class="title-logout" type="button" data-ref="logout"></button>
       </div>
       <div class="station-ask" data-ref="ask" role="dialog" aria-modal="true" hidden>
         <p class="station-ask-text" data-ref="askText"></p>
@@ -49,18 +55,35 @@ export function mountBase(root, { t, config, game, onDive, onLogbook }) {
   let busy = false;
   const once = (fn) => () => { if (busy) return; busy = true; fn(); };
 
-  // Nachfrage: der laufende Tauchgang endet, Gesammeltes bleibt
-  ref.askYes.textContent = t('base.switchYes');
-  ref.askNo.textContent = t('base.switchNo');
-  let askTarget = null;
-  function askSwitch(areaId, name) {
-    askTarget = areaId;
-    ref.askText.textContent = t('base.switchAsk', { from: t(`areas.${v.run.areaId}.name`), to: name });
+  // Nachfrage im Fenster der Station: beim Wechsel des Gebiets (der laufende Tauchgang endet, Gesammeltes bleibt)
+  // und beim Abmelden. Ja führt onYes aus, Nein schließt das Fenster.
+  let onYes = null;
+  function ask(text, yes, no, fn) {
+    onYes = fn;
+    ref.askText.textContent = text;
+    ref.askYes.textContent = yes;
+    ref.askNo.textContent = no;
     ref.ask.hidden = false;
     ref.askNo.focus({ preventScroll: true });
   }
-  ref.askNo.addEventListener('click', () => { ref.ask.hidden = true; askTarget = null; });
-  ref.askYes.addEventListener('click', once(() => onDive(askTarget, { abandon: true })));
+  const askSwitch = (areaId, name) => ask(
+    t('base.switchAsk', { from: t(`areas.${v.run.areaId}.name`), to: name }),
+    t('base.switchYes'), t('base.switchNo'), () => onDive(areaId, { abandon: true }));
+  ref.askNo.addEventListener('click', () => { ref.ask.hidden = true; onYes = null; });
+  ref.askYes.addEventListener('click', () => { if (busy || !onYes) return; busy = true; onYes(); });
+
+  if (account) {
+    ref.who.hidden = false;
+    ref.whoName.textContent = t('login.who', { name: account.name });
+    ref.logout.textContent = t('login.logout');
+    ref.logout.addEventListener('click', () => {
+      if (busy) return;
+      ask(t('base.logoutAsk', { name: account.name }), t('login.logout'), t('base.logoutNo'), () => {
+        ref.askYes.disabled = true; ref.askNo.disabled = true;
+        account.onLogout();
+      });
+    });
+  }
 
   // Bullaugen: Fenster mit dem Gebietsbild, darunter der Knopf; das ganze Bullauge ist der Knopf
   const openAreas = p.areas.filter((a) => a.open);

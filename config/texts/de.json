@@ -413,7 +413,9 @@
     "soon": "{area}: kommt bald",
     "switchAsk": "Willst du zu „{to}“ tauchen? Dann ist dein Tauchgang in „{from}“ vorbei. Karten, Perlen und Ausrüstung behältst du.",
     "switchYes": "Ja, tauchen",
-    "switchNo": "Nein"
+    "switchNo": "Nein",
+    "logoutAsk": "Bist du nicht {name}? Dann melde dich ab. Dein Spielstand bleibt gespeichert.",
+    "logoutNo": "Zurück"
   },
   "figures": {
     "diver": {
