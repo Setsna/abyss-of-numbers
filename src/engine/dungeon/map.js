@@ -6,7 +6,7 @@
 // Schicht; hat die nächste Schicht weniger Räume, zu i − 1 und i (jeweils auf vorhandene
 // Plätze begrenzt). Benachbarte Schichten unterscheiden sich um höchstens einen Raum
 // (validate.js), deshalb hat jeder Raum einen Nachfolger und jeder Raum einen Vorgänger.
-import { createRng, deriveSeed } from '../rng.js?v=0bcb9d58';
+import { createRng, deriveSeed } from '../rng.js?v=03719b61';
 
 export function nextSlots(slot, nextCount, count) {
   const wanted = nextCount < count ? [slot - 1, slot] : [slot, slot + 1];
