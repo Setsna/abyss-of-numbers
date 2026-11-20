@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=91f88903';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=91f88903';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=91f88903';
-import { chooseSource } from '../learning/learning.js?v=91f88903';
-import { crossPlace } from '../math/places.js?v=91f88903';
-import { neighborWay } from '../math/ways.js?v=91f88903';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=91f88903';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=91f88903';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=91f88903';
-import { cardEffect } from '../cards/effect.js?v=91f88903';
+import { createRng, deriveSeed } from '../rng.js?v=b2d5e6d3';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=b2d5e6d3';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=b2d5e6d3';
+import { chooseSource } from '../learning/learning.js?v=b2d5e6d3';
+import { crossPlace } from '../math/places.js?v=b2d5e6d3';
+import { neighborWay } from '../math/ways.js?v=b2d5e6d3';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=b2d5e6d3';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=b2d5e6d3';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=b2d5e6d3';
+import { cardEffect } from '../cards/effect.js?v=b2d5e6d3';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -277,6 +277,8 @@ function asStep(task) {
     display: solve ? `${task.prompt} = ?` : task.display ?? null,
     choices: task.choices, correctIndex: task.correctIndex,
     solutionText: task.solutionText, practiceKey: task.practiceKey,
+    // Leiter und Stufe für die Zählung der Lernübersicht (Phase 10); für die Lernstufe zählt der Schritt nicht (markCounts, hiddenFind)
+    ladder: task.ladder ?? null, stageId: task.stageId ?? null,
     line: task.line, marks: task.marks,
     // eigene Zeit des Schritts (A-7): Zeitklasse und Zusatzzeit der Stufe, aus der er stammt
     timeClass: task.timeClass ?? null, extraMs: task.extraMs ?? 0,
@@ -346,7 +348,8 @@ function answerStep(c, outcome, choiceIndex) {
   const task = pending.task;
   const def = c.config.cards[pending.cardId];
   const st = task.steps[task.stepIndex];
-  const events = [{ type: 'stepJudged', stepIndex: task.stepIndex, outcome, ladder: st.ladder ?? null, stageId: st.stageId ?? null, counts: Boolean(st.counts && !st.tried) }];
+  // first: erster Versuch dieses Schritts (Zählung der Lernübersicht, Phase 10)
+  const events = [{ type: 'stepJudged', stepIndex: task.stepIndex, outcome, ladder: st.ladder ?? null, stageId: st.stageId ?? null, counts: Boolean(st.counts && !st.tried), first: !st.tried }];
   st.tried = true;
   if (outcome === 'correct') {
     if (def.effect.type === 'damagePerStep') {
@@ -623,7 +626,11 @@ function applyCorrect(c, def, pending, multiplier) {
 
 // Felder für die Lernstufen (Regelwerk 7.1): Leiter, Stufe, ob die Antwort zählt, Übungsaufgabe
 function judgedFields(t) {
-  return { ladder: t.ladder ?? null, stageId: t.stageId ?? null, counts: Boolean(t.counts && !t.steps), practiceKey: t.practiceKey ?? null, practice: Boolean(t.practice), review: Boolean(t.review) };
+  // single: Aufgabe ohne Schritte; bei mehrschrittigen zählen die Schritte (stepJudged), nicht die Schlussmeldung (Phase 10)
+  // tally: Leiter für die Zählung der Lernübersicht (Phase 10). „Zwei Schritte“ zählt unter der Rechenart der Karte, weil der
+  // erste Teil aus deren Stufe kommt. Wahr/Falsch und „Terme vergleichen“ mischen Rechenarten und zählen nicht (Konzept 4.2).
+  const tally = t.ladder ?? (t.format === 'twoStep' ? t.operation : null);
+  return { ladder: t.ladder ?? null, stageId: t.stageId ?? null, counts: Boolean(t.counts && !t.steps), practiceKey: t.practiceKey ?? null, practice: Boolean(t.practice), review: Boolean(t.review), single: !t.steps, tally };
 }
 
 // chosen: gewählte Antwort (für den Fehlertyp); -1 oder null bei abgelaufener Zeit

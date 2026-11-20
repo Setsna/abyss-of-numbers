@@ -1,0 +1,458 @@
+{
+  "_quelle": "Mathe-Regelwerk, Tabellen in Abschnitt 5 und 6 (docs/superpowers/specs/2026-11-18-mathe-regelwerk-design.md). Name: Spalte „Was gerechnet wird“, sonst „Gesuchte Zahl“, „Was fehlt“, „Form“, „Frage“ oder „Zahlenregeln“; Geteilt: Umkehraufgaben der Mal-Stufe (5.4, 6.4); Stufen, die im Regelwerk „wie …“ heißen, mit dem Namen der Bezugsstufe. Beispiel: erstes Beispiel wörtlich. Stufen „wie `K3-…`“ tragen den Namen der Bezugsstufe, das Beispiel bleibt das eigene der Tabelle.",
+  "ladders": {
+    "add": "Plus",
+    "sub": "Minus",
+    "mul": "Mal",
+    "div": "Geteilt",
+    "line": "Zahlenstrahl",
+    "seq": "Zahlenfolgen",
+    "comp": "Ergänzen",
+    "wall": "Zahlenmauern",
+    "chain": "Kettenaufgaben",
+    "pvs": "Punkt vor Strich",
+    "teil": "Teilbarkeit"
+  },
+  "stages": {
+    "K3-ADD-1": {
+      "name": "bis 100, ohne Zehnerübergang: Zahl plus Einer oder plus glatte Zehner",
+      "example": "54 + 5 = 59"
+    },
+    "K3-ADD-2": {
+      "name": "bis 100, zwei zweistellige Zahlen ohne Zehnerübergang",
+      "example": "41 + 13 = 54"
+    },
+    "K3-ADD-3": {
+      "name": "bis 100, mit Zehnerübergang",
+      "example": "48 + 6 = 54"
+    },
+    "K3-ADD-4": {
+      "name": "bis 1000, Zehnerzahl plus glatte Hunderter",
+      "example": "300 + 200 = 500"
+    },
+    "K3-ADD-5": {
+      "name": "bis 1000, beliebige dreistellige Zahl plus Einer, Zehner oder Hunderter, ohne Übergang",
+      "example": "235 + 4 = 239"
+    },
+    "K3-ADD-6": {
+      "name": "bis 1000, Zehnerzahl plus reine Zehner mit Hunderterübergang",
+      "example": "450 + 70 = 520"
+    },
+    "K3-ADD-7": {
+      "name": "bis 1000, zwei glatte Zehnerzahlen, mit oder ohne Hunderterübergang",
+      "example": "430 + 250 = 680"
+    },
+    "K3-CHAIN-1": {
+      "name": "bis 100, Start 5 bis 40, je Glied plus oder minus 2 bis 20, jedes Zwischenergebnis 1 bis 100",
+      "example": "24 + 8 = 32, 32 − 5 = 27, 27 + 6 = 33"
+    },
+    "K3-CHAIN-2": {
+      "name": "Start 2 bis 10; das erste Glied ist „mal 2, 3, 4 oder 5“ (kleines Einmaleins), danach zwei Glieder wie Stufe 1",
+      "example": "7 · 4 = 28, 28 + 6 = 34, 34 − 9 = 25"
+    },
+    "K3-CHAIN-3": {
+      "name": "bis 1000 in glatten Zehnern, Start 100 bis 500, je Glied plus oder minus 10 bis 90",
+      "example": "340 + 80 = 420, 420 − 50 = 370, 370 + 60 = 430"
+    },
+    "K3-CHAIN-4": {
+      "name": "Start 20 bis 90 in glatten Zehnern; das erste Glied ist „mal 2, 3, 4 oder 5“ (Zehnereinmaleins), danach zwei Glieder wie Stufe 3",
+      "example": "60 · 3 = 180, 180 + 40 = 220, 220 − 70 = 150"
+    },
+    "K3-COMP-1": {
+      "name": "zum nächsten Zehner, Zahl 11 bis 89 mit Einer nicht 0",
+      "example": "37 + ? = 40 → 3"
+    },
+    "K3-COMP-2": {
+      "name": "glatte Zehnerzahl 10 bis 90 zur 100",
+      "example": "60 + ? = 100 → 40"
+    },
+    "K3-COMP-3": {
+      "name": "beliebige Zahl 11 bis 89 mit Einer nicht 0 zur 100",
+      "example": "37 + ? = 100 → 63"
+    },
+    "K3-COMP-4": {
+      "name": "Zehnerzahl zum nächsten Hunderter",
+      "example": "360 + ? = 400 → 40"
+    },
+    "K3-COMP-5": {
+      "name": "dreistellige Zahl mit Einer nicht 0 zum nächsten Zehner",
+      "example": "393 + ? = 400 → 7"
+    },
+    "K3-COMP-6": {
+      "name": "Zehnerzahl 110 bis 990 zur 1000",
+      "example": "370 + ? = 1000 → 630"
+    },
+    "K3-DIV-1": {
+      "name": "Umkehraufgaben zu Mal-Stufe 1",
+      "example": "35 : 5 = 7"
+    },
+    "K3-DIV-2": {
+      "name": "Umkehraufgaben zu Mal-Stufe 2",
+      "example": "28 : 4 = 7"
+    },
+    "K3-DIV-3": {
+      "name": "Umkehraufgaben zu Mal-Stufe 3",
+      "example": "56 : 7 = 8"
+    },
+    "K3-DIV-4": {
+      "name": "Umkehraufgaben zu Mal-Stufe 4",
+      "example": "180 : 3 = 60"
+    },
+    "K3-DIV-5": {
+      "name": "Umkehraufgaben zu Mal-Stufe 5",
+      "example": "600 : 2 = 300"
+    },
+    "K3-DIV-6": {
+      "name": "Umkehraufgaben zu Mal-Stufe 6",
+      "example": "560 : 7 = 80"
+    },
+    "K3-LINE-1": {
+      "name": "glatte Zehnerzahl 10 bis 90",
+      "example": "70"
+    },
+    "K3-LINE-2": {
+      "name": "Zahl mit der Endziffer 5 (5, 15 … 95)",
+      "example": "35"
+    },
+    "K3-LINE-3": {
+      "name": "glatter Hunderter oder Fünfziger",
+      "example": "300"
+    },
+    "K3-LINE-4": {
+      "name": "glatte Zehnerzahl 10 bis 990",
+      "example": "160"
+    },
+    "K3-MUL-1": {
+      "name": "Kernaufgaben",
+      "example": "5 · 7 = 35"
+    },
+    "K3-MUL-2": {
+      "name": "Einmaleins mit 3 und 4",
+      "example": "4 · 7 = 28"
+    },
+    "K3-MUL-3": {
+      "name": "Einmaleins mit 6 bis 9",
+      "example": "6 · 7 = 42"
+    },
+    "K3-MUL-4": {
+      "name": "Zehnereinmaleins mit kleinen Faktoren",
+      "example": "3 · 60 = 180"
+    },
+    "K3-MUL-5": {
+      "name": "einstellige Zahl mal glatte Hunderter",
+      "example": "2 · 300 = 600"
+    },
+    "K3-MUL-6": {
+      "name": "Zehnereinmaleins mit großen Faktoren",
+      "example": "7 · 80 = 560"
+    },
+    "K3-PVS-1": {
+      "name": "a + b · c",
+      "example": "3 + 6 · 2 = 15"
+    },
+    "K3-PVS-2": {
+      "name": "a − b · c",
+      "example": "20 − 2 · 2 = 16"
+    },
+    "K3-PVS-3": {
+      "name": "a + b : c oder a − b : c",
+      "example": "20 + 16 : 2 = 28"
+    },
+    "K3-SEQ-1": {
+      "name": "bis 100, steigend, Schritt 2, 5 oder 10, Start ein Vielfaches des Schritts bis 50",
+      "example": "5, 10, 15, 20 → 25"
+    },
+    "K3-SEQ-2": {
+      "name": "bis 100, steigend mit Schritt 3, 4, 6, 7, 8 oder 9, oder fallend mit Schritt 2 bis 10; Start ein Vielfaches des Schritts (steigend bis 50, fallend 20 bis 100)",
+      "example": "3, 6, 9, 12 → 15"
+    },
+    "K3-SEQ-3": {
+      "name": "bis 1000, Start glatte Zehnerzahl, Schritt 10, 20, 50 oder 100, steigend oder fallend",
+      "example": "600, 610, 620, 630 → 640"
+    },
+    "K3-SEQ-4": {
+      "name": "bis 1000, Start beliebig, Schritt 2, 4 oder 5, steigend oder fallend, die fünf Glieder überschreiten einen Zehner",
+      "example": "594, 596, 598, 600 → 602"
+    },
+    "K3-SUB-1": {
+      "name": "bis 100, ohne Zehnerübergang: Zahl minus Einer oder minus glatte Zehner",
+      "example": "57 − 4 = 53"
+    },
+    "K3-SUB-2": {
+      "name": "bis 100, zwei zweistellige Zahlen ohne Zehnerübergang",
+      "example": "87 − 34 = 53"
+    },
+    "K3-SUB-3": {
+      "name": "bis 100, mit Zehnerübergang",
+      "example": "54 − 8 = 46"
+    },
+    "K3-SUB-4": {
+      "name": "bis 1000, Zehnerzahl minus glatte Hunderter",
+      "example": "600 − 200 = 400"
+    },
+    "K3-SUB-5": {
+      "name": "bis 1000, beliebige dreistellige Zahl minus Einer, Zehner oder Hunderter, ohne Übergang",
+      "example": "334 − 2 = 332"
+    },
+    "K3-SUB-6": {
+      "name": "bis 1000, mit Hunderterübergang: Zehnerzahl minus reine Zehner, oder glatter Hunderter minus Einer",
+      "example": "520 − 70 = 450"
+    },
+    "K3-SUB-7": {
+      "name": "bis 1000, zwei glatte Zehnerzahlen, mit oder ohne Hunderterübergang",
+      "example": "680 − 240 = 440"
+    },
+    "K3-WALL-1": {
+      "name": "die beiden mittleren Steine und die Spitze (nur Plus)",
+      "example": "Grundsteine 1 bis 30, Spitze höchstens 100"
+    },
+    "K3-WALL-2": {
+      "name": "ein Grundstein, ein mittlerer Stein, die Spitze (einmal Minus)",
+      "example": "wie Stufe 1"
+    },
+    "K3-WALL-3": {
+      "name": "von der Spitze nach unten (dreimal Minus)",
+      "example": "wie Stufe 1"
+    },
+    "K3-WALL-4": {
+      "name": "die beiden mittleren Steine und die Spitze (nur Plus), glatte Zehnerzahlen",
+      "example": "Grundsteine glatte Zehnerzahlen 10 bis 300, Spitze höchstens 1000"
+    },
+    "K3-WALL-5": {
+      "name": "ein Grundstein, ein mittlerer Stein, die Spitze (einmal Minus), glatte Zehnerzahlen",
+      "example": "Grundsteine glatte Zehnerzahlen 10 bis 300, Spitze höchstens 1000"
+    },
+    "K3-WALL-6": {
+      "name": "von der Spitze nach unten (dreimal Minus), glatte Zehnerzahlen",
+      "example": "Grundsteine glatte Zehnerzahlen 10 bis 300, Spitze höchstens 1000"
+    },
+    "K4-ADD-1": {
+      "name": "bis 1000, Zehnerzahl plus glatte Hunderter",
+      "example": "250 + 200 = 450"
+    },
+    "K4-ADD-2": {
+      "name": "bis 1000, Zehnerzahl plus reine Zehner mit Hunderterübergang",
+      "example": "450 + 70 = 520"
+    },
+    "K4-ADD-3": {
+      "name": "bis 1000, zwei glatte Zehnerzahlen, mit oder ohne Hunderterübergang",
+      "example": "350 + 470 = 820"
+    },
+    "K4-ADD-4": {
+      "name": "glatte Tausenderzahl plus eine Zahl an einer einzigen Stelle, ohne Übergang",
+      "example": "323 000 + 600 = 323 600"
+    },
+    "K4-ADD-5": {
+      "name": "glatte Tausenderzahl plus Tausender oder Zehntausender mit Übergang",
+      "example": "23 000 + 8000 = 31 000"
+    },
+    "K4-ADD-6": {
+      "name": "zwei glatte Zahlen wie in Stufe 3, in Tausendern oder Zehntausendern",
+      "example": "35 000 + 47 000 = 82 000"
+    },
+    "K4-CHAIN-1": {
+      "name": "bis 1000 in glatten Zehnern, Start 100 bis 500, je Glied plus oder minus 10 bis 90",
+      "example": "340 + 80 = 420, 420 − 50 = 370, 370 + 60 = 430"
+    },
+    "K4-CHAIN-2": {
+      "name": "Start 20 bis 90 in glatten Zehnern; das erste Glied ist „mal 2, 3, 4 oder 5“ (Zehnereinmaleins), danach zwei Glieder wie Stufe 3",
+      "example": "60 · 3 = 180, 180 + 40 = 220, 220 − 70 = 150"
+    },
+    "K4-CHAIN-3": {
+      "name": "in glatten Tausendern, Start 10 000 bis 50 000, je Glied plus oder minus 1000 bis 9000",
+      "example": "34 000 + 8000 = 42 000"
+    },
+    "K4-CHAIN-4": {
+      "name": "Start 2000 bis 9000 in glatten Tausendern; das erste Glied ist „mal 2, 3, 4 oder 5“",
+      "example": "6000 · 3 = 18 000"
+    },
+    "K4-COMP-1": {
+      "name": "Zehnerzahl zum nächsten Hunderter",
+      "example": "360 + ? = 400 → 40"
+    },
+    "K4-COMP-2": {
+      "name": "Zehnerzahl 110 bis 990 zur 1000",
+      "example": "370 + ? = 1000 → 630"
+    },
+    "K4-COMP-3": {
+      "name": "glatte Hunderterzahl 1100 bis 99 900 zum nächsten Tausender",
+      "example": "15 400 + ? = 16 000 → 600"
+    },
+    "K4-COMP-4": {
+      "name": "glatte Tausenderzahl zum nächsten Zehntausender, oder glatte Zehntausenderzahl zum nächsten Hunderttausender",
+      "example": "64 000 + ? = 70 000 → 6000"
+    },
+    "K4-COMP-5": {
+      "name": "glatte Zehntausenderzahl 110 000 bis 990 000 zur Million",
+      "example": "370 000 + ? = 1 000 000 → 630 000"
+    },
+    "K4-DIV-1": {
+      "name": "Umkehraufgaben zu Mal-Stufe 1",
+      "example": "28 : 4 = 7"
+    },
+    "K4-DIV-2": {
+      "name": "Umkehraufgaben zu Mal-Stufe 2",
+      "example": "240 : 8 = 30"
+    },
+    "K4-DIV-3": {
+      "name": "Umkehraufgaben zu Mal-Stufe 3",
+      "example": "1000 : 5 = 200"
+    },
+    "K4-DIV-4": {
+      "name": "Umkehraufgaben zu Mal-Stufe 4",
+      "example": "5000 : 10 = 500"
+    },
+    "K4-DIV-5": {
+      "name": "Umkehraufgaben zu Mal-Stufe 5",
+      "example": "3500 : 5 = 700"
+    },
+    "K4-DIV-6": {
+      "name": "Umkehraufgaben zu Mal-Stufe 6",
+      "example": "2800 : 70 = 40"
+    },
+    "K4-LINE-1": {
+      "name": "glatte Zehnerzahl 10 bis 990",
+      "example": "740"
+    },
+    "K4-LINE-2": {
+      "name": "glatter Tausender oder Fünfhunderter",
+      "example": "2500"
+    },
+    "K4-LINE-3": {
+      "name": "glatter Zehntausender oder Fünftausender",
+      "example": "45 000"
+    },
+    "K4-LINE-4": {
+      "name": "glatter Hunderttausender oder Fünfzigtausender",
+      "example": "650 000"
+    },
+    "K4-LINE-5": {
+      "name": "glatter Zehntausender",
+      "example": "160 000"
+    },
+    "K4-MUL-1": {
+      "name": "kleines Einmaleins ohne Kernaufgaben",
+      "example": "4 · 7 = 28"
+    },
+    "K4-MUL-2": {
+      "name": "Zehnereinmaleins",
+      "example": "3 · 60 = 180"
+    },
+    "K4-MUL-3": {
+      "name": "einstellige Zahl mal glatte Hunderter",
+      "example": "5 · 200 = 1000"
+    },
+    "K4-MUL-4": {
+      "name": "mal 10 und mal 100",
+      "example": "300 · 10 = 3000"
+    },
+    "K4-MUL-5": {
+      "name": "einstellige Zahl mal glatte große Zahl",
+      "example": "9"
+    },
+    "K4-MUL-6": {
+      "name": "glatte Zahl mal glatte Zahl",
+      "example": "40 · 70 = 2800"
+    },
+    "K4-PVS-1": {
+      "name": "a + b · c oder a − b · c",
+      "example": "50 + 5 · 3 = 65"
+    },
+    "K4-PVS-2": {
+      "name": "a + b : c oder a − b : c",
+      "example": "200 − 20 : 5 = 196"
+    },
+    "K4-PVS-3": {
+      "name": "a · (b + c), a · (b − c), (b + c) · a oder (b − c) · a",
+      "example": "2 · (80 + 20) = 200"
+    },
+    "K4-PVS-4": {
+      "name": "(b + c) : a oder (b − c) : a",
+      "example": "(90 + 90) : 3 = 60"
+    },
+    "K4-SEQ-1": {
+      "name": "bis 1000, Start glatte Zehnerzahl, Schritt 10, 20, 50 oder 100, steigend oder fallend",
+      "example": "600, 610, 620, 630 → 640"
+    },
+    "K4-SEQ-2": {
+      "name": "bis 1000, Start beliebig, Schritt 2, 4 oder 5, steigend oder fallend, die fünf Glieder überschreiten einen Zehner",
+      "example": "594, 596, 598, 600 → 602"
+    },
+    "K4-SEQ-3": {
+      "name": "Start 1000 bis 990 000 in Hunderterschritten, Schritt 10, 100 oder 1000, steigend oder fallend",
+      "example": "6000, 6010, 6020, 6030 → 6040"
+    },
+    "K4-SEQ-4": {
+      "name": "Start glatte Zehntausenderzahl oder Fünftausenderzahl, Schritt 5000, 10 000, 50 000 oder 100 000, steigend oder fallend",
+      "example": "110 000, 120 000, 130 000, 140 000 → 150 000"
+    },
+    "K4-SEQ-5": {
+      "name": "Schritt 2, 3 oder 5 mal 10, 100, 1000 oder 10 000; Start ein Vielfaches derselben Zehnerstufe; steigend oder fallend",
+      "example": "58 000, 56 000, 54 000, 52 000 → 50 000"
+    },
+    "K4-SUB-1": {
+      "name": "bis 1000, Zehnerzahl minus glatte Hunderter",
+      "example": "950 − 400 = 550"
+    },
+    "K4-SUB-2": {
+      "name": "bis 1000, mit Hunderterübergang: Zehnerzahl minus reine Zehner, oder glatter Hunderter minus Einer",
+      "example": "520 − 70 = 450"
+    },
+    "K4-SUB-3": {
+      "name": "bis 1000, zwei glatte Zehnerzahlen, mit oder ohne Hunderterübergang",
+      "example": "860 − 320 = 540"
+    },
+    "K4-SUB-4": {
+      "name": "große Zahl minus eine Zahl an einer einzigen Stelle, ohne Übergang",
+      "example": "388 888 − 300 = 388 588"
+    },
+    "K4-SUB-5": {
+      "name": "glatte Tausenderzahl minus Tausender oder Zehntausender mit Übergang",
+      "example": "22 000 − 3000 = 19 000"
+    },
+    "K4-SUB-6": {
+      "name": "zwei glatte Zahlen wie in Stufe 3, in Tausendern oder Zehntausendern",
+      "example": "68 000 − 24 000 = 44 000"
+    },
+    "K4-TEIL-1": {
+      "name": "teilbar durch 2, 5 oder 10",
+      "example": "durch 5: 412, 530, 357, 251 → 530"
+    },
+    "K4-TEIL-2": {
+      "name": "teilbar durch 2, 5 oder 10",
+      "example": "durch 2: 3733, 12 435, 23 468, 5411 → 23 468"
+    },
+    "K4-TEIL-3": {
+      "name": "„Welche Zahl ist ein Teiler von 24?“",
+      "example": "5, 7, 8, 9 → 8"
+    },
+    "K4-TEIL-4": {
+      "name": "„Welche Zahl ist ein Vielfaches von 7?“",
+      "example": "36, 44, 56, 62 → 56"
+    },
+    "K4-WALL-1": {
+      "name": "die beiden mittleren Steine und die Spitze (nur Plus), glatte Zehnerzahlen",
+      "example": "Grundsteine glatte Zehnerzahlen 10 bis 300, Spitze höchstens 1000"
+    },
+    "K4-WALL-2": {
+      "name": "ein Grundstein, ein mittlerer Stein, die Spitze (einmal Minus), glatte Zehnerzahlen",
+      "example": "Grundsteine glatte Zehnerzahlen 10 bis 300, Spitze höchstens 1000"
+    },
+    "K4-WALL-3": {
+      "name": "von der Spitze nach unten (dreimal Minus), glatte Zehnerzahlen",
+      "example": "Grundsteine glatte Zehnerzahlen 10 bis 300, Spitze höchstens 1000"
+    },
+    "K4-WALL-4": {
+      "name": "die beiden mittleren Steine und die Spitze (nur Plus), Tausender oder Zehntausender",
+      "example": "Grundsteine 12 000, 7000, 25 000; Mitte 19 000 und 32 000; Spitze 51 000"
+    },
+    "K4-WALL-5": {
+      "name": "ein Grundstein, ein mittlerer Stein, die Spitze (einmal Minus), Tausender oder Zehntausender",
+      "example": "Grundsteine 12 000, 7000, 25 000; Mitte 19 000 und 32 000; Spitze 51 000"
+    },
+    "K4-WALL-6": {
+      "name": "von der Spitze nach unten (dreimal Minus), Tausender oder Zehntausender",
+      "example": "Grundsteine 12 000, 7000, 25 000; Mitte 19 000 und 32 000; Spitze 51 000"
+    }
+  }
+}

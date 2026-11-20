@@ -5,20 +5,21 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=91f88903';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=91f88903';
-import { wayForKey } from './math/ways.js?v=91f88903';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=91f88903';
-import { nextCurrent, answerCode } from './combat/current.js?v=91f88903';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=91f88903';
-import { generateMap, addExtraRest } from './dungeon/map.js?v=91f88903';
-import { createSave } from './save/save.js?v=91f88903';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=91f88903';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=91f88903';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=91f88903';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=91f88903';
-import { rollEvent, optionCost } from './dungeon/events.js?v=91f88903';
-import { createRiddle } from './dungeon/riddle.js?v=91f88903';
+import { createRng, deriveSeed } from './rng.js?v=b2d5e6d3';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=b2d5e6d3';
+import { wayForKey } from './math/ways.js?v=b2d5e6d3';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=b2d5e6d3';
+import { nextCurrent, answerCode } from './combat/current.js?v=b2d5e6d3';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=b2d5e6d3';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=b2d5e6d3';
+import { createSave } from './save/save.js?v=b2d5e6d3';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=b2d5e6d3';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=b2d5e6d3';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=b2d5e6d3';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=b2d5e6d3';
+import { rollEvent, optionCost } from './dungeon/events.js?v=b2d5e6d3';
+import { createRiddle } from './dungeon/riddle.js?v=b2d5e6d3';
+import { noteDive, noteDay, noteRun, noteAnswer } from './progression/statistics.js?v=b2d5e6d3';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -44,6 +45,7 @@ export function createGame({ config, save, seed }) {
     runs: createRng(deriveSeed(seed, 'runs')),
     map: null,         // { seed, data } zwischengespeicherte Seekarte
     now: save?.geaendert ?? 0,
+    tzOffset: 0, // Versatz der Zeitzone des Geräts in Minuten (wie getTimezoneOffset), für den Spieltag
   };
 
   // Seesterne (Phase 9): Reichen die Sterne für ein Gebiet, das noch zu ist (z. B. Preis später gesenkt), öffnet es sich beim Laden
@@ -222,6 +224,7 @@ export function createGame({ config, save, seed }) {
       if (stationEffect('extraRest')) state.save.lauf.vorrat = true;
       if (stationEffect('diveStartBlock')) state.save.lauf.werkstatt = true;
     }
+    noteDive(state.save, areaId, state.now, state.tzOffset); // Lernübersicht (Phase 10): Spieltag und Gebiet
     state.screen = 'map';
     // offene Kartenauswahl aus einem Ereignis (Perlen oder Leben schon bezahlt) kommt nach dem Neuladen wieder
     if (l && l.beute) offerEventCards(l.beute, currentMap().rooms.find((r) => r.id === l.beute)?.type === 'riddle' ? { riddle: true, event: false } : {});
@@ -234,6 +237,7 @@ export function createGame({ config, save, seed }) {
     const l = lauf();
     if (!reachable().includes(roomId)) return reject('notReachable');
     const room = currentMap().rooms.find((r) => r.id === roomId);
+    noteDay(state.save, state.now, state.tzOffset); // Spieltag auch, wenn die Seite über Nacht offen blieb (Phase 10)
     const events = [{ type: 'roomEntered', roomId, roomType: room.type }];
     if (room.type === 'rest') {
       // Ruheplatz heilt einen Anteil der Höchstleben (Balance nach Probespiel 17.11.2026)
@@ -404,6 +408,7 @@ export function createGame({ config, save, seed }) {
     // nur der erste Versuch je Stein oder Folge zählt (Regelwerk 7.1 Nr. 7)
     const first = !rec.versucht[rec.schritt];
     rec.versucht[rec.schritt] = 1;
+    if (first) noteAnswer(state.save, r.ladder, correct ? 'correct' : 'wrong'); // Lernübersicht (Phase 10)
     // nur, solange die Rätselstufe noch die Stufe des Kindes ist (nach dem Neuladen kann sie sich geändert haben);
     // stageFor erst danach fragen, denn es legt den Eintrag der Leiter an
     if (first && config.game.learning.enabled && !r.info.stageChanged.includes(r.ladder)
@@ -672,6 +677,7 @@ export function createGame({ config, save, seed }) {
         s.gebiete[id] = { geschafft: false, tiefe: 0, ...(s.gebiete[id] ?? {}), offen: true };
         events.push({ type: 'areaUnlocked', areaId: id });
       }
+      noteRun(s, areaId, depth, true); // Lernübersicht (Phase 10)
       s.lauf = null;
       state.cleared = { areaId, depth, star, stars, unlocked };
       state.afterReward = 'areaCleared';
@@ -697,6 +703,9 @@ export function createGame({ config, save, seed }) {
       // für die neue (Regelwerk 7.1 Nr. 7; Review 7b, B4)
       if ((e.type === 'answerJudged' || e.type === 'stepJudged') && e.counts && counting && !info.stageChanged.includes(e.ladder)) extra.push(...countAnswer(e.ladder, e.outcome === 'correct'));
       if (e.type === 'answerJudged' && e.practice && e.outcome === 'correct' && counting) practiceSolved(e.practiceKey);
+      // Lernübersicht (Phase 10): erster Versuch je Aufgabe und je Schritt, auch wenn er für die Lernstufe nicht zählt
+      if (counting && e.type === 'answerJudged' && e.single && e.tally) noteAnswer(state.save, e.tally, e.outcome);
+      if (counting && e.type === 'stepJudged' && e.first && e.ladder) noteAnswer(state.save, e.ladder, e.outcome);
       if (e.type === 'answerJudged') {
         if (e.outcome === 'correct' && e.tierId === 'lightning') info.lightningHits += 1;
         // Strömung (D33): Antworten im Tauchgang merken, außer in der Erklärung
@@ -727,6 +736,7 @@ export function createGame({ config, save, seed }) {
         if (lauf() && info.roomId !== null) {
           // Gebiet wieder voll besetzt, alles Gesammelte bleibt (Konzept 6)
           extra.push({ type: 'runLost', areaId: lauf().gebiet });
+          noteRun(state.save, lauf().gebiet, lauf().tiefe, false); // Lernübersicht (Phase 10)
           state.save.lauf = null;
           state.screen = 'base';
         } else {
@@ -998,7 +1008,8 @@ export function createGame({ config, save, seed }) {
   return {
     startCombat,
     get combat() { return state.combat; },
-    setNow(now) { state.now = now; },
+    // tzOffsetMinutes: Zeitzone des Geräts (Phase 10, Spieltage der Lernübersicht); ohne Angabe bleibt der letzte Wert
+    setNow(now, tzOffsetMinutes) { state.now = now; if (Number.isFinite(tzOffsetMinutes)) state.tzOffset = tzOffsetMinutes; },
     dispatch(command) {
       if (state.screen === 'combat') {
         if (command?.type === 'pickReward') return reject('screen');

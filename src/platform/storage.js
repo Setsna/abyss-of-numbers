@@ -2,7 +2,7 @@
 // Ein ungültiger Stand wird nicht gelöscht, sondern unter "<Schlüssel>.defekt" aufbewahrt.
 // Ein Stand aus einer NEUEREN Fassung des Spiels (höhere Versionsnummer) ist nicht defekt: Dieses Gerät hat
 // nur noch die ältere Fassung geladen. Er bleibt unberührt, Status "newer" (Update-Sicherheit, 20.11.2026).
-import { validateSave, migrateSave, repairSave, SAVE_VERSION } from '../engine/save/save.js?v=91f88903';
+import { validateSave, migrateSave, repairSave, SAVE_VERSION } from '../engine/save/save.js?v=b2d5e6d3';
 
 export const STORAGE_KEY = 'abyss-of-numbers-v1';
 const BROKEN_KEY = `${STORAGE_KEY}.defekt`;
@@ -58,8 +58,17 @@ export function createStorage(backend, config) {
     // Ein Fehler im Spiel soll höchstens den Fortschritt seit dem letzten gültigen Stand kosten, nicht den Stand.
     write(save) {
       try {
-        const raw = JSON.stringify(save);
-        if (validateSave(JSON.parse(raw), config).length > 0) return false;
+        let raw = JSON.stringify(save);
+        const copy = JSON.parse(raw);
+        let errors = validateSave(copy, config);
+        // Eine fehlerhafte Zählung der Lernübersicht kostet nur die Zählung, nie den Spielstand (Review Phase 10, Etappe 1).
+        // Jeder andere Fehler: nichts schreiben, der letzte gültige Stand bleibt liegen.
+        if (errors.length > 0 && errors.every((e) => e.startsWith('statistik'))) {
+          delete copy.statistik;
+          raw = JSON.stringify(copy);
+          errors = validateSave(copy, config);
+        }
+        if (errors.length > 0) return false;
         backend.setItem(STORAGE_KEY, raw);
         return true;
       } catch {

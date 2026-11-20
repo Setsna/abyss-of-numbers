@@ -1,8 +1,9 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=91f88903';
-import { createRiddle } from '../dungeon/riddle.js?v=91f88903';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=91f88903';
+import { generateMap } from '../dungeon/map.js?v=b2d5e6d3';
+import { createRiddle } from '../dungeon/riddle.js?v=b2d5e6d3';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=b2d5e6d3';
+import { validateStatistics } from '../progression/statistics.js?v=b2d5e6d3';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -104,6 +105,9 @@ export function validateSave(s, config) {
 
   if (s.lauf !== null && !isObj(s.lauf)) fail('lauf', 'muss null oder ein Objekt sein');
   else if (s.lauf) validateRun(s.lauf, config, fail, s);
+
+  // Zählung für die Lernübersicht (Phase 10): freiwillig, ohne Versionssprung
+  if (s.statistik !== undefined) validateStatistics(s.statistik, config, fail);
 
   if (!isObj(s.uebung)) fail('uebung', 'fehlt');
   else {
@@ -253,7 +257,13 @@ function validateRun(l, config, fail, save) {
 // Alles andere bleibt Sache von validateSave. Aufruf nach migrateSave (storage.js). Liefert Notizen.
 export function repairSave(save, config) {
   const notes = [];
-  if (!isObj(save) || !isObj(save.lauf)) return notes;
+  if (!isObj(save)) return notes;
+  // Zählung der Lernübersicht (Phase 10): beschädigt → nur dieses Feld verwerfen, die Zählung beginnt neu
+  if (save.statistik !== undefined && validateSave(save, config).some((e) => e.startsWith('statistik'))) {
+    delete save.statistik;
+    notes.push('statistik: beschädigt, neu begonnen');
+  }
+  if (!isObj(save.lauf)) return notes;
   const l = save.lauf;
   if (Number.isInteger(l.leben) && l.leben < 1) {
     l.leben = 1;
