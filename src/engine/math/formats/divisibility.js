@@ -4,8 +4,8 @@
 //   multiple  „Welche Zahl ist ein Vielfaches von 7?“ (richtige Zahl aus dem Einmaleins der Vorgabe)
 // Falsche Zahlen sind verlockend: F-TEIL-a die Ziffer der Regel steht an der falschen Stelle
 // (357 bei „durch 5“, 12 435 bei „durch 2“), F-TEIL-b eine Nachbarzahl einer passenden Zahl.
-import { formatNumber } from '../format.js?v=2a306128';
-import { drawUntil } from './common.js?v=2a306128';
+import { formatNumber } from '../format.js?v=dc004222';
+import { drawUntil } from './common.js?v=dc004222';
 
 const draw = (r, rng) => r.min + (r.step ?? 1) * rng.nextInt(0, Math.floor((r.max - r.min) / (r.step ?? 1)));
 

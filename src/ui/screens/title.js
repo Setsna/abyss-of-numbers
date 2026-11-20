@@ -1,7 +1,7 @@
 // Startbildschirm (Plan Etappe 7): Titel und ein großer Knopf, „Los!“ ohne Stand, „Weiter“ mit Stand.
 // Unten unauffällig „Für Erwachsene“ (Etappe 8). Mit Konto (Etappe 10) unten links: wer angemeldet ist,
 // „Abmelden“ und, wenn nötig, eine Zeile zum Netz (account: { name, onLogout, onNet(f) }).
-import { renderAsset, assetUrl } from '../assets.js?v=2a306128';
+import { renderAsset, assetUrl } from '../assets.js?v=dc004222';
 
 export function mountTitle(root, { t, hasSave, onStart, onAdult, account = null }) {
   root.innerHTML = `

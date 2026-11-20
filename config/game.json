@@ -31,6 +31,22 @@
       "heal"
     ]
   },
+  "mission": {
+    "enabled": true,
+    "reward": 5,
+    "goals": {
+      "uebung": 3,
+      "rechenart": 6,
+      "serie": 5
+    },
+    "practiceEvery": 2
+  },
+  "rescue": {
+    "enabled": true,
+    "tasks": 3,
+    "needed": 2,
+    "hpShare": 0.3
+  },
   "penalty": {
     "wrong": 2,
     "timeout": 2,

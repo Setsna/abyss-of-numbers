@@ -5,6 +5,7 @@
 //   lauf        je Gebiet und Tiefe [geschafft, verloren]; ein abgebrochener Tauchgang zählt nicht
 //   antwort     je Leiter [richtig, falsch, Zeit abgelaufen], erster Versuch je Aufgabe und Schritt im Tauchgang
 //   letzte      je Leiter die letzten zehn ersten Versuche, '1' richtig, '0' falsch oder zu spät; nie geleert
+//   rettung     [geschafft, nicht geschafft] der Rettungsaufgabe (Phase 10, Etappe 4), freiwillig; ihre Antworten zählen nirgends
 // Keine Antwortzeiten, keine Zeitpunkte einzelner Antworten.
 
 export const LAST_ANSWERS = 10;
@@ -50,6 +51,13 @@ export function noteRun(save, areaId, depth, won) {
   rec[won ? 0 : 1] += 1;
 }
 
+// Rettungsaufgabe (Regelwerk 14.2): nur ob sie geschafft wurde
+export function noteRescue(save, saved) {
+  const st = stats(save);
+  const rec = (st.rettung ??= [0, 0]);
+  rec[saved ? 0 : 1] += 1;
+}
+
 const OUTCOME_SLOT = { correct: 0, wrong: 1, timeout: 2 };
 export function noteAnswer(save, ladder, outcome) {
   const slot = OUTCOME_SLOT[outcome];
@@ -80,6 +88,7 @@ export function validateStatistics(st, config, fail) {
       }
     }
   }
+  if (st.rettung !== undefined && !counts(st.rettung, 2)) fail('statistik.rettung', '[geschafft, nicht geschafft] als ganze Zahlen ≥ 0');
   for (const key of ['antwort', 'letzte']) {
     if (!isObj(st[key])) { fail(`statistik.${key}`, 'Objekt'); continue; }
     for (const [ladder, v] of Object.entries(st[key])) {

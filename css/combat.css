@@ -582,6 +582,8 @@
 .steps-dots i { width: calc(18 * var(--u)); height: calc(18 * var(--u)); border-radius: 50%; border: var(--line-thin) solid var(--ink); background: var(--paper); }
 .steps-dots i.is-done { background: var(--heal); }
 .steps-dots i.is-now { background: var(--sun); }
+/* Rettungsaufgabe (Phase 10): nicht geschaffte Aufgabe, grau statt rot (kein Druck) */
+.steps-dots i.is-missed { background: color-mix(in srgb, var(--ink) 35%, var(--paper)); }
 .free-note { margin: 0; text-align: center; font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); }
 /* Rechenweg nach einem Fehler (Phase 6b, Regelwerk 8.1): eine Zeile unter der Rechnung */
 /* Rechenweg als eigener Block auf blassem Sonnengelb wie der Kartenhinweis: ein Satz, der erklärt

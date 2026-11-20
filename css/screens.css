@@ -549,6 +549,16 @@
   padding: calc(84 * var(--u)) calc(28 * var(--u)) calc(24 * var(--u));
 }
 .station-scene .caption { max-width: 60%; }
+/* Tagesauftrag (Phase 10, Etappe 5): Stand in einer eigenen Zeile unter dem Auftrag */
+.station-scene .caption .mission-progress { display: block; margin-top: calc(4 * var(--u)); font-weight: 700; }
+.station-scene .caption.is-mission { font-size: calc(22 * var(--u)); } /* eine Stufe kleiner als die übliche Ansage (24u) */
+/* Lautwort „Geschafft!“ beim Tagesauftrag: am Schild oben links */
+.station-boom.is-mission { left: 4%; top: 22%; width: auto; }
+/* Hochformat: Auftrag über die volle Breite in zwei Zeilen, Stand in derselben Zeile (sonst verdeckt das Schild den Kopf der Heldin) */
+@media (orientation: portrait) {
+  .station-scene .caption.is-mission { max-width: calc(100% - 2 * var(--line)); }
+  .station-scene .caption .mission-progress { display: inline; margin: 0 0 0 0.5em; white-space: nowrap; }
+}
 .station-hero {
   grid-area: hero; position: relative; z-index: 2; min-height: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: calc(8 * var(--u));

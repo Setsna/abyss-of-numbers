@@ -1,35 +1,36 @@
 // Einstieg: Konfiguration und Bildliste laden, prüfen, Spielstand laden, dann Titel oder (nur lokal) Testkämpfe.
-// Testkampf: index.html?dev=combat&enemies=crab,jelly&seed=1  (dazu &zeit=plus50|plus100|noTimer, &calm=1, &stufe=2, &stroemung=1.2, &area=caves, &klasse=4)
+// Testkampf: index.html?dev=combat&enemies=crab,jelly&seed=1  (dazu &zeit=plus50|plus100|noTimer, &calm=1, &stufe=2, &stroemung=1.2, &area=caves, &klasse=4,
+//   &rettung=1&leben=1 für die Rettungsaufgabe)
 // Ohne ?dev=…: Spielablauf über Station und Seekarte.
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=2a306128';
-import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=2a306128';
-import { createAccount, accountBackend } from './platform/account.js?v=2a306128';
-import { FIREBASE } from './platform/firebase-config.js?v=2a306128';
-import { createAudio } from './platform/audio.js?v=2a306128';
-import { validateConfig } from './engine/config/validate.js?v=2a306128';
-import { createSave } from './engine/save/save.js?v=2a306128';
-import { createGame } from './engine/game.js?v=2a306128';
-import { setTexts, t } from './ui/text.js?v=2a306128';
-import { setManifest } from './ui/assets.js?v=2a306128';
-import { isLocalHost } from './ui/app.js?v=2a306128';
-import { mountCombat } from './ui/screens/combat.js?v=2a306128';
-import { mountReward } from './ui/screens/reward.js?v=2a306128';
-import { mountShop } from './ui/screens/shop.js?v=2a306128';
-import { mountEvent } from './ui/screens/event.js?v=2a306128';
-import { mountRiddle } from './ui/screens/riddle.js?v=2a306128';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=2a306128';
-import { mountBase } from './ui/screens/base.js?v=2a306128';
-import { mountTitle } from './ui/screens/title.js?v=2a306128';
-import { mountLogin } from './ui/screens/login.js?v=2a306128';
-import { mountStop } from './ui/screens/stop.js?v=2a306128';
-import { mountGrade } from './ui/screens/grade.js?v=2a306128';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=2a306128';
-import { mountLogbook } from './ui/screens/logbook.js?v=2a306128';
-import { mountAdult } from './ui/screens/adult.js?v=2a306128';
-import { createRng } from './engine/rng.js?v=2a306128';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=dc004222';
+import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=dc004222';
+import { createAccount, accountBackend } from './platform/account.js?v=dc004222';
+import { FIREBASE } from './platform/firebase-config.js?v=dc004222';
+import { createAudio } from './platform/audio.js?v=dc004222';
+import { validateConfig } from './engine/config/validate.js?v=dc004222';
+import { createSave } from './engine/save/save.js?v=dc004222';
+import { createGame } from './engine/game.js?v=dc004222';
+import { setTexts, t } from './ui/text.js?v=dc004222';
+import { setManifest } from './ui/assets.js?v=dc004222';
+import { isLocalHost } from './ui/app.js?v=dc004222';
+import { mountCombat } from './ui/screens/combat.js?v=dc004222';
+import { mountReward } from './ui/screens/reward.js?v=dc004222';
+import { mountShop } from './ui/screens/shop.js?v=dc004222';
+import { mountEvent } from './ui/screens/event.js?v=dc004222';
+import { mountRiddle } from './ui/screens/riddle.js?v=dc004222';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=dc004222';
+import { mountBase } from './ui/screens/base.js?v=dc004222';
+import { mountTitle } from './ui/screens/title.js?v=dc004222';
+import { mountLogin } from './ui/screens/login.js?v=dc004222';
+import { mountStop } from './ui/screens/stop.js?v=dc004222';
+import { mountGrade } from './ui/screens/grade.js?v=dc004222';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=dc004222';
+import { mountLogbook } from './ui/screens/logbook.js?v=dc004222';
+import { mountAdult } from './ui/screens/adult.js?v=dc004222';
+import { createRng } from './engine/rng.js?v=dc004222';
 
 const app = document.getElementById('app');
 
@@ -120,7 +121,10 @@ function runDevCombats(config, params) {
     // &area=caves usw. wählt auch die Aufgaben des Gebiets (Phase 6b, Gebietsfenster)
     const area = config.class3.areas[params.get('area')] ? params.get('area') : 'reef';
     const elite = config.elites.rules[params.get('elite')] ? params.get('elite') : null; // &elite=guard|regen|rage (Phase 9)
-    game.startCombat(enemies.length ? enemies : ['crab'], level, { enemyPower: Number(params.get('stroemung') || 1), areaId: area, elite });
+    // &rettung=1&leben=1 (Phase 10): Rettungsaufgabe im Testkampf ansehen, Held mit wenig Leben
+    const rescue = params.get('rettung') === '1';
+    const hp = Number(params.get('leben')) > 0 ? Number(params.get('leben')) : undefined;
+    game.startCombat(enemies.length ? enemies : ['crab'], level, { enemyPower: Number(params.get('stroemung') || 1), areaId: area, elite, rescue, hp });
     show(mountCombat(app, {
       config, t, game, audio,
       onWon: () => {
@@ -239,6 +243,7 @@ function runGame(config, session = null) {
         onDive: (areaId, { abandon = false, depth } = {}) => { act(depth === undefined ? { type: 'dive', areaId, abandon } : { type: 'dive', areaId, abandon, depth }); route(); },
         onLogbook: (page) => { act({ type: 'openLogbook', page }); route(); },
         onAckNewCards: () => act({ type: 'ackNewCards' }), // Phase 9
+        onAckMission: () => act({ type: 'ackMission' }), // Tagesauftrag geschafft gesehen (Phase 10)
         // Station ausbauen (Etappe 8): nach dem Kauf steht das Stück im Bild, oben ein Satz dazu
         onBuy: (upgradeId) => {
           const ok = act({ type: 'buyUpgrade', upgradeId }).some((e) => e.type === 'upgradeBought');
@@ -265,6 +270,7 @@ function runGame(config, session = null) {
         tutorial: v.tutorial,
         explained: v.explained,
         onExplain: (key) => act({ type: 'markExplained', key }),
+        onPersist: () => { game.setNow(Date.now(), new Date().getTimezoneOffset()); persist(); }, // Rettung, Zweite Luft (Phase 10)
         onWon: () => {
           persist(); // Raum erledigt, Erfahrung und Perlen sind schon verbucht
           show(mountReward(app, {
@@ -277,7 +283,8 @@ function runGame(config, session = null) {
             },
           }));
         },
-        onLost: () => { persist(); route(); },
+        // Uhr vor der Rückkehr zur Station: nach Mitternacht gilt der Auftrag des neuen Tages (Abschlussreview Etappe 5)
+        onLost: () => { game.setNow(Date.now(), new Date().getTimezoneOffset()); persist(); route(); },
       }));
     } else if (v.screen === 'reward') {
       // Beute nach einem Schatz (nach einem Kampf zeigt sie onWon)

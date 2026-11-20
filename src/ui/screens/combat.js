@@ -1,18 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=2a306128';
-import { combatView } from '../../engine/combat/combat.js?v=2a306128';
-import { ICON } from '../icons.js?v=2a306128';
-import { renderAsset, assetUrl } from '../assets.js?v=2a306128';
-import { poseBox, dashDistance } from '../components/pose.js?v=2a306128';
-import { playEvents, wait, isCalm } from '../app.js?v=2a306128';
-import { bindKeys } from '../input.js?v=2a306128';
-import { renderEnemy } from '../components/enemy.js?v=2a306128';
-import { renderCard, emptySlot } from '../components/card.js?v=2a306128';
-import { createTaskPanel } from '../components/task-panel.js?v=2a306128';
-import { startTimerBar } from '../components/timer-bar.js?v=2a306128';
-import { createTutorial } from '../tutorial.js?v=2a306128';
+import { wayText, hintAsk } from '../text.js?v=dc004222';
+import { combatView } from '../../engine/combat/combat.js?v=dc004222';
+import { ICON } from '../icons.js?v=dc004222';
+import { renderAsset, assetUrl } from '../assets.js?v=dc004222';
+import { poseBox, dashDistance } from '../components/pose.js?v=dc004222';
+import { playEvents, wait, isCalm, needsSave } from '../app.js?v=dc004222';
+import { bindKeys } from '../input.js?v=dc004222';
+import { renderEnemy } from '../components/enemy.js?v=dc004222';
+import { renderCard, emptySlot } from '../components/card.js?v=dc004222';
+import { createTaskPanel } from '../components/task-panel.js?v=dc004222';
+import { startTimerBar } from '../components/timer-bar.js?v=dc004222';
+import { createTutorial } from '../tutorial.js?v=dc004222';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -53,7 +53,7 @@ const STAGE_HTML = `
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 // tutorial: Erklärung im ersten Kampf; explained: schon erklärte Kartenarten; onExplain(key): merken.
-export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutorial = false, explained = {}, onExplain = () => {} }) {
+export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutorial = false, explained = {}, onExplain = () => {}, onPersist = () => {} }) {
   root.innerHTML = STAGE_HTML;
   const $ = (id) => root.querySelector(`#${id}`);
   const cards = config.cards;
@@ -187,6 +187,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     let text = '';
     if (foesTurn) text = t('caption.foeTurn');
     else if (v.phase === 'feedback') text = t('caption.next');
+    else if (v.phase === 'rescue') text = t('rescue.caption', { needed: v.rescue.needed, total: v.rescue.total });
     else if (v.phase === 'task' && task) {
       const f = task.stepFormat ?? task.format;
       text = t(f === 'solve' ? 'caption.solve' : `caption.${f}`);
@@ -384,6 +385,36 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       showBoom(t('boss.phase2'));
       await wait(700);
     },
+    // Rettungsaufgabe (Phase 10, Etappe 4): Lautwort zuerst, dann die Aufgabe ohne Zeitleiste (nichts bewegt sich über ihr)
+    async rescueStarted(e) {
+      foesTurn = false;
+      render(shown);
+      showBoom(t('rescue.boom'));
+      // Das Lautwort steht auch bei „Weniger Bewegung“ 1 s (CSS still 1000ms); erst danach die Aufgabe öffnen
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      $('boom').classList.remove('is-on');
+      openRescue(e.task);
+    },
+    rescueTaskOpened(e) { openRescue(e.task); },
+    async rescueJudged(e) {
+      if (e.outcome === 'correct') {
+        panel.markRight(task.correctIndex);
+        await wait(500);
+      } else {
+        panel.markWrong(e.chosen);
+        panel.markRight(task.correctIndex);
+        await wait(600);
+        showFeedback(e);
+      }
+    },
+    async rescueEnded(e) {
+      panel.close();
+      task = null;
+      shown.hero.hp = e.hp;
+      render(shown);
+      $('caption').textContent = e.saved ? t('rescue.saved', { hp: e.hp }) : t('rescue.failed');
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Lesezeit, auch bei „Weniger Bewegung“ nicht gekürzt
+    },
     async secondWind() { // Talent Zweite Luft (Phase 9)
       showBoom(t('talents.secondWindBoom'));
       await wait(700);
@@ -513,6 +544,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
   async function run(command, extraHandlers = {}) {
     busy = true;
     const events = game.dispatch(command);
+    if (needsSave(events)) onPersist(); // Rettung, Zweite Luft: Merker sofort speichern (I1)
     shown = clone(shown ?? live());
     await playEvents(events, { ...handlers, ...extraHandlers }, sound);
     busy = false;
@@ -522,7 +554,31 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     return events;
   }
 
+  // Rettungsaufgabe: Punkte je Aufgabe aus dem Stand der Engine, ohne Zeitleiste
+  function openRescue(next) {
+    task = next;
+    const r = combatView(combat).rescue;
+    const progress = r ? Array.from({ length: r.total }, (_, i) => (i < r.results.length ? r.results[i] : i === r.results.length ? 'now' : 'open')) : null;
+    panel.open(task, { progress });
+    panel.timerRoot.hidden = true;
+  }
+
+  async function rescueAnswer(k) {
+    if (busy) return;
+    panel.lock();
+    busy = true;
+    const events = game.dispatch({ type: 'answer', choiceIndex: k });
+    if (needsSave(events)) onPersist(); // Auftrag geschafft (Abschlussreview Etappe 5, I1)
+    shown = clone(shown);
+    await playEvents(events.map((e) => (e.type === 'rescueJudged' ? { ...e, chosen: k } : e)), handlers, sound);
+    busy = false;
+    autoTarget();
+    render();
+    if (combat.phase === 'won' || combat.phase === 'lost') endBanner(combat.phase === 'won');
+  }
+
   async function answer(k) {
+    if (combat.phase === 'rescue') return rescueAnswer(k);
     if (combat.phase !== 'task' || !timerBar) return;
     panel.lock();
     timerBar.stop();
@@ -530,6 +586,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     timerBar = null;
     const command = k < 0 ? { type: 'timeout' } : { type: 'answer', choiceIndex: k, elapsedMs };
     const events = game.dispatch(command);
+    if (needsSave(events)) onPersist(); // Auftrag geschafft mitten im Kampf (Abschlussreview Etappe 5, I1)
     busy = true;
     shown = clone(shown);
     await playEvents(events.map((e) => (e.type === 'answerJudged' || e.type === 'stepJudged' ? { ...e, chosen: k } : e)), handlers, sound);
@@ -570,6 +627,12 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
   }
 
   async function next() {
+    if (combat.phase === 'rescue' && !busy) {
+      panel.close();
+      task = null;
+      await run({ type: 'acknowledgeFeedback' });
+      return;
+    }
     if (combat.phase !== 'feedback' || busy) return;
     panel.close();
     pendingUid = null;

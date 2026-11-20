@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=2a306128';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=2a306128';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=2a306128';
-import { chooseSource } from '../learning/learning.js?v=2a306128';
-import { crossPlace } from '../math/places.js?v=2a306128';
-import { neighborWay } from '../math/ways.js?v=2a306128';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=2a306128';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=2a306128';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=2a306128';
-import { cardEffect } from '../cards/effect.js?v=2a306128';
+import { createRng, deriveSeed } from '../rng.js?v=dc004222';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=dc004222';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=dc004222';
+import { chooseSource } from '../learning/learning.js?v=dc004222';
+import { crossPlace } from '../math/places.js?v=dc004222';
+import { neighborWay } from '../math/ways.js?v=dc004222';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=dc004222';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=dc004222';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=dc004222';
+import { cardEffect } from '../cards/effect.js?v=dc004222';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -30,7 +30,8 @@ function enemyType(config, typeId) {
   return t;
 }
 
-export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off', areaId, level = 1, seed, untimedTasks = 0, grade = 3, forgiving = false, cardLevels = {}, enemyPower = 1, depthPower = 1, deep = false, elite = null, taskPlan = null }) {
+export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off', areaId, level = 1, seed, untimedTasks = 0, grade = 3, forgiving = false, cardLevels = {}, enemyPower = 1, depthPower = 1, deep = false, elite = null, taskPlan = null, rescue = false }) {
+  // rescue (Phase 10, Etappe 4): Rettungsaufgabe in diesem Kampf möglich (Tauchgang, einmal je Tauchgang; Regelwerk 14)
   // elite (Phase 9, Etappe 2): Regel aus elites.json für den ersten Gegner (guard, regen, rage)
   // depthPower (Phase 9): Tiefe des Tauchgangs, wirkt wie die Strömung auf Leben und Angriff; deep: zweites Bossmuster (deepPhases)
   // taskPlan (Phase 6b): { grade, stageOf: { <leiter>: n }, windows: { <leiter>: [von, bis] } }; ohne Plan Regelwerk 7.6 nach level
@@ -87,6 +88,8 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
     streakMax: config.game.streak.maxBonus + (hero.streakMaxBonus ?? 0),
     secondWind: hero.secondWind ?? 0,
     streak: 0, // Serie richtiger Antworten in Folge (Etappe 8, M13); die Zeit wird nie kürzer
+    rescueLeft: rescue ? 1 : 0, // Rettungsaufgabe (Phase 10): noch möglich in diesem Kampf
+    rescue: null, // laufende Rettung: { ops, index, right, wrong, stage, results, task }
   };
   // Schutzregel schon in der ersten Runde: beginnt die Reihe mit einer Rechenart, die alle anderen schützen, rückt sie weiter
   for (const [e, index] of rotationPlan(combat, { first: true })) { e.rotation.index = index; e.immune = immuneAt(e, index); }
@@ -424,7 +427,7 @@ function rankOf(c, ladder, stageId, win) {
 // Mischregel (Regelwerk 7.2): zählt die Aufgaben je Leiter und wählt die Quelle der nächsten
 function mixSource(c, ladder, n, practice = []) {
   c.mixCount[ladder] = (c.mixCount[ladder] ?? 0) + 1;
-  return chooseSource({ stufe: n, win: c.taskPlan.windows[ladder], count: c.mixCount[ladder], mixEvery: c.taskPlan.mixEvery ?? 0, practice }, c.rng.tasks);
+  return chooseSource({ stufe: n, win: c.taskPlan.windows[ladder], count: c.mixCount[ladder], mixEvery: c.taskPlan.mixEvery ?? 0, practiceEvery: c.taskPlan.practiceEvery ?? 0, practice }, c.rng.tasks);
 }
 
 // A-3 (Durchsicht 6b): Kennung einer Rechnung für „schon gestellt“, in allen Formaten. Rechnungen
@@ -633,6 +636,23 @@ function judgedFields(t) {
   return { ladder: t.ladder ?? null, stageId: t.stageId ?? null, counts: Boolean(t.counts && !t.steps), practiceKey: t.practiceKey ?? null, practice: Boolean(t.practice), review: Boolean(t.review), single: !t.steps, tally };
 }
 
+// Hilfe nach einem Fehler (Regelwerk 8.1, 8.2): Fehlertyp der gewählten Antwort, Rechenweg, Stelle des Übergangs.
+// Im Kampf und in der Rettung gleich (Regelwerk 14.1). chosen: gewählte Antwort; -1 oder null bei abgelaufener Zeit
+function mistakeHelp(t, chosen) {
+  const mistakeType = (chosen !== null && chosen >= 0 ? t.choiceTypes?.[chosen] : null) ?? null;
+  let way = t.way ?? null;
+  // Nachbaraufgabe getippt: Weg von dieser Aufgabe aus, passend zum Hinweis (Phase 7a, Kritik P2)
+  if ((mistakeType === 'F-MUL-a' || mistakeType === 'F-MUL-d') && Number.isInteger(t.a) && Number.isInteger(t.b)) {
+    const nw = neighborWay(t.a, t.b, Number(String(t.choices[chosen]).replace(/\D/g, '')));
+    if (nw) way = nw;
+  }
+  // Stelle des Übergangs für den Hinweis (Phase 7a, D47); nur bei Plus und Minus mit Fehlertyp
+  // (bei der Muräne trägt die Aufgabe a und b der Rechnung auch im Suchschritt, deshalb die Prüfung des Typs)
+  const plusMinusMistake = /^F-(ADD|SUB)-/.test(mistakeType ?? '');
+  const hintPlace = plusMinusMistake && Number.isInteger(t.a) && Number.isInteger(t.b) ? crossPlace(t.operation, t.a, t.b) : null;
+  return { mistakeType, way, hintPlace };
+}
+
 // chosen: gewählte Antwort (für den Fehlertyp); -1 oder null bei abgelaufener Zeit
 function resolveTask(c, outcome, tierId, multiplier, chosen = null) {
   const pending = c.pending;
@@ -640,20 +660,7 @@ function resolveTask(c, outcome, tierId, multiplier, chosen = null) {
   c.pending = null;
   const t = pending.task;
   const events = [{ type: 'answerJudged', outcome, tierId, solutionText: t.solutionText, cardId: pending.cardId, ...judgedFields(t) }];
-  if (outcome !== 'correct') {
-    // Hilfe nach einem Fehler (Regelwerk 8.1, 8.2): Fehlertyp der gewählten Antwort und Rechenweg
-    events[0].mistakeType = (chosen !== null && chosen >= 0 ? t.choiceTypes?.[chosen] : null) ?? null;
-    events[0].way = t.way ?? null;
-    // Nachbaraufgabe getippt: Weg von dieser Aufgabe aus, passend zum Hinweis (Phase 7a, Kritik P2)
-    if ((events[0].mistakeType === 'F-MUL-a' || events[0].mistakeType === 'F-MUL-d') && Number.isInteger(t.a) && Number.isInteger(t.b)) {
-      const nw = neighborWay(t.a, t.b, Number(String(t.choices[chosen]).replace(/\D/g, '')));
-      if (nw) events[0].way = nw;
-    }
-    // Stelle des Übergangs für den Hinweis (Phase 7a, D47); nur bei Plus und Minus mit Fehlertyp
-    // (bei der Muräne trägt die Aufgabe a und b der Rechnung auch im Suchschritt, deshalb die Prüfung des Typs)
-    const plusMinusMistake = /^F-(ADD|SUB)-/.test(events[0].mistakeType ?? '');
-    events[0].hintPlace = plusMinusMistake && Number.isInteger(t.a) && Number.isInteger(t.b) ? crossPlace(t.operation, t.a, t.b) : null;
-  }
+  if (outcome !== 'correct') Object.assign(events[0], mistakeHelp(t, chosen));
   if (outcome === 'correct') {
     events.push(...applyCorrect(c, def, pending, multiplier));
     setStreak(c, c.streak + 1, events);
@@ -680,6 +687,7 @@ function resolveTask(c, outcome, tierId, multiplier, chosen = null) {
 }
 
 function answer(c, { choiceIndex, elapsedMs }) {
+  if (c.phase === 'rescue') return rescueAnswer(c, choiceIndex);
   if (c.phase !== 'task') return reject('phase');
   const task = c.pending.task;
   // Phase 7a: nur ein vorhandener Knopf und eine Zeit als Zahl (die Oberfläche schickt nichts anderes);
@@ -705,6 +713,10 @@ function timeout(c) {
 }
 
 function acknowledgeFeedback(c) {
+  if (c.phase === 'rescue') {
+    if (c.rescue.stage !== 'feedback') return reject('phase');
+    return rescueDecided(c) ? finishRescue(c) : openRescueTask(c);
+  }
   if (c.phase !== 'feedback') return reject('phase');
   c.phase = 'player';
   return [{ type: 'feedbackClosed' }];
@@ -791,6 +803,11 @@ function endTurn(c) {
       c.secondWind = 0;
       events.push({ type: 'secondWind', hp: c.hero.hp });
     }
+    if (c.hero.hp <= 0 && c.rescueLeft > 0) {
+      // Rettungsaufgabe (Phase 10): der Kampf hält an, die übrigen Gegner handeln in dieser Runde nicht mehr
+      events.push(...startRescue(c));
+      return events;
+    }
     if (c.hero.hp <= 0) {
       c.phase = 'lost';
       events.push({ type: 'combatLost' });
@@ -803,6 +820,87 @@ function endTurn(c) {
     events.push({ type: 'combatWon' });
     return events;
   }
+  events.push(...startTurn(c));
+  return events;
+}
+
+// ---------- Rettungsaufgabe (Phase 10, Etappe 4; Regelwerk 14.1, 14.2) ----------
+// Drei „Rechnung lösen“ aus drei verschiedenen Rechenarten, Stufe wie im Kampf, keine Mischregel, keine
+// Gegnerregel, keine Zeit, ein Versuch. Die Antworten kommen als rescueJudged, nicht als answerJudged: Lernstufe,
+// Strömung, Zählung, Serie und Kartenstufe sehen sie deshalb nicht.
+const RESCUE_OPS = ['add', 'sub', 'mul', 'div'];
+
+function startRescue(c) {
+  const cfg = c.config.game.rescue;
+  c.rescueLeft = 0;
+  const pool = RESCUE_OPS.filter((op) => c.taskPlan.stageOf?.[op]);
+  for (let i = pool.length - 1; i > 0; i--) { // mischen mit dem Aufgabenzufall (A-8)
+    const j = c.rng.tasks.nextInt(0, i);
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  const ops = Array.from({ length: cfg.tasks }, (_, i) => pool[i % pool.length]);
+  c.rescue = { ops, index: -1, right: 0, wrong: 0, stage: 'task', results: [], task: null };
+  c.phase = 'rescue';
+  const opened = openRescueTask(c);
+  return [{ type: 'rescueStarted', task: opened[0].task, total: cfg.tasks, needed: cfg.needed }];
+}
+
+// Nächste Aufgabe erst beim Öffnen erzeugen: eine nicht gestellte dritte Aufgabe belegt „schon gestellt“ nicht (A-3)
+function openRescueTask(c) {
+  const r = c.rescue;
+  r.index += 1;
+  const op = r.ops[r.index];
+  const task = generateFromStage(op, stageAt(c.curriculum, op, c.taskPlan.stageOf[op]), c.area, c.rng.tasks, c.asked);
+  c.asked.add(taskKey(task.operation, task.a, task.b));
+  task.timeLimitMs = 0;
+  task.untimed = true;
+  task.rescue = true;
+  if (c.taskPlan.windows?.[op]) task.stageRank = rankOf(c, op, task.stageId, c.taskPlan.windows[op]); // Testspieler
+  r.task = task;
+  r.stage = 'task';
+  return [{ type: 'rescueTaskOpened', task: clone(task) }];
+}
+
+function rescueDecided(c) {
+  const { right, wrong } = c.rescue;
+  const cfg = c.config.game.rescue;
+  return right >= cfg.needed || wrong > cfg.tasks - cfg.needed;
+}
+
+function rescueAnswer(c, choiceIndex) {
+  const r = c.rescue;
+  if (r.stage !== 'task') return reject('phase');
+  const t = r.task;
+  if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || choiceIndex >= t.choices.length) return reject('command');
+  const correct = choiceIndex === t.correctIndex;
+  if (correct) r.right += 1; else r.wrong += 1;
+  r.results.push(correct ? 'right' : 'wrong');
+  const help = correct ? { mistakeType: null, way: null, hintPlace: null } : mistakeHelp(t, choiceIndex);
+  const events = [{ type: 'rescueJudged', outcome: correct ? 'correct' : 'wrong', solutionText: t.solutionText, ...help,
+    practiceKey: t.practiceKey ?? null, stageId: t.stageId ?? null, right: r.right, wrong: r.wrong }];
+  if (!correct) { r.stage = 'feedback'; return events; } // erst die Lösung zeigen, dann acknowledgeFeedback
+  events.push(...(rescueDecided(c) ? finishRescue(c) : openRescueTask(c)));
+  return events;
+}
+
+function finishRescue(c) {
+  const cfg = c.config.game.rescue;
+  const saved = c.rescue.right >= cfg.needed;
+  c.rescue = null;
+  if (!saved) {
+    c.hero.hp = 0;
+    c.phase = 'lost';
+    return [{ type: 'rescueEnded', saved: false, hp: 0 }, { type: 'combatLost' }];
+  }
+  c.hero.hp = Math.max(1, Math.ceil(c.hero.maxHp * cfg.hpShare));
+  const events = [{ type: 'rescueEnded', saved: true, hp: c.hero.hp }];
+  // Dornen oder Gift haben im selben Zug den letzten Gegner besiegt: gewonnen statt neuer Runde
+  if (c.enemies.every((e) => !alive(e))) {
+    c.phase = 'won';
+    events.push({ type: 'combatWon' });
+    return events;
+  }
+  c.phase = 'player';
   events.push(...startTurn(c));
   return events;
 }
@@ -846,6 +944,11 @@ export function combatView(combat, { targetUid } = {}) {
     }),
     piles: { draw: c.piles.draw.length, discard: c.piles.discard.length, exhausted: c.piles.exhausted.length },
     task: c.phase === 'task' ? c.pending.task : null,
+    // Rettungsaufgabe (Phase 10): offene Aufgabe, Stand und Ergebnis der beantworteten Aufgaben
+    rescue: c.phase === 'rescue' ? {
+      task: c.rescue.task, index: c.rescue.index, total: c.config.game.rescue.tasks, needed: c.config.game.rescue.needed,
+      right: c.rescue.right, wrong: c.rescue.wrong, stage: c.rescue.stage, results: c.rescue.results.slice(),
+    } : null,
     cycleRequired: c.phase === 'cycle' ? c.cycle.required : null,
   };
 }

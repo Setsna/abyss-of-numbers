@@ -1,5 +1,5 @@
 // Klassenstufe (Plan Etappe 7): zwei große Felder. Seit Phase 6b hat Klasse 4 eigene Aufgaben.
-import { addWorld } from '../components/world.js?v=2a306128';
+import { addWorld } from '../components/world.js?v=dc004222';
 
 export function mountGrade(root, { t, config, onChoose }) {
   root.innerHTML = `

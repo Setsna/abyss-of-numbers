@@ -7,13 +7,13 @@
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=2a306128';
-import { renderAsset, assetUrl } from '../assets.js?v=2a306128';
-import { homeAreaId, worldLayer } from '../components/world.js?v=2a306128';
-import { renderCard } from '../components/card.js?v=2a306128';
-import { isCalm } from '../app.js?v=2a306128';
+import { ICON } from '../icons.js?v=dc004222';
+import { renderAsset, assetUrl } from '../assets.js?v=dc004222';
+import { homeAreaId, worldLayer } from '../components/world.js?v=dc004222';
+import { renderCard } from '../components/card.js?v=dc004222';
+import { isCalm } from '../app.js?v=dc004222';
 
-export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onBuy = null, bought = null, account = null }) {
+export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null }) {
   const v = game.view();
   const p = v.profile;
   root.innerHTML = `
@@ -78,8 +78,21 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
     <span class="chip chip-stars" aria-label="${p.stars === 1 ? t('base.starsOne') : t('base.stars', { n: p.stars })}">${ICON.star}<span>${p.stars}</span></span>`;
   // Nach dem zehnten Stück (Ingo 20.11.2026): „Deine Station ist fertig!“ statt des üblichen Satzes
   const complete = Boolean(bought) && (v.station?.items ?? []).every((x) => x.owned);
-  ref.text.textContent = complete ? t('station.complete')
-    : bought ? t('station.bought', { name: t(`station.items.${bought}.name`) }) : t('base.text');
+  // Schild oben links: Kauf (einmalig) → Tagesauftrag (Phase 10, Etappe 5) → der übliche Satz
+  const m = v.mission;
+  const missionNews = !bought && m?.geschafft && !m.gemeldet;
+  if (complete) ref.text.textContent = t('station.complete');
+  else if (bought) ref.text.textContent = t('station.bought', { name: t(`station.items.${bought}.name`) });
+  else if (missionNews) ref.text.textContent = t('mission.done', { n: config.game.mission.reward });
+  else if (m?.geschafft) ref.text.textContent = t('mission.doneLater');
+  else if (m) {
+    ref.text.classList.add('is-mission');
+    const op = m.leiter ? t(`mission.ops.${m.leiter}`) : '';
+    const line = document.createElement('span');
+    line.className = 'mission-progress';
+    line.textContent = t('mission.progress', { stand: m.stand, ziel: m.ziel });
+    ref.text.replaceChildren(t(`mission.${m.art}`, { ziel: m.ziel, op }), line);
+  } else ref.text.textContent = t('base.text');
 
   let busy = false;
   const once = (fn) => () => { if (busy) return; busy = true; fn(); };
@@ -291,6 +304,18 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
         requestAnimationFrame(tick);
       }, 300);
     }
+  }
+
+  // Tagesauftrag geschafft (Phase 10, Etappe 5): beim nächsten Stationsbesuch einmal „Geschafft!“ mit Klang
+  // (Ereignis missionSeen, sounds.json); danach bestätigt, damit es nicht wiederkommt
+  if (missionNews) {
+    const word = document.createElement('span');
+    word.className = 'station-boom is-mission';
+    word.setAttribute('aria-hidden', 'true');
+    word.textContent = t('mission.doneWord');
+    scene.append(word);
+    word.addEventListener('animationend', () => word.remove());
+    onAckMission?.();
   }
 
   ref.build.innerHTML = `<span class="spot-icon">${ICON.build}</span><span class="spot-label"></span>`;

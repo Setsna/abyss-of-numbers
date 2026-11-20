@@ -4,8 +4,8 @@
 // (Frage oben, `task.display` als große Zeile).
 // Seit Etappe 4 mehrschrittig (Kette, Mauer, Zuordnen): Punkte zeigen den Fortschritt, nach einem
 // freien Fehlversuch bleibt der falsche Knopf gesperrt und ein Satz nennt die übrigen Versuche.
-import { renderNumberLine } from './number-line.js?v=2a306128';
-import { renderNumberWall } from './number-wall.js?v=2a306128';
+import { renderNumberLine } from './number-line.js?v=dc004222';
+import { renderNumberWall } from './number-wall.js?v=dc004222';
 
 const BUBBLE_HTML = `
   <div class="timer" data-ref="timer" aria-hidden="true"><i></i><i></i><i></i><b data-ref="fill"></b></div>
@@ -79,9 +79,21 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
 
   const freeText = (left) => t(left === 0 ? 'ask.freeNone' : left === 1 ? 'ask.freeMistake' : 'ask.freeMistakes', { n: left });
 
-  function renderSteps(task) {
+  // progress (Rettungsaufgabe, Phase 10): Liste aus 'right' | 'wrong' | 'now' | 'open', ein Punkt je Aufgabe
+  const DOT = { right: 'is-done', wrong: 'is-missed', now: 'is-now', open: '' };
+  function renderSteps(task, progress = null) {
     ref.note.hidden = !(task.steps && task.freeLeft < task.freeMistakes);
     if (!ref.note.hidden) ref.note.textContent = freeText(task.freeLeft);
+    if (progress) {
+      ref.dots.hidden = false;
+      ref.dots.replaceChildren(...progress.map((state) => {
+        const d = document.createElement('i');
+        if (DOT[state]) d.className = DOT[state];
+        return d;
+      }));
+      ref.dots.setAttribute('aria-label', t('rescue.stepOf', { n: Math.max(1, progress.indexOf('now') + 1), of: progress.length }));
+      return;
+    }
     if (!task.steps) { ref.dots.hidden = true; return; }
     ref.dots.hidden = false;
     ref.dots.replaceChildren(...task.steps.map((_, i) => {
@@ -97,7 +109,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
     timerRoot: ref.timer,
     timerFill: ref.fill,
 
-    open(task) {
+    open(task, { progress = null } = {}) {
       current = task;
       ref.way.hidden = true;
       ref.yours.hidden = true;
@@ -121,7 +133,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
       if (isLine) ref.line.replaceChildren(renderNumberLine(task));
       else if (isWall) ref.line.replaceChildren(renderNumberWall(task, { t }));
       else ref.line.replaceChildren();
-      renderSteps(task);
+      renderSteps(task, progress);
       ref.answers.hidden = false;
       ref.answers.classList.toggle('is-equations', equations);
       ref.answers.classList.toggle('is-terms', fmt === 'compareTerms'); // kurze Rechnungen: 2 × 2

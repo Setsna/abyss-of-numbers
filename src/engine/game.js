@@ -5,21 +5,22 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=2a306128';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=2a306128';
-import { wayForKey } from './math/ways.js?v=2a306128';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=2a306128';
-import { nextCurrent, answerCode } from './combat/current.js?v=2a306128';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=2a306128';
-import { generateMap, addExtraRest } from './dungeon/map.js?v=2a306128';
-import { createSave } from './save/save.js?v=2a306128';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=2a306128';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=2a306128';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=2a306128';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=2a306128';
-import { rollEvent, optionCost } from './dungeon/events.js?v=2a306128';
-import { createRiddle } from './dungeon/riddle.js?v=2a306128';
-import { noteDive, noteDay, noteRun, noteAnswer } from './progression/statistics.js?v=2a306128';
+import { createRng, deriveSeed } from './rng.js?v=dc004222';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=dc004222';
+import { wayForKey } from './math/ways.js?v=dc004222';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=dc004222';
+import { nextCurrent, answerCode } from './combat/current.js?v=dc004222';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=dc004222';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=dc004222';
+import { createSave } from './save/save.js?v=dc004222';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=dc004222';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=dc004222';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=dc004222';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=dc004222';
+import { rollEvent, optionCost } from './dungeon/events.js?v=dc004222';
+import { createRiddle } from './dungeon/riddle.js?v=dc004222';
+import { noteDive, noteDay, noteRun, noteAnswer, noteRescue } from './progression/statistics.js?v=dc004222';
+import { ensureMission, noteMission, missionPracticeEvery } from './progression/mission.js?v=dc004222';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -46,6 +47,7 @@ export function createGame({ config, save, seed }) {
     map: null,         // { seed, data } zwischengespeicherte Seekarte
     now: save?.geaendert ?? 0,
     tzOffset: 0, // Versatz der Zeitzone des Geräts in Minuten (wie getTimezoneOffset), für den Spieltag
+    clockSet: false, // Uhr von der Plattform gestellt (setNow); erst dann gibt es einen Tagesauftrag (Phase 10, Etappe 5)
   };
 
   // Seesterne (Phase 9): Reichen die Sterne für ein Gebiet, das noch zu ist (z. B. Preis später gesenkt), öffnet es sich beim Laden
@@ -83,7 +85,7 @@ export function createGame({ config, save, seed }) {
     return ids.filter((id) => !l.erledigt.includes(id));
   }
 
-  function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1, depth = 1, elite = null }) {
+  function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1, depth = 1, elite = null, rescue = null }) {
     const s = state.save;
     // Werkstatt (Etappe 8): Schutz nur im ersten Kampf des Tauchgangs. Der Merker fällt erst nach dem Kampf weg,
     // damit ein Neuladen mitten im Kampf den Schutz nicht kostet (Review Etappe 5–8).
@@ -92,6 +94,9 @@ export function createGame({ config, save, seed }) {
     state.workshopUsed = workshopBlock > 0;
     const taskPlan = planFor({ areaId, level, boss, inDive: roomId !== null });
     const tutorial = untimedTasks > 0 && roomId !== null;
+    // Rettungsaufgabe (Phase 10, Regelwerk 14.1): im Tauchgang, nicht in der Erklärung, einmal je Tauchgang.
+    // rescue: nur der Entwicklerzugang setzt sie im Testkampf ausdrücklich (?dev=combat&rettung=1).
+    const canRescue = rescue ?? (roomId !== null && !tutorial && config.game.rescue.enabled && !lauf()?.rettung);
     state.combat = createCombat({
       config,
       enemyTypeIds,
@@ -111,6 +116,7 @@ export function createGame({ config, save, seed }) {
       deep: depth >= config.depths.bossDeepPhaseFrom,
       elite, // Elitegegner (Phase 9, Etappe 2)
       taskPlan,
+      rescue: Boolean(canRescue),
     });
     // stageChanged: Leitern, deren Stufe in diesem Kampf gewechselt hat (zählen bis zum Kampfende nicht mehr)
     state.combatInfo = { areaId, roomId, boss, depth, elite: Boolean(elite), enemyTypeIds, openTask: null, mistakes: [], lightningHits: 0, tutorial, cardLevelUps: [], stageUps: [], stageChanged: [] };
@@ -143,7 +149,8 @@ export function createGame({ config, save, seed }) {
     // Übungsaufgaben mit Stufe, älteste zuerst (Regelwerk 7.2)
     const practice = Object.entries(s.uebung).filter(([, e]) => e.stufe).sort((x, y) => x[1].t - y[1].t).map(([key, e]) => ({ key, stufe: e.stufe }));
     // Zähler der Mischregel aus dem Spielstand: er läuft über Kämpfe und Tauchgänge weiter (Review 7b, B1)
-    return { grade: s.klasse, stageOf, windows, countable: true, mixEvery: cfg.mixEvery, practice, mixCount: mixCounts(s.lernen, s.klasse, areaId), ...extra };
+    // practiceEvery: zusätzliche Stelle für Fehleraufgaben, solange der Tagesauftrag „Übungsliste“ läuft (Regelwerk 14.3)
+    return { grade: s.klasse, stageOf, windows, countable: true, mixEvery: cfg.mixEvery, practiceEvery: missionPracticeEvery(s, config), practice, mixCount: mixCounts(s.lernen, s.klasse, areaId), ...extra };
   }
 
   // Gezählte Antwort verbuchen (Regelwerk 7.1); neue höchste Stufe bringt Perlen (7.7).
@@ -180,10 +187,11 @@ export function createGame({ config, save, seed }) {
     state.combatCount += 1;
     state.afterReward = null;
     return beginCombat({
-      enemyTypeIds, level, areaId: options.areaId ?? 'reef', hp: state.hp,
+      enemyTypeIds, level, areaId: options.areaId ?? 'reef', hp: options.hp ?? state.hp, // hp: Entwicklerzugang (Phase 10)
       combatSeed: deriveSeed(seed, `combat${state.combatCount}`), untimedTasks: options.untimedTasks ?? 0,
       enemyPower: options.enemyPower ?? 1,
       elite: options.elite ?? null, // Testkampf mit Elitegegner (Phase 9)
+      rescue: Boolean(options.rescue), // Entwicklerzugang: Rettung im Testkampf (Phase 10)
     });
   }
 
@@ -692,6 +700,11 @@ export function createGame({ config, save, seed }) {
     const extra = [];
     for (const e of events) {
       if (e.type === 'secondWind' && lauf()) lauf().zweiteLuft = true; // Talent Zweite Luft: einmal je Tauchgang
+      // Rettungsaufgabe (Phase 10, Regelwerk 14.2): Merker sofort, damit ein Neuladen sie verbraucht; falsche Rechnungen
+      // auf die Übungsliste (mit Stufe); gezählt wird nur, ob sie geschafft wurde. Sonst zählen ihre Antworten nirgends.
+      if (e.type === 'rescueStarted' && lauf()) lauf().rettung = true;
+      if (e.type === 'rescueJudged' && e.outcome !== 'correct') info.mistakes.push({ key: e.practiceKey, text: e.solutionText, stufe: e.stageId ?? undefined });
+      if (e.type === 'rescueEnded' && lauf() && info.roomId !== null) noteRescue(state.save, e.saved);
       if (e.type === 'taskOpened' || e.type === 'stepOpened') info.openTask = e.task;
       // Mischregel (Regelwerk 7.2; Review 7b, B1): der Zähler je Leiter steht im Spielstand
       if (e.type === 'taskOpened' && lauf() && info.roomId !== null && state.combat.taskPlan.mixEvery) {
@@ -706,6 +719,19 @@ export function createGame({ config, save, seed }) {
       // Lernübersicht (Phase 10): erster Versuch je Aufgabe und je Schritt, auch wenn er für die Lernstufe nicht zählt
       if (counting && e.type === 'answerJudged' && e.single && e.tally) noteAnswer(state.save, e.tally, e.outcome);
       if (counting && e.type === 'stepJudged' && e.first && e.ladder) noteAnswer(state.save, e.ladder, e.outcome);
+      // Tagesauftrag (Phase 10, Etappe 5; Regelwerk 14.4): dieselben Stellen wie die Zählung, dazu Fehleraufgaben und Serie
+      if (counting) {
+        const right = e.outcome === 'correct';
+        const done = [];
+        if (e.type === 'answerJudged' && e.single && e.tally) done.push(...noteMission(state.save, config, 'ladder', { ladder: e.tally, correct: right }));
+        if (e.type === 'stepJudged' && e.first && e.ladder) done.push(...noteMission(state.save, config, 'ladder', { ladder: e.ladder, correct: right }));
+        if (e.type === 'answerJudged' && e.practice) done.push(...noteMission(state.save, config, 'practice', { correct: right }));
+        if (e.type === 'answerJudged') done.push(...noteMission(state.save, config, 'answer', { correct: right }));
+        if (done.length) {
+          state.combat.taskPlan.practiceEvery = 0; // ab der nächsten Aufgabe wieder Regelwerk 7.2
+          extra.push(...done);
+        }
+      }
       if (e.type === 'answerJudged') {
         if (e.outcome === 'correct' && e.tierId === 'lightning') info.lightningHits += 1;
         // Strömung (D33): Antworten im Tauchgang merken, außer in der Erklärung
@@ -858,6 +884,14 @@ export function createGame({ config, save, seed }) {
     const s = state.save;
     return unlockedCards(s, config).filter((id) => config.cards[id].unlockStars > 0 && !s.entdeckt.includes(id));
   }
+  // Tagesauftrag (Phase 10, Etappe 5): Meldung „Auftrag geschafft!“ in der Station einmal bestätigen
+  function ackMission() {
+    const m = state.save.auftrag;
+    if (!m?.geschafft) return reject('mission');
+    m.gemeldet = true;
+    return [{ type: 'missionSeen' }];
+  }
+
   function ackNewCards() {
     const cards = newCards();
     state.save.entdeckt.push(...cards);
@@ -968,14 +1002,14 @@ export function createGame({ config, save, seed }) {
   }
 
   // Befehle außerhalb des Kampfs; im Kampf werden sie mit „phase“ abgelehnt.
-  const MENU_COMMANDS = new Set(['ackNewCards', 'chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero', 'buyUpgrade']);
+  const MENU_COMMANDS = new Set(['ackMission', 'ackNewCards', 'chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero', 'buyUpgrade']);
 
   // Erlaubte Befehle je Bildschirm.
   const COMMANDS = {
     title: { start, setSetting, resetSave },
     grade: { chooseGrade },
     heroCreate: { createHero },
-    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent, ackNewCards, buyUpgrade },
+    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent, ackNewCards, ackMission, buyUpgrade },
     logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem, editHero, chooseTalent },
     heroEdit: { changeHero, cancelHeroEdit },
     map: { enterRoom, surface },
@@ -1005,22 +1039,37 @@ export function createGame({ config, save, seed }) {
     };
   }
 
+  function missionCheck() {
+    if (state.screen !== 'base' || !state.save || !state.clockSet) return [];
+    if (!ensureMission(state.save, config, state.now, state.tzOffset)) return [];
+    return [{ type: 'missionCreated', mission: { ...state.save.auftrag } }];
+  }
+
+  function route(command) {
+    if (state.screen === 'combat') {
+      if (command?.type === 'pickReward') return reject('screen');
+      if (MENU_COMMANDS.has(command?.type)) return reject('phase');
+      if (command?.type === 'markExplained') return markExplained(command);
+      return combatCommand(command);
+    }
+    if (command?.type === 'markExplained') return markExplained(command); // auf jedem Bildschirm erlaubt
+    const handler = COMMANDS[state.screen]?.[command?.type];
+    if (!handler) return reject('screen');
+    return handler(command);
+  }
+
   return {
     startCombat,
     get combat() { return state.combat; },
     // tzOffsetMinutes: Zeitzone des Geräts (Phase 10, Spieltage der Lernübersicht); ohne Angabe bleibt der letzte Wert
-    setNow(now, tzOffsetMinutes) { state.now = now; if (Number.isFinite(tzOffsetMinutes)) state.tzOffset = tzOffsetMinutes; },
+    setNow(now, tzOffsetMinutes) { state.now = now; state.clockSet = true; if (Number.isFinite(tzOffsetMinutes)) state.tzOffset = tzOffsetMinutes; },
     dispatch(command) {
-      if (state.screen === 'combat') {
-        if (command?.type === 'pickReward') return reject('screen');
-        if (MENU_COMMANDS.has(command?.type)) return reject('phase');
-        if (command?.type === 'markExplained') return markExplained(command);
-        return combatCommand(command);
-      }
-      if (command?.type === 'markExplained') return markExplained(command); // auf jedem Bildschirm erlaubt
-      const handler = COMMANDS[state.screen]?.[command?.type];
-      if (!handler) return reject('screen');
-      return handler(command);
+      // Tagesauftrag (Phase 10, Etappe 5): entsteht, wenn das Kind an dem Tag zum ersten Mal die Station sieht.
+      // Auch vor dem Befehl prüfen: Stand die Seite über Nacht auf der Station, gilt für „Tauchen“ schon der neue Tag
+      // (Abschlussreview Etappe 5, I2).
+      const events = [...missionCheck(), ...route(command)];
+      events.push(...missionCheck());
+      return events;
     },
     view({ targetUid } = {}) {
       const s = state.save;
@@ -1035,6 +1084,7 @@ export function createGame({ config, save, seed }) {
         event: state.screen === 'event' ? eventView() : null,
         riddle: state.screen === 'riddle' ? riddleView() : null,
         station: state.screen === 'base' && s ? stationView() : null, // Ausbau (Etappe 8)
+        mission: state.screen === 'base' && s?.auftrag ? { ...s.auftrag } : null, // Tagesauftrag (Phase 10, Etappe 5)
         cleared: state.cleared ? { ...state.cleared } : null,
         run: l ? { areaId: l.gebiet, depth: l.tiefe } : null,
         logbook: state.screen === 'logbook' ? { page: state.logbookPage } : null,

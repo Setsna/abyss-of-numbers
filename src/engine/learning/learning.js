@@ -84,8 +84,12 @@ export function saveMixCounts(lernen, grade, areaId, counts, mixEvery) {
 // Eine passende Übungsaufgabe hat Vorrang (practice: nur Einträge dieser Rechenart im Fenster),
 // sonst eine zufällige niedrigere Stufe des Fensters; am unteren Rand die aktuelle Stufe.
 // count: wievielte Aufgabe dieser Leiter im Kampf (ab 1).
-export function chooseSource({ stufe, win, count, mixEvery, practice = [] }, rng) {
-  if (!mixEvery || count % mixEvery !== 0) return { source: 'current', stufe };
+// practiceEvery (Tagesauftrag „Übungsliste“, Regelwerk 14.3): zusätzliche Stelle nur für Fehleraufgaben, nie für Wiederholungen.
+export function chooseSource({ stufe, win, count, mixEvery, practiceEvery = 0, practice = [] }, rng) {
+  if (!mixEvery || count % mixEvery !== 0) {
+    if (practiceEvery && count % practiceEvery === 0 && practice.length > 0) return { source: 'practice', entry: practice[0] };
+    return { source: 'current', stufe };
+  }
   if (practice.length > 0) return { source: 'practice', entry: practice[0] };
   if (stufe > win[0]) return { source: 'lower', stufe: rng.nextInt(win[0], stufe - 1) };
   return { source: 'current', stufe };

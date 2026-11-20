@@ -1,9 +1,9 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=2a306128';
-import { nextSlots } from '../dungeon/map.js?v=2a306128';
-import { REJECT_REASONS } from '../combat/combat.js?v=2a306128';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=2a306128';
+import { CONFIG_FILES } from './files.js?v=dc004222';
+import { nextSlots } from '../dungeon/map.js?v=dc004222';
+import { REJECT_REASONS } from '../combat/combat.js?v=dc004222';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=dc004222';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -70,6 +70,23 @@ function validateGame(file, g, errors) {
     c.number('penalty.wrong', { min: 0, integer: true });
     c.number('penalty.timeout', { min: 0, integer: true });
     c.number('penalty.minHp', { min: 1, integer: true });
+  }
+  // Tagesauftrag (Phase 10, Etappe 5; Regelwerk 14.3 bis 14.5)
+  if (c.object('mission')) {
+    if (typeof g.mission.enabled !== 'boolean') c.fail('mission.enabled', 'true oder false');
+    c.number('mission.reward', { min: 0, integer: true });
+    c.number('mission.practiceEvery', { min: 0, integer: true });
+    if (!g.mission.goals || typeof g.mission.goals !== 'object') c.fail('mission.goals', 'fehlt');
+    else for (const k of ['uebung', 'rechenart', 'serie']) c.number(`mission.goals.${k}`, { min: 1, integer: true });
+  }
+  // Rettungsaufgabe (Phase 10, Etappe 4; Regelwerk 14)
+  if (c.object('rescue')) {
+    const r = g.rescue;
+    if (typeof r.enabled !== 'boolean') c.fail('rescue.enabled', 'true oder false');
+    c.number('rescue.tasks', { min: 1, integer: true });
+    c.number('rescue.needed', { min: 1, integer: true });
+    if (Number.isInteger(r.needed) && Number.isInteger(r.tasks) && r.needed > r.tasks) c.fail('rescue.needed', 'höchstens tasks');
+    if (!(typeof r.hpShare === 'number' && r.hpShare > 0 && r.hpShare <= 1)) c.fail('rescue.hpShare', 'Zahl über 0 bis 1');
   }
   if (c.object('baseTimeMs')) {
     for (const k of ['solve', 'pickTrue', 'pickFalse']) c.number(`baseTimeMs.${k}`, { min: 1000, integer: true });

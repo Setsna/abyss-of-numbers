@@ -1,9 +1,10 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=2a306128';
-import { createRiddle } from '../dungeon/riddle.js?v=2a306128';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=2a306128';
-import { validateStatistics } from '../progression/statistics.js?v=2a306128';
+import { generateMap } from '../dungeon/map.js?v=dc004222';
+import { createRiddle } from '../dungeon/riddle.js?v=dc004222';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=dc004222';
+import { validateStatistics } from '../progression/statistics.js?v=dc004222';
+import { validateMission } from '../progression/mission.js?v=dc004222';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -16,6 +17,7 @@ import { validateStatistics } from '../progression/statistics.js?v=2a306128';
 // Version 8 (Phase 9, Jahresausbau Etappe 1): gebiete[id].tiefe (höchste geschaffte Tiefe) und lauf.tiefe.
 // Version 9 (Phase 9, Etappe 2): neue Seekarten-Vorlagen; ein laufender Tauchgang endet beim Umbau.
 // Version 10 (Phase 9, Etappe 3): talente { "5", "10", "15", "20": Kennung oder null }; lauf.zweiteLuft (frei).
+//   Ohne Versionssprung (Phase 10, Etappe 4): lauf.rettung (frei, true = Rettungsaufgabe in diesem Tauchgang verbraucht).
 // Version 11 (Phase 9, Etappe 4): gefunden (Karten fürs Album), besiegt (Gegner fürs Meeresbuch).
 // Version 12 (D54, 19.11.2026): Strömung höchstens 1,2; ältere Stände werden darauf begrenzt.
 // Version 13 (Phase 9, Etappe 5): entdeckt (neue Karten, deren Meldung schon gezeigt wurde).
@@ -108,6 +110,7 @@ export function validateSave(s, config) {
 
   // Zählung für die Lernübersicht (Phase 10): freiwillig, ohne Versionssprung
   if (s.statistik !== undefined) validateStatistics(s.statistik, config, fail);
+  if (s.auftrag !== undefined) validateMission(s.auftrag, config, fail); // Tagesauftrag (Phase 10, Etappe 5), ohne Versionssprung
 
   if (!isObj(s.uebung)) fail('uebung', 'fehlt');
   else {
@@ -203,6 +206,7 @@ function validateRun(l, config, fail, save) {
   if (!Number.isInteger(l.leben) || l.leben < 1) fail('lauf.leben', 'ganze Zahl ≥ 1');
   if (!Number.isInteger(l.tiefe) || l.tiefe < 1) fail('lauf.tiefe', 'ganze Zahl ≥ 1');
   if (l.zweiteLuft !== undefined && typeof l.zweiteLuft !== 'boolean') fail('lauf.zweiteLuft', 'true oder false');
+  if (l.rettung !== undefined && typeof l.rettung !== 'boolean') fail('lauf.rettung', 'true oder false');
   for (const k of ['vorrat', 'werkstatt']) if (l[k] !== undefined && l[k] !== true) fail(`lauf.${k}`, 'true oder nicht vorhanden');
   const map = generateMap(area, l.seed, config, Number.isInteger(l.tiefe) ? l.tiefe : 1);
   const ids = new Set(map.rooms.map((r) => r.id));
@@ -262,6 +266,11 @@ export function repairSave(save, config) {
   if (save.statistik !== undefined && validateSave(save, config).some((e) => e.startsWith('statistik'))) {
     delete save.statistik;
     notes.push('statistik: beschädigt, neu begonnen');
+  }
+  // Tagesauftrag (Phase 10, Etappe 5): beschädigt → nur dieses Feld verwerfen, beim nächsten Stationsbesuch kommt ein neuer
+  if (save.auftrag !== undefined && validateSave(save, config).some((e) => e.startsWith('auftrag'))) {
+    delete save.auftrag;
+    notes.push('auftrag: beschädigt, verworfen');
   }
   if (!isObj(save.lauf)) return notes;
   const l = save.lauf;

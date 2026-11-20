@@ -871,6 +871,28 @@
     "cost": "{n} Perlen",
     "noPearls": "Du hast zu wenig Perlen."
   },
+  "mission": {
+    "uebung": "Auftrag heute: Löse {ziel} Aufgaben richtig, die du schon einmal falsch hattest.",
+    "rechenart": "Auftrag heute: Löse {ziel} {op}-Aufgaben richtig.",
+    "serie": "Auftrag heute: Schaffe {ziel} richtige Antworten hintereinander.",
+    "ops": {
+      "add": "Plus",
+      "sub": "Minus",
+      "mul": "Mal",
+      "div": "Geteilt"
+    },
+    "progress": "{stand} von {ziel}",
+    "done": "Auftrag geschafft! +{n} Perlen",
+    "doneWord": "Geschafft!",
+    "doneLater": "Auftrag geschafft! Morgen gibt es einen neuen."
+  },
+  "rescue": {
+    "boom": "Rettungsring!",
+    "caption": "Dir geht die Luft aus! Löse {needed} von {total} Aufgaben richtig. Dann tauchst du weiter.",
+    "saved": "Geschafft! Du tauchst mit {hp} Leben weiter.",
+    "failed": "Das hat nicht gereicht. Du tauchst auf. Alles Gesammelte bleibt.",
+    "stepOf": "Aufgabe {n} von {of}"
+  },
   "talents": {
     "title": "Talente",
     "pick": "Wähle ein Talent. Du kannst es jederzeit wechseln.",
