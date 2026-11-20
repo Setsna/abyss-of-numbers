@@ -7,10 +7,10 @@
 // Muster, Einheit der Grundsteine (1 oder 10), Grenzen der Grundsteine und Spitze stehen in der Stufe.
 // Falsche Antworten je Stein: F-WALL-a an der Rechenstelle um 1 daneben (± Einheit),
 // F-WALL-b addiert statt subtrahiert, F-WALL-c die Zahl eines der beiden bekannten Steine.
-import { formatEquation } from '../format.js?v=ac66dd10';
-import { drawUntil } from './common.js?v=ac66dd10';
-import { pickChoices, commonRound } from '../mistakes.js?v=ac66dd10';
-import { wayFor } from '../ways.js?v=ac66dd10';
+import { formatEquation } from '../format.js?v=805614a5';
+import { drawUntil } from './common.js?v=805614a5';
+import { pickChoices, commonRound } from '../mistakes.js?v=805614a5';
+import { wayFor } from '../ways.js?v=805614a5';
 
 // Wie jeder Stein aus anderen folgt: [Zelle, Rechenart, Zelle x, Zelle y] mit Ergebnis = x op y.
 const HOW = {

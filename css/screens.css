@@ -1006,6 +1006,8 @@
   translate: 0 -70%; rotate: -6deg; opacity: 0;
   animation: built-word 1400ms var(--ease-out) 380ms forwards;
 }
+/* zehntes Stück: größer und länger */
+.station-boom.is-complete { font-size: calc(96 * var(--u)); animation-duration: 2200ms; }
 body.is-calm .station-boom { animation-name: built-word-calm; animation-delay: 0ms; }
 @media (prefers-reduced-motion: reduce) { .station-boom { animation-name: built-word-calm; animation-delay: 0ms; } }
 @keyframes built-word {

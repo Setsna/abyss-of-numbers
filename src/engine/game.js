@@ -5,20 +5,20 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=ac66dd10';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=ac66dd10';
-import { wayForKey } from './math/ways.js?v=ac66dd10';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=ac66dd10';
-import { nextCurrent, answerCode } from './combat/current.js?v=ac66dd10';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=ac66dd10';
-import { generateMap, addExtraRest } from './dungeon/map.js?v=ac66dd10';
-import { createSave } from './save/save.js?v=ac66dd10';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=ac66dd10';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=ac66dd10';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=ac66dd10';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=ac66dd10';
-import { rollEvent, optionCost } from './dungeon/events.js?v=ac66dd10';
-import { createRiddle } from './dungeon/riddle.js?v=ac66dd10';
+import { createRng, deriveSeed } from './rng.js?v=805614a5';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=805614a5';
+import { wayForKey } from './math/ways.js?v=805614a5';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=805614a5';
+import { nextCurrent, answerCode } from './combat/current.js?v=805614a5';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=805614a5';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=805614a5';
+import { createSave } from './save/save.js?v=805614a5';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=805614a5';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=805614a5';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=805614a5';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=805614a5';
+import { rollEvent, optionCost } from './dungeon/events.js?v=805614a5';
+import { createRiddle } from './dungeon/riddle.js?v=805614a5';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -83,9 +83,11 @@ export function createGame({ config, save, seed }) {
 
   function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1, depth = 1, elite = null }) {
     const s = state.save;
-    // Werkstatt (Etappe 8): Schutz nur im ersten Kampf des Tauchgangs
+    // Werkstatt (Etappe 8): Schutz nur im ersten Kampf des Tauchgangs. Der Merker fällt erst nach dem Kampf weg,
+    // damit ein Neuladen mitten im Kampf den Schutz nicht kostet (Review Etappe 5–8).
     let workshopBlock = 0;
-    if (roomId !== null && lauf()?.werkstatt) { workshopBlock = stationEffect('diveStartBlock'); delete lauf().werkstatt; }
+    if (roomId !== null && lauf()?.werkstatt) workshopBlock = stationEffect('diveStartBlock');
+    state.workshopUsed = workshopBlock > 0;
     const taskPlan = planFor({ areaId, level, boss, inDive: roomId !== null });
     const tutorial = untimedTasks > 0 && roomId !== null;
     state.combat = createCombat({
@@ -375,13 +377,18 @@ export function createGame({ config, save, seed }) {
   }
 
   // ---------- Rätselraum (Phase 9, Etappe 7; Regelwerk 13.4) ----------
-  // Im Spielstand steht nur lauf.raetsel { raum, stufe, schritt, frei, versucht }; die Aufgabe entsteht aus dem Seed.
+  // Im Spielstand steht nur lauf.raetsel { raum, stufe, schritt, frei, versucht, falsch?, gewechselt? };
+  // die Aufgabe entsteht aus dem Seed. falsch: schon getippte falsche Antworten des aktuellen Steins,
+  // gewechselt: in diesem Rätsel hat sich die Stufe schon geändert (beides übersteht das Neuladen, Review Etappe 5–8).
   function openRiddle(roomId, saved = null) {
     const l = lauf();
     const curriculumId = config.areas.areas[l.gebiet].curriculum;
-    const r = createRiddle({ config, save: state.save, curriculumId, runSeed: l.seed, roomId, stufe: saved?.stufe });
+    const r = createRiddle({ config, save: state.save, curriculumId, areaId: l.gebiet, runSeed: l.seed, roomId, stufe: saved?.stufe });
     l.raetsel = saved ?? { raum: roomId, stufe: r.stufe, schritt: 0, frei: config.riddles.freeMistakes, versucht: [] };
-    state.riddle = { ...r, curriculumId, wrongChoices: [], mistake: null, result: null, info: { stageChanged: [], stageUps: [] } };
+    state.riddle = {
+      ...r, curriculumId, areaId: l.gebiet, wrongChoices: (saved?.falsch ?? []).slice(), mistake: null, result: null,
+      info: { stageChanged: saved?.gewechselt ? [r.ladder] : [], stageUps: [] },
+    };
     state.screen = 'riddle';
     return [{ type: 'riddleOpened', roomId, format: r.format }];
   }
@@ -397,11 +404,16 @@ export function createGame({ config, save, seed }) {
     // nur der erste Versuch je Stein oder Folge zählt (Regelwerk 7.1 Nr. 7)
     const first = !rec.versucht[rec.schritt];
     rec.versucht[rec.schritt] = 1;
-    if (first && config.game.learning.enabled && !r.info.stageChanged.includes(r.ladder)) {
-      events.push(...countAnswer(r.ladder, correct, { areaId: r.curriculumId, win: r.win, info: r.info }));
+    // nur, solange die Rätselstufe noch die Stufe des Kindes ist (nach dem Neuladen kann sie sich geändert haben);
+    // stageFor erst danach fragen, denn es legt den Eintrag der Leiter an
+    if (first && config.game.learning.enabled && !r.info.stageChanged.includes(r.ladder)
+      && stageFor(state.save.lernen, state.save.klasse, r.areaId, r.ladder, r.win) === rec.stufe) {
+      events.push(...countAnswer(r.ladder, correct, { areaId: r.areaId, win: r.win, info: r.info }));
+      if (r.info.stageChanged.includes(r.ladder)) rec.gewechselt = true;
     }
     if (correct) {
       r.wrongChoices = [];
+      delete rec.falsch;
       r.mistake = null;
       if (rec.schritt + 1 < r.steps.length) { rec.schritt += 1; return events; }
       return [...events, ...riddleSolved()];
@@ -409,6 +421,7 @@ export function createGame({ config, save, seed }) {
     if (rec.frei > 0) {
       rec.frei -= 1;
       r.wrongChoices.push(choiceIndex);
+      rec.falsch = r.wrongChoices.slice();
       r.mistake = st.choiceTypes?.[choiceIndex] ?? null; // Hinweis passend zum Fehler (Regelwerk 8)
       return [...events, { type: 'riddleMistake', left: rec.frei, mistake: r.mistake }];
     }
@@ -524,7 +537,9 @@ export function createGame({ config, save, seed }) {
     if (s.perlen < item.price) return reject('pearls');
     s.perlen -= item.price;
     s.station.push(upgradeId);
-    return [{ type: 'upgradeBought', upgradeId, price: item.price }];
+    // Letztes Stück (Ingo 20.11.2026): „Station fertig!“ mit eigenem Klang (sounds.json upgradeBought:complete)
+    const complete = Object.keys(config.station).every((id) => s.station.includes(id));
+    return [{ type: 'upgradeBought', upgradeId, price: item.price, ...(complete ? { outcome: 'complete' } : {}) }];
   }
 
   function stationView() {
@@ -700,7 +715,11 @@ export function createGame({ config, save, seed }) {
           info.mistakes.push({ key: info.openTask.practiceKey, text: e.solutionText, stufe: info.openTask.format === 'solve' ? info.openTask.stageId : undefined });
         }
       }
-      if (e.type === 'combatWon') extra.push(...adjustCurrent(), ...onCombatWon());
+      if (e.type === 'combatWon') {
+        if (state.workshopUsed && lauf()) delete lauf().werkstatt;
+        state.workshopUsed = false;
+        extra.push(...adjustCurrent(), ...onCombatWon());
+      }
       if (e.type === 'combatLost') {
         addPractice(state.save, info.mistakes, state.now, config);
         state.hp = maxHp(state.save, config); // nach dem Auftauchen wieder volle Leben (Konzept 6)

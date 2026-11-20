@@ -26,6 +26,7 @@
     "treasureOpened": "chestOpened",
     "levelUp": "levelUp",
     "upgradeBought": "chestOpened",
+    "upgradeBought:complete": "levelUp",
     "cardLevelUp": "levelUp",
     "roomEntered:boss": "bossStart"
   },

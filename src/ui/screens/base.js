@@ -7,11 +7,11 @@
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=ac66dd10';
-import { renderAsset, assetUrl } from '../assets.js?v=ac66dd10';
-import { homeAreaId, worldLayer } from '../components/world.js?v=ac66dd10';
-import { renderCard } from '../components/card.js?v=ac66dd10';
-import { isCalm } from '../app.js?v=ac66dd10';
+import { ICON } from '../icons.js?v=805614a5';
+import { renderAsset, assetUrl } from '../assets.js?v=805614a5';
+import { homeAreaId, worldLayer } from '../components/world.js?v=805614a5';
+import { renderCard } from '../components/card.js?v=805614a5';
+import { isCalm } from '../app.js?v=805614a5';
 
 export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onBuy = null, bought = null, account = null }) {
   const v = game.view();
@@ -76,7 +76,10 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
     <span class="chip">${t('hud.level', { n: p.stufe })}</span>
     <span class="chip" aria-label="${t('hud.pearls', { n: p.perlen })}">${ICON.pearl}<span>${p.perlen}</span></span>
     <span class="chip chip-stars" aria-label="${p.stars === 1 ? t('base.starsOne') : t('base.stars', { n: p.stars })}">${ICON.star}<span>${p.stars}</span></span>`;
-  ref.text.textContent = bought ? t('station.bought', { name: t(`station.items.${bought}.name`) }) : t('base.text');
+  // Nach dem zehnten Stück (Ingo 20.11.2026): „Deine Station ist fertig!“ statt des üblichen Satzes
+  const complete = Boolean(bought) && (v.station?.items ?? []).every((x) => x.owned);
+  ref.text.textContent = complete ? t('station.complete')
+    : bought ? t('station.bought', { name: t(`station.items.${bought}.name`) }) : t('base.text');
 
   let busy = false;
   const once = (fn) => () => { if (busy) return; busy = true; fn(); };
@@ -246,7 +249,6 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
   // Ist die Station schon abgebaut, meldet sich der Zuhörer beim nächsten Drehen ab.
   const portraitQuery = matchMedia('(orientation: portrait)');
   const place = () => {
-    if (!scene.isConnected) { portraitQuery.removeEventListener('change', place); return; }
     for (const piece of pieces) {
       const cfg = config.station[piece.dataset.id];
       const slot = (portraitQuery.matches && cfg.slotPortrait) || cfg.slot;
@@ -266,7 +268,8 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
       const word = document.createElement('span');
       word.className = 'station-boom';
       word.setAttribute('aria-hidden', 'true');
-      word.textContent = t('station.built');
+      word.textContent = complete ? t('station.done') : t('station.built');
+      if (complete) word.classList.add('is-complete');
       word.style.left = piece.style.left;
       word.style.top = piece.style.top;
       word.style.width = piece.style.width;
@@ -377,12 +380,21 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
     updateInert();
     ref.build.focus({ preventScroll: true });
   });
-  // Escape schließt das oberste Fenster (erst die Nachfrage, dann die Liste)
-  scene.addEventListener('keydown', (e) => {
+  // Escape schließt das oberste Fenster (erst die Nachfrage, dann die Liste); am Dokument, damit es auch wirkt,
+  // wenn nach einem Tipp nichts den Fokus hat (Review Etappe 5–8)
+  const onKey = (e) => {
     if (e.key !== 'Escape' || busy) return;
     if (!ref.ask.hidden) { e.preventDefault(); ref.askNo.click(); }
     else if (!ref.buildPanel.hidden) { e.preventDefault(); ref.buildBack.click(); }
-  });
+  };
+  document.addEventListener('keydown', onKey);
 
   root.querySelector('.porthole:not(:disabled)')?.focus({ preventScroll: true });
+  // Beim Wechsel des Bildschirms (show() in main.js) melden sich die Zuhörer ab
+  return {
+    destroy() {
+      document.removeEventListener('keydown', onKey);
+      portraitQuery.removeEventListener('change', place);
+    },
+  };
 }

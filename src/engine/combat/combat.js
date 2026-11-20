@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=ac66dd10';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=ac66dd10';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=ac66dd10';
-import { chooseSource } from '../learning/learning.js?v=ac66dd10';
-import { crossPlace } from '../math/places.js?v=ac66dd10';
-import { neighborWay } from '../math/ways.js?v=ac66dd10';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=ac66dd10';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=ac66dd10';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=ac66dd10';
-import { cardEffect } from '../cards/effect.js?v=ac66dd10';
+import { createRng, deriveSeed } from '../rng.js?v=805614a5';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=805614a5';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=805614a5';
+import { chooseSource } from '../learning/learning.js?v=805614a5';
+import { crossPlace } from '../math/places.js?v=805614a5';
+import { neighborWay } from '../math/ways.js?v=805614a5';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=805614a5';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=805614a5';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=805614a5';
+import { cardEffect } from '../cards/effect.js?v=805614a5';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -170,6 +170,9 @@ function blockedReason(c, cardDef, target) {
     if (target.immune && target.immuneBroken === 0 && cardDef.task?.operation === target.immune) return 'immune';
     if (isShielded(c, target)) return 'shielded';
   }
+  // Flächenschaden (Phase 9): nur, wenn mindestens ein Gegner treffbar ist; sonst wäre die Energie umsonst weg
+  if (cardDef.target === 'enemies' && cardDef.effect.type === 'damageAll'
+    && !c.enemies.some((e) => alive(e) && !isShielded(c, e) && !immuneTo(e, cardDef))) return 'immune';
   return null;
 }
 
@@ -302,7 +305,7 @@ function answerStep(c, outcome, choiceIndex) {
     }
     if (task.stepIndex + 1 < task.steps.length) {
       setStep(task, task.stepIndex + 1);
-      if (!task.untimed) task.timeLimitMs = timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game, task.stepTimeClass, task.stepExtraMs);
+      if (!task.untimed) task.timeLimitMs = Math.round(timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game, task.stepTimeClass, task.stepExtraMs) * (task.slow ?? 1));
       events.push({ type: 'stepOpened', stepIndex: task.stepIndex, task: clone(task) });
       return events;
     }
@@ -473,7 +476,8 @@ function playCard(c, { cardUid, targetUid }) {
       ? timeLimitFor(task.stepFormat, c.hero.calm, c.moreTime, c.config.game, task.stepTimeClass, task.stepExtraMs)
       : timeLimitFor(task.format, c.hero.calm, c.moreTime, c.config.game, task.timeClass ?? null, task.extraMs ?? 0);
   }
-  if (c.slowNext && task.timeLimitMs > 0) { task.timeLimitMs = Math.round(task.timeLimitMs * c.slowNext); c.slowNext = 0; }
+  // Ruhige Strömung: gilt für alle Schritte dieser Aufgabe (Review Etappe 5–8)
+  if (c.slowNext && task.timeLimitMs > 0) { task.slow = c.slowNext; task.timeLimitMs = Math.round(task.timeLimitMs * task.slow); c.slowNext = 0; }
   if (c.forgiving) task.forgiving = true;
   c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? null, task };
   c.phase = 'task';
@@ -666,10 +670,11 @@ function endTurn(c) {
     if (intent.type === 'attack') {
       const r = hit(c.hero, intent.amount);
       events.push({ type: 'heroDamaged', amount: r.amount, blocked: r.blocked });
-      if (c.hero.thorns) { // Dornenkoralle (Phase 9)
+      if (c.hero.thorns && !isShielded(c, enemy)) { // Dornenkoralle (Phase 9); nicht durch den Schild anderer Gegner
         const t = hit(enemy, c.hero.thorns.amount);
         events.push({ type: 'thornsHit', enemyUid: enemy.uid, amount: t.amount });
         if (!alive(enemy)) { events.push({ type: 'enemyDefeated', enemyUid: enemy.uid }); continue; } // besiegt: keine Elite-Regel, kein Gift mehr (Review Etappe 5–8)
+        checkPhase(enemy, events);
       }
     } else if (intent.type === 'block') {
       enemy.block += intent.amount;
@@ -691,7 +696,8 @@ function endTurn(c) {
       enemy.hp -= lost;
       events.push({ type: 'poisonTick', enemyUid: enemy.uid, amount: lost });
       if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
-      if (--enemy.poison.turns <= 0) enemy.poison = null;
+      else checkPhase(enemy, events); // Gift kann den Boss unter die Grenze der nächsten Phase drücken
+      if (enemy.poison && --enemy.poison.turns <= 0) enemy.poison = null;
     }
     if (enemy.weak && --enemy.weak.turns <= 0) { enemy.weak = null; events.push({ type: 'weakEnded', enemyUid: enemy.uid }); }
     if (c.hero.hp <= 0 && c.secondWind > 0) {

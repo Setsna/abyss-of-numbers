@@ -985,6 +985,8 @@
     "shortLabel": "{name}, {price} Perlen, dir fehlen noch {n}",
     "built": "Gebaut!",
     "tileShort": "Dir fehlen noch {n} Perlen. Tauch weiter!",
-    "tileShortOne": "Dir fehlt noch 1 Perle. Tauch weiter!"
+    "tileShortOne": "Dir fehlt noch 1 Perle. Tauch weiter!",
+    "complete": "Deine Station ist fertig! Alle zehn Stücke stehen.",
+    "done": "Fertig!"
   }
 }

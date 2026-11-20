@@ -1,8 +1,8 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=ac66dd10';
-import { createRiddle } from '../dungeon/riddle.js?v=ac66dd10';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=ac66dd10';
+import { generateMap } from '../dungeon/map.js?v=805614a5';
+import { createRiddle } from '../dungeon/riddle.js?v=805614a5';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=805614a5';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -220,6 +220,15 @@ function validateRun(l, config, fail, save) {
       } catch { /* Stufe fehlt in der Leiter */ }
       if (!riddle || r.stufe < riddle.win[0] || r.stufe > riddle.win[1]) fail('lauf.raetsel.stufe', 'Stufe im Fenster des Gebiets');
       else if (r.schritt >= riddle.steps.length || r.versucht.length > riddle.steps.length) fail('lauf.raetsel.schritt', `schritt und versucht passend zu ${riddle.steps.length} Steinen`);
+      else {
+        const st = riddle.steps[r.schritt];
+        if (r.falsch !== undefined && !(Array.isArray(r.falsch) && r.falsch.length <= config.riddles.freeMistakes
+          && new Set(r.falsch).size === r.falsch.length
+          && r.falsch.every((i) => Number.isInteger(i) && i >= 0 && i < st.choices.length && i !== st.correctIndex))) {
+          fail('lauf.raetsel.falsch', 'Liste falscher Antworten des aktuellen Steins');
+        }
+        if (r.gewechselt !== undefined && r.gewechselt !== true) fail('lauf.raetsel.gewechselt', 'true oder nicht vorhanden');
+      }
     }
   }
   if (!isObj(l.versuche) || !Object.entries(l.versuche).every(([id, n]) => ids.has(id) && isCount(n))) fail('lauf.versuche', 'Raum → Anzahl');
