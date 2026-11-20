@@ -1,7 +1,8 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=01d505e2';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=01d505e2';
+import { generateMap } from '../dungeon/map.js?v=ac66dd10';
+import { createRiddle } from '../dungeon/riddle.js?v=ac66dd10';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=ac66dd10';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -17,7 +18,8 @@ import { curriculumOf, stageById } from '../math/ladders/index.js?v=01d505e2';
 // Version 11 (Phase 9, Etappe 4): gefunden (Karten fürs Album), besiegt (Gegner fürs Meeresbuch).
 // Version 12 (D54, 19.11.2026): Strömung höchstens 1,2; ältere Stände werden darauf begrenzt.
 // Version 13 (Phase 9, Etappe 5): entdeckt (neue Karten, deren Meldung schon gezeigt wurde).
-export const SAVE_VERSION = 13;
+// Version 14 (Phase 9, Etappe 8): station (gekaufte Stücke); lauf.vorrat und lauf.werkstatt (nur true, frei).
+export const SAVE_VERSION = 14;
 const MIX_COUNT_MAX = 100; // Obergrenze für den Zähler der Mischregel (gespeichert wird der Rest beim Teilen durch mixEvery)
 const SLOTS = ['kopf', 'koerper', 'hand'];
 const STATS = ['kraft', 'ruhe', 'leben'];
@@ -53,6 +55,7 @@ export function createSave(now, grade, config, hero = null) {
     gefunden: [...new Set(config.decks.starter)], // Kartenalbum (Phase 9)
     besiegt: {}, // Meeresbuch: Gegner-Id oder <Id>.elite → Anzahl (Phase 9)
     entdeckt: [], // neue Karten, deren Meldung gezeigt wurde (Phase 9, Etappe 5)
+    station: [], // gekaufte Stücke der Station (Phase 9, Etappe 8)
   };
 }
 
@@ -100,7 +103,7 @@ export function validateSave(s, config) {
   }
 
   if (s.lauf !== null && !isObj(s.lauf)) fail('lauf', 'muss null oder ein Objekt sein');
-  else if (s.lauf) validateRun(s.lauf, config, fail);
+  else if (s.lauf) validateRun(s.lauf, config, fail, s);
 
   if (!isObj(s.uebung)) fail('uebung', 'fehlt');
   else {
@@ -142,6 +145,7 @@ export function validateSave(s, config) {
     if (!config.enemies[id] && !config.bosses.bosses[id]) fail(`besiegt.${key}`, 'unbekannter Gegner');
     else if (!(Number.isInteger(n) && n >= 1)) fail(`besiegt.${key}`, 'ganze Zahl ≥ 1');
   }
+  if (!Array.isArray(s.station) || !s.station.every((id) => config.station?.[id]) || new Set(s.station).size !== s.station.length) fail('station', 'Liste gekaufter Stücke, jedes einmal');
   if (!Array.isArray(s.entdeckt) || !s.entdeckt.every((id) => config.cards[id]) || new Set(s.entdeckt).size !== s.entdeckt.length) fail('entdeckt', 'Liste bekannter Karten, jede einmal');
   // Talente (Phase 9): genau die vier Stufen, je null oder ein Talent dieser Stufe
   const levels = Object.keys(config.talents ?? {});
@@ -188,17 +192,36 @@ function validateLearning(lernen, config, fail) {
 }
 
 // Laufender Tauchgang: Raumkennungen müssen auf der Seekarte aus seed vorkommen.
-function validateRun(l, config, fail) {
+function validateRun(l, config, fail, save) {
   const area = config.areas.areas[l.gebiet];
   if (!area || area.comingSoon) { fail('lauf.gebiet', 'unbekanntes oder noch nicht spielbares Gebiet'); return; }
   if (!Number.isInteger(l.seed) || l.seed < 0 || l.seed > 0xffffffff) { fail('lauf.seed', 'ganze Zahl 0 bis 2^32−1'); return; }
   if (!Number.isInteger(l.leben) || l.leben < 1) fail('lauf.leben', 'ganze Zahl ≥ 1');
   if (!Number.isInteger(l.tiefe) || l.tiefe < 1) fail('lauf.tiefe', 'ganze Zahl ≥ 1');
   if (l.zweiteLuft !== undefined && typeof l.zweiteLuft !== 'boolean') fail('lauf.zweiteLuft', 'true oder false');
-  const ids = new Set(generateMap(area, l.seed, config, Number.isInteger(l.tiefe) ? l.tiefe : 1).rooms.map((r) => r.id));
+  for (const k of ['vorrat', 'werkstatt']) if (l[k] !== undefined && l[k] !== true) fail(`lauf.${k}`, 'true oder nicht vorhanden');
+  const map = generateMap(area, l.seed, config, Number.isInteger(l.tiefe) ? l.tiefe : 1);
+  const ids = new Set(map.rooms.map((r) => r.id));
   if (!Array.isArray(l.erledigt) || !l.erledigt.every((id) => ids.has(id))) fail('lauf.erledigt', 'Liste vorhandener Räume');
   if (l.beute !== undefined && (!ids.has(l.beute) || !l.erledigt?.includes?.(l.beute))) fail('lauf.beute', 'erledigter Raum mit offener Kartenauswahl');
   if (l.position !== null && !ids.has(l.position)) fail('lauf.position', 'null oder ein vorhandener Raum');
+  // Rätselraum (Phase 9, Etappe 7): offenes Rätsel mit Stein, freien Fehlversuchen und ersten Versuchen je Stein
+  if (l.raetsel !== undefined) {
+    const r = l.raetsel;
+    if (!isObj(r) || !ids.has(r.raum) || l.erledigt?.includes?.(r.raum) || !Number.isInteger(r.stufe) || r.stufe < 1 || !isCount(r.schritt) || !isCount(r.frei)
+      || !Array.isArray(r.versucht) || !r.versucht.every((x) => x === 0 || x === 1)) fail('lauf.raetsel', 'offener Raum, stufe, schritt, frei, versucht als Liste aus 0 und 1');
+    else if (map.rooms.find((x) => x.id === r.raum)?.type !== 'riddle') fail('lauf.raetsel.raum', 'muss ein Rätselraum sein');
+    else if (r.frei > config.riddles.freeMistakes) fail('lauf.raetsel.frei', `höchstens ${config.riddles.freeMistakes}`);
+    else {
+      // Das Rätsel einmal so bauen wie beim Fortsetzen (Review Etappe 5–8): Stufe im Fenster, Schritt und Versuche passen
+      let riddle = null;
+      try {
+        riddle = createRiddle({ config, save, curriculumId: area.curriculum, runSeed: l.seed, roomId: r.raum, stufe: r.stufe });
+      } catch { /* Stufe fehlt in der Leiter */ }
+      if (!riddle || r.stufe < riddle.win[0] || r.stufe > riddle.win[1]) fail('lauf.raetsel.stufe', 'Stufe im Fenster des Gebiets');
+      else if (r.schritt >= riddle.steps.length || r.versucht.length > riddle.steps.length) fail('lauf.raetsel.schritt', `schritt und versucht passend zu ${riddle.steps.length} Steinen`);
+    }
+  }
   if (!isObj(l.versuche) || !Object.entries(l.versuche).every(([id, n]) => ids.has(id) && isCount(n))) fail('lauf.versuche', 'Raum → Anzahl');
   if (!isObj(l.laden)) fail('lauf.laden', 'fehlt');
   else for (const [id, rec] of Object.entries(l.laden)) {
@@ -296,6 +319,12 @@ export function migrateSave(raw, config) {
     s.entdeckt = [];
     s.version = 13;
     notes.push('version: 12 → 13 (neue Karten)');
+  }
+  if (s.version === 13) {
+    // Station ausbauen (Phase 9, Etappe 8): noch nichts gekauft
+    s.station = [];
+    s.version = 14;
+    notes.push('version: 13 → 14 (Station)');
   }
   return { save: s, notes };
 }

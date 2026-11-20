@@ -1,5 +1,5 @@
 // Fortschritt: Erfahrung und Stufen, Kartenbeute, Deck, Übungsliste.
-import { starCount } from './depth.js?v=01d505e2';
+import { starCount } from './depth.js?v=ac66dd10';
 
 // Karten, die mit den Seesternen des Kindes frei sind (Phase 9, Konzept 11)
 export function unlockedCards(save, config) {

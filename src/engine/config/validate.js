@@ -1,9 +1,9 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=01d505e2';
-import { nextSlots } from '../dungeon/map.js?v=01d505e2';
-import { REJECT_REASONS } from '../combat/combat.js?v=01d505e2';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=01d505e2';
+import { CONFIG_FILES } from './files.js?v=ac66dd10';
+import { nextSlots } from '../dungeon/map.js?v=ac66dd10';
+import { REJECT_REASONS } from '../combat/combat.js?v=ac66dd10';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=ac66dd10';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -174,7 +174,7 @@ const EFFECT_TYPES = ['damage', 'block', 'heal', 'cycle', 'buff', 'breakImmunity
   'damageBlock', 'damageAll', 'damageTwo', 'poison', 'draw', 'slowTime', 'thorns']; // neue Wirkungen: Phase 9, Etappe 5
 const BUFF_STATS = ['strength'];
 const TASK_FORMATS = ['solve', 'pickTrue', 'pickFalse', 'numberLine', 'sequence', 'complement', 'chain', 'wall', 'match', 'compareTerms'];
-const RULE_FORMATS = ['twoStep', 'pointBeforeLine']; // nur über Bossregeln
+const RULE_FORMATS = ['twoStep', 'pointBeforeLine', 'chain']; // nur über Gegnerregeln (chain: Kettenaal, Phase 9)
 const MULTI_STEP = ['chain', 'wall', 'match'];
 const TARGETS = ['enemy', 'hero', 'enemies']; // enemies: ohne Zielwahl, trifft Gegner selbst (Blasenkette)
 const INTENT_TYPES = ['attack', 'block'];
@@ -390,15 +390,7 @@ function checkEnemyList(c, enemies, prefix) {
       if (!INTENT_TYPES.includes(step?.type) || !(Number.isInteger(step.amount) && step.amount >= 0)) c.fail(`${id}.pattern[${i}]`, 'braucht type attack/block und amount ≥ 0');
     });
     // Bossregeln und Kampfphasen (Phase 5, Etappe 6)
-    if (e.rule !== undefined && e.rule !== null) {
-      const r = e.rule;
-      if (r.type === 'hidden') {
-        if (r.find !== 'numberLine') c.fail(`${id}.rule.find`, 'nur numberLine');
-        if (!(Number.isInteger(r.multiplier) && r.multiplier >= 1)) c.fail(`${id}.rule.multiplier`, 'ganze Zahl ab 1');
-      } else if (r.type === 'taskModifier') {
-        if (!RULE_FORMATS.includes(r.format)) c.fail(`${id}.rule.format`, `muss ${RULE_FORMATS.join(' oder ')} sein`);
-      } else c.fail(`${id}.rule.type`, 'hidden oder taskModifier');
-    }
+    if (e.rule !== undefined && e.rule !== null) checkRule(c, `${id}.rule`, e.rule);
     // deepPhases (Phase 9): zweites Muster ab der Tiefe depths.bossDeepPhaseFrom, gleiche Form wie phases
     for (const key of ['phases', 'deepPhases']) {
       if (e[key] === undefined) continue;
@@ -406,11 +398,56 @@ function checkEnemyList(c, enemies, prefix) {
       else e[key].forEach((ph, i) => {
         if (!(Number.isInteger(ph?.belowHpPercent) && ph.belowHpPercent > 0 && ph.belowHpPercent < 100)) c.fail(`${id}.${key}[${i}].belowHpPercent`, '1 bis 99');
         if (!Array.isArray(ph?.pattern) || ph.pattern.length === 0 || ph.pattern.some((st) => !INTENT_TYPES.includes(st?.type) || !(Number.isInteger(st.amount) && st.amount >= 0))) c.fail(`${id}.${key}[${i}].pattern`, 'Muster aus attack/block');
+        // Phase 9 (Tempelhüter): eine Phase darf die Regel wechseln, null hebt sie auf
+        if (ph?.rule !== undefined && ph.rule !== null) checkRule(c, `${id}.${key}[${i}].rule`, ph.rule);
       });
     }
     if (e.shieldedBy !== undefined) {
       if (!Array.isArray(e.shieldedBy) || e.shieldedBy.some((o) => !enemies[o])) c.fail(`${id}.shieldedBy`, 'muss vorhandene Gegner nennen');
     }
+  }
+}
+
+// Gegnerregel (Phase 5, Etappe 6; Phase 9: wechselnde Immunität des Tauschkrebses)
+function checkRule(c, path, r) {
+  if (r.type === 'hidden') {
+    if (r.find !== 'numberLine') c.fail(`${path}.find`, 'nur numberLine');
+    if (!(Number.isInteger(r.multiplier) && r.multiplier >= 1)) c.fail(`${path}.multiplier`, 'ganze Zahl ab 1');
+  } else if (r.type === 'taskModifier') {
+    if (!RULE_FORMATS.includes(r.format)) c.fail(`${path}.format`, `muss ${RULE_FORMATS.join(', ')} sein`);
+  } else if (r.type === 'rotatingImmunity') {
+    if (!Array.isArray(r.order) || r.order.length < 2 || r.order.some((op) => !OPERATIONS.includes(op)) || new Set(r.order).size !== r.order.length) {
+      c.fail(`${path}.order`, `mindestens zwei verschiedene aus ${OPERATIONS.join(', ')}`);
+    }
+  } else c.fail(`${path}.type`, 'hidden, taskModifier oder rotatingImmunity');
+}
+
+// Rätselraum (Phase 9, Etappe 7; Regelwerk 13.4)
+function validateRiddles(file, r, errors) {
+  const c = checker(file, r, errors);
+  const LADDERS = { wall: 'wall', sequence: 'seq' };
+  if (!Array.isArray(r.formats) || r.formats.length === 0 || r.formats.some((f) => LADDERS[f?.format] !== f?.ladder)) c.fail('formats', 'Liste aus { format: wall, ladder: wall } und { format: sequence, ladder: seq }');
+  c.number('freeMistakes', { min: 0, max: 5, integer: true });
+  if (!Array.isArray(r.pearls) || r.pearls.length !== 2 || !r.pearls.every((n) => Number.isInteger(n) && n >= 0) || r.pearls[0] > r.pearls[1]) c.fail('pearls', '[von, bis] als ganze Zahlen');
+}
+
+// Station ausbauen (Phase 9, Etappe 8): Preis, Platz im Stationsbild (Anteile 0 bis 1), freiwilliger Vorteil
+const STATION_EFFECTS = { diveStartBlock: [1, 10], extraRest: [1, 1] };
+function validateStation(file, st, errors, config) {
+  const c = checker(file, st, errors);
+  let last = 0;
+  for (const [id, it] of Object.entries(st)) {
+    c.number(`${id}.price`, { min: 1, integer: true });
+    if (Number.isInteger(it?.price) && it.price <= last) c.fail(`${id}.price`, 'Preise steigen in der Reihenfolge der Datei');
+    if (Number.isInteger(it?.price)) last = it.price;
+    for (const k of ['x', 'y', 'w']) c.number(`${id}.slot.${k}`, { min: 0, max: 1 });
+    if (it?.slotPortrait !== undefined) for (const k of ['x', 'y', 'w']) c.number(`${id}.slotPortrait.${k}`, { min: 0, max: 1 });
+    if (it?.effect !== undefined) {
+      const entries = Object.entries(it.effect ?? {});
+      if (entries.length !== 1 || !STATION_EFFECTS[entries[0][0]]) c.fail(`${id}.effect`, `genau ein Vorteil aus ${Object.keys(STATION_EFFECTS).join(', ')}`);
+      else { const [k, v] = entries[0]; c.number(`${id}.effect.${k}`, { min: STATION_EFFECTS[k][0], max: STATION_EFFECTS[k][1], integer: true }); }
+    }
+    if (config?.texts && typeof config.texts.station?.items?.[id]?.name !== 'string') c.fail(id, 'Name fehlt in texts station.items');
   }
 }
 
@@ -450,9 +487,9 @@ function validateStarterCoverage(c, config) {
   }
 }
 
-const ROOM_TYPES = ['combat', 'rest', 'boss', 'treasure', 'shop', 'elite', 'event'];
+const ROOM_TYPES = ['combat', 'rest', 'boss', 'treasure', 'shop', 'elite', 'event', 'riddle']; // riddle: Tempel (Phase 9)
 const FIGHT_TYPES = ['combat', 'elite']; // zählen als Kampf auf dem Weg (Phase 9)
-const CHOICE_TYPES = ['combat', 'rest', 'treasure', 'shop', 'event']; // „choices“ darf keinen Boss ziehen
+const CHOICE_TYPES = ['combat', 'rest', 'treasure', 'shop', 'event', 'riddle']; // „choices“ darf keinen Boss ziehen
 
 // Eine Vorlage der Seekarte prüfen (seit Phase 9 mehrere je Gebiet: layers und moreLayouts[i].layers).
 // lp: Pfad für Meldungen, dp: Punkt-Pfad für checker.number.
@@ -548,6 +585,8 @@ function validateAreas(file, a, errors, config) {
     c.number(`${base}.price`, { min: 0, integer: true });
     if (a.order?.[0] === areaId && area.price !== 0) c.fail(`${base}.price`, 'das erste Gebiet kostet 0');
     if (area.comingSoon === true) continue;
+    // Messung (Nachtrag Etappe 7): Fenster eines anderen Gebiets als Rand für stageRank
+    if (area.rankFrom !== undefined && (area.rankFrom === areaId || !a.areas[area.rankFrom])) c.fail(`${base}.rankFrom`, 'anderes vorhandenes Gebiet');
     if (!config.decks?.rewardPools?.[areaId]) c.fail(base, 'kein Beutepool in decks.json');
     // Formate mit eigener Leiter (Phase 6b) brauchen ihre Leiter im Gebietsfenster
     for (const grade of ['class3', 'class4']) {
@@ -627,7 +666,7 @@ const VALIDATORS = {
   game: validateGame, texts: validateTexts, class3: validateCurriculum, class4: validateCurriculum,
   cards: validateCards, decks: validateDecks, enemies: validateEnemies,
   bosses: validateBosses, areas: validateAreas,
-  levels: validateLevels, rewards: validateRewards, depths: validateDepths, elites: validateElites, events: validateEvents, talents: validateTalents, heroes: validateHeroes, items: validateItems,
+  levels: validateLevels, rewards: validateRewards, depths: validateDepths, elites: validateElites, events: validateEvents, riddles: validateRiddles, station: validateStation, talents: validateTalents, heroes: validateHeroes, items: validateItems,
   sounds: validateSounds,
 };
 

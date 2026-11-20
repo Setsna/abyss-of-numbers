@@ -4,8 +4,8 @@
 // (Frage oben, `task.display` als große Zeile).
 // Seit Etappe 4 mehrschrittig (Kette, Mauer, Zuordnen): Punkte zeigen den Fortschritt, nach einem
 // freien Fehlversuch bleibt der falsche Knopf gesperrt und ein Satz nennt die übrigen Versuche.
-import { renderNumberLine } from './number-line.js?v=01d505e2';
-import { renderNumberWall } from './number-wall.js?v=01d505e2';
+import { renderNumberLine } from './number-line.js?v=ac66dd10';
+import { renderNumberWall } from './number-wall.js?v=ac66dd10';
 
 const BUBBLE_HTML = `
   <div class="timer" data-ref="timer" aria-hidden="true"><i></i><i></i><i></i><b data-ref="fill"></b></div>
@@ -185,7 +185,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
       ref.timer.hidden = true;
       // Zahlenstrahl und Mauer bleiben stehen, die richtige Stelle wird mit der Zahl gezeigt
       if ((current?.stepFormat ?? current?.format) === 'numberLine') ref.line.replaceChildren(renderNumberLine(current, { solution: true }));
-      if (current?.format === 'wall') ref.line.replaceChildren(renderNumberWall(current, { solution: true, t }));
+      if (current?.format === 'wall') ref.line.replaceChildren(renderNumberWall(current, { solution: true, all: Boolean(current.solveAll), t }));
       ref.note.hidden = true;
       ref.next.textContent = t('btn.next');
       ref.next.hidden = false;

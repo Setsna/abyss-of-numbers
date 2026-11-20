@@ -12,9 +12,11 @@ export const CONFIG_FILES = {
   elites: 'enemies/elites.json', // Elitegegner (Phase 9, Etappe 2)
   areas: 'dungeons/areas.json',
   events: 'dungeons/events.json', // Ereignisräume (Phase 9, Etappe 2)
+  riddles: 'dungeons/riddles.json', // Rätselraum im Tempel (Phase 9, Etappe 7)
   levels: 'progression/levels.json',
   rewards: 'progression/rewards.json',
   depths: 'progression/depths.json', // Jahresausbau (Phase 9)
+  station: 'progression/station.json', // Station ausbauen (Phase 9, Etappe 8)
   heroes: 'heroes/heroes.json',
   talents: 'heroes/talents.json', // Talente (Phase 9, Etappe 3)
   items: 'items/items.json',

@@ -199,6 +199,60 @@
           ]
         }
       ]
+    },
+    "templeKeeper": {
+      "hp": 72,
+      "immune": null,
+      "pattern": [
+        {
+          "type": "attack",
+          "amount": 9
+        },
+        {
+          "type": "block",
+          "amount": 8
+        },
+        {
+          "type": "attack",
+          "amount": 12
+        }
+      ],
+      "rule": {
+        "type": "rotatingImmunity",
+        "order": [
+          "add",
+          "sub",
+          "mul",
+          "div"
+        ]
+      },
+      "phases": [
+        {
+          "belowHpPercent": 50,
+          "rule": {
+            "type": "taskModifier",
+            "format": "pointBeforeLine"
+          },
+          "pattern": [
+            {
+              "type": "attack",
+              "amount": 11
+            },
+            {
+              "type": "attack",
+              "amount": 8
+            },
+            {
+              "type": "block",
+              "amount": 8
+            },
+            {
+              "type": "attack",
+              "amount": 14
+            }
+          ]
+        }
+      ]
     }
   },
   "encounters": {
@@ -216,6 +270,9 @@
     ],
     "trenchBoss": [
       "trenchLord"
+    ],
+    "templeBoss": [
+      "templeKeeper"
     ]
   }
 }

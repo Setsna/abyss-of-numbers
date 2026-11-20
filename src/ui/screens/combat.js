@@ -1,18 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=01d505e2';
-import { combatView } from '../../engine/combat/combat.js?v=01d505e2';
-import { ICON } from '../icons.js?v=01d505e2';
-import { renderAsset, assetUrl } from '../assets.js?v=01d505e2';
-import { poseBox, dashDistance } from '../components/pose.js?v=01d505e2';
-import { playEvents, wait, isCalm } from '../app.js?v=01d505e2';
-import { bindKeys } from '../input.js?v=01d505e2';
-import { renderEnemy } from '../components/enemy.js?v=01d505e2';
-import { renderCard, emptySlot } from '../components/card.js?v=01d505e2';
-import { createTaskPanel } from '../components/task-panel.js?v=01d505e2';
-import { startTimerBar } from '../components/timer-bar.js?v=01d505e2';
-import { createTutorial } from '../tutorial.js?v=01d505e2';
+import { wayText, hintAsk } from '../text.js?v=ac66dd10';
+import { combatView } from '../../engine/combat/combat.js?v=ac66dd10';
+import { ICON } from '../icons.js?v=ac66dd10';
+import { renderAsset, assetUrl } from '../assets.js?v=ac66dd10';
+import { poseBox, dashDistance } from '../components/pose.js?v=ac66dd10';
+import { playEvents, wait, isCalm } from '../app.js?v=ac66dd10';
+import { bindKeys } from '../input.js?v=ac66dd10';
+import { renderEnemy } from '../components/enemy.js?v=ac66dd10';
+import { renderCard, emptySlot } from '../components/card.js?v=ac66dd10';
+import { createTaskPanel } from '../components/task-panel.js?v=ac66dd10';
+import { startTimerBar } from '../components/timer-bar.js?v=ac66dd10';
+import { createTutorial } from '../tutorial.js?v=ac66dd10';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -346,6 +346,12 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
 
   // Ereignisse auf den angezeigten Stand anwenden, damit Zahlen Schritt für Schritt sichtbar werden.
   const handlers = {
+    // Tauschkrebs (Phase 9, Etappe 7): neue Immunität zu Beginn der Runde
+    immunityRotated(e) {
+      const foe = shown.enemies.find((x) => x.uid === e.enemyUid);
+      if (foe) { foe.immune = e.immune; foe.nextImmune = e.next; }
+      render(shown);
+    },
     streakChanged(e) {
       shown.hero.streak = e.streak;
       render(shown);

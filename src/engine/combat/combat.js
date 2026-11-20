@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=01d505e2';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=01d505e2';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=01d505e2';
-import { chooseSource } from '../learning/learning.js?v=01d505e2';
-import { crossPlace } from '../math/places.js?v=01d505e2';
-import { neighborWay } from '../math/ways.js?v=01d505e2';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=01d505e2';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=01d505e2';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=01d505e2';
-import { cardEffect } from '../cards/effect.js?v=01d505e2';
+import { createRng, deriveSeed } from '../rng.js?v=ac66dd10';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=ac66dd10';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=ac66dd10';
+import { chooseSource } from '../learning/learning.js?v=ac66dd10';
+import { crossPlace } from '../math/places.js?v=ac66dd10';
+import { neighborWay } from '../math/ways.js?v=ac66dd10';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=ac66dd10';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=ac66dd10';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=ac66dd10';
+import { cardEffect } from '../cards/effect.js?v=ac66dd10';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -38,6 +38,7 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
   // cardLevels: Stufe je Kartenart (Etappe 8), gilt für den ganzen Kampf
   // forgiving: Erklärungskampf (D24), Fehler kosten keine Leben und kommen nicht auf die Übungsliste.
   const shuffleRng = createRng(deriveSeed(seed, 'shuffle'));
+  const ops = damageOperations(deck, config);
   const taskRng = createRng(deriveSeed(seed, 'tasks'));
   const combat = {
     config,
@@ -70,6 +71,7 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
         // Phase 5, Etappe 6: Bossregel, Kampfphasen, Schwächung durch die Tintenwolke
         rule: t.rule ?? null, phases: t.phases ?? (deep ? t.deepPhases ?? [] : []), phase: 1, weak: null,
         elite: isElite ? { rule: elite, acts: 0, cfg: config.elites.rules[elite] } : null,
+        ...rotationFor(t.rule, ops),
       };
     }),
     piles: createPiles(deck, shuffleRng),
@@ -94,6 +96,20 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
   return combat;
 }
 
+// Rechenarten der Schadenskarten im Deck (wie attackOperations im Händler)
+function damageOperations(deck, config) {
+  return new Set(deck.map((id) => config.cards[id]).filter((d) => d?.task?.operation && /^(damage|poison)/.test(d.effect.type)).map((d) => d.task.operation));
+}
+
+// Tauschkrebs, Tempelhüter (Phase 9, Etappe 7): Immunität wechselt jede Runde in der Reihe der Regel.
+// Eine Rechenart, ohne die das Deck keinen Schaden mehr machen kann, fällt aus der Reihe (Prüfschwerpunkt 5).
+function rotationFor(rule, ops) {
+  if (rule?.type !== 'rotatingImmunity') return {};
+  const order = rule.order.filter((op) => [...ops].some((o) => o !== op));
+  return order.length ? { rotation: { order, index: 0 }, immune: order[0] } : { rotation: null, immune: null };
+}
+const nextImmune = (e) => (e.rotation ? e.rotation.order[(e.rotation.index + 1) % e.rotation.order.length] : null);
+
 function startTurn(c) {
   c.turn += 1;
   // Panzerknacker (Phase 5, Etappe 3): aufgehobene Immunität zählt die eigenen Züge herunter
@@ -102,6 +118,11 @@ function startTurn(c) {
     if (e.immuneBroken > 0) {
       e.immuneBroken -= 1;
       if (e.immuneBroken === 0) restored.push({ type: 'immunityRestored', enemyUid: e.uid });
+    }
+    if (c.turn > 1 && e.rotation && alive(e)) {
+      e.rotation.index += 1;
+      e.immune = e.rotation.order[e.rotation.index % e.rotation.order.length];
+      restored.push({ type: 'immunityRotated', enemyUid: e.uid, immune: e.immune, next: nextImmune(e) });
     }
   }
   if (c.blockKeep > 0) c.blockKeep -= 1; else c.hero.block = 0;
@@ -178,6 +199,11 @@ function checkPhase(enemy, events) {
   if (!next || !alive(enemy) || enemy.hp >= (enemy.maxHp * next.belowHpPercent) / 100) return;
   enemy.phase += 1;
   enemy.pattern = next.pattern;
+  // Tempelhüter (Phase 9): die Phase setzt eine neue Regel; die wechselnde Immunität endet damit
+  if (next.rule !== undefined) {
+    enemy.rule = next.rule;
+    if (enemy.rotation && next.rule?.type !== 'rotatingImmunity') { enemy.rotation = null; enemy.immune = null; }
+  }
   enemy.patternIndex = 0;
   events.push({ type: 'bossPhase', enemyUid: enemy.uid, phase: enemy.phase });
 }
@@ -324,10 +350,13 @@ function ladderTask(c, spec) {
   return task;
 }
 
-// Stufe einer Aufgabe über dem unteren Rand des Fensters (0 = Rand); Testspieler und Balance-Messung
+// Stufe einer Aufgabe über dem unteren Rand des Fensters (0 = Rand); Testspieler und Balance-Messung.
+// taskPlan.rankBase (Tempel): Rand aus dem Fenster eines anderen Gebiets, dann nie unter 0.
 function rankOf(c, ladder, stageId, win) {
   const n = c.curriculum.ladders[ladder].stages.findIndex((s) => s.id === stageId) + 1;
-  return n > 0 ? n - win[0] : c.taskPlan.stageOf[ladder] - win[0];
+  const stage = n > 0 ? n : c.taskPlan.stageOf[ladder];
+  const base = c.taskPlan.rankBase?.[ladder];
+  return base === undefined ? stage - win[0] : Math.max(0, stage - base);
 }
 
 // Mischregel (Regelwerk 7.2): zählt die Aufgaben je Leiter und wählt die Quelle der nächsten
@@ -363,6 +392,9 @@ function fitsPractice(c, op, win, p) {
 
 // Was zählt (Regelwerk 7.1 Nr. 7): nur Aufgaben aus der aktuellen Stufe des Kindes mit genau einer Rechnung
 const COUNTED_FORMATS = new Set(['solve', ...Object.keys(FORMAT_LADDER), 'match']);
+// Wirkungen mit Schaden an dem einen gewählten Ziel: vor ihnen gilt „erst finden“ (Regelwerk 13.3)
+const SINGLE_HITS = new Set(['damage', 'damageBlock', 'damageTwo', 'poison']);
+
 function markCounts(c, task) {
   const current = (ladder) => (c.taskPlan.stageOf[ladder] ? stageAt(c.curriculum, ladder, c.taskPlan.stageOf[ladder]).id : null);
   const ok = (x) => Boolean(c.taskPlan.countable && !task.review && !task.hiddenFind && COUNTED_FORMATS.has(task.format) && x.ladder && x.stageId === current(x.ladder));
@@ -404,7 +436,8 @@ function playCard(c, { cardUid, targetUid }) {
   // ifLadder (Klasse 4, Panzerknacker): hat das Gebietsfenster diese Leiter, gilt ihr Format (Teilbarkeit)
   const alt = def.task.ifLadder;
   if (alt && c.taskPlan.stageOf[alt]) spec.format = Object.keys(FORMAT_LADDER).find((f) => FORMAT_LADDER[f] === alt);
-  const rule = target?.rule;
+  // Flächenkarte (Ziel alle): gilt für einen lebenden Gegner eine Formatregel, nimmt sie diese (Regelwerk 13.3, Review Etappe 5–8)
+  const rule = target?.rule ?? (def.target === 'enemies' ? c.enemies.find((e) => alive(e) && e.rule?.type === 'taskModifier')?.rule : undefined);
   // Wächter, Herr des Grabens: Rechenkarten gegen sie bekommen ein anderes Format
   if (rule?.type === 'taskModifier' && spec.format === 'solve') spec.format = rule.format;
   const ownLadder = FORMAT_LADDER[spec.format];
@@ -418,7 +451,7 @@ function playCard(c, { cardUid, targetUid }) {
   if (review) task.review = true;
   if (task.ladder && task.stageRank === undefined && c.taskPlan.windows[task.ladder]) task.stageRank = rankOf(c, task.ladder, task.stageId, c.taskPlan.windows[task.ladder]);
   // Muräne: vor jedem Angriff erst am Zahlenstrahl finden; gefunden wirkt die Karte mehrfach
-  if (rule?.type === 'hidden' && def.effect.type === 'damage') {
+  if (rule?.type === 'hidden' && target && SINGLE_HITS.has(def.effect.type)) {
     const find = freshTask(c, () => generateTask({ format: rule.find, stages: spec.stages }, c.area, c.rng.tasks));
     const rest = task.steps ? task.steps.map((st) => ({ format: task.format, timeClass: task.timeClass ?? null, extraMs: task.extraMs ?? 0, ...st })) : [asStep(task)];
     task = { ...task, steps: [asStep(find), ...rest], noTempo: true, multiplier: rule.multiplier, hiddenFind: true, stepOffset: 1 };
@@ -636,7 +669,7 @@ function endTurn(c) {
       if (c.hero.thorns) { // Dornenkoralle (Phase 9)
         const t = hit(enemy, c.hero.thorns.amount);
         events.push({ type: 'thornsHit', enemyUid: enemy.uid, amount: t.amount });
-        if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
+        if (!alive(enemy)) { events.push({ type: 'enemyDefeated', enemyUid: enemy.uid }); continue; } // besiegt: keine Elite-Regel, kein Gift mehr (Review Etappe 5–8)
       }
     } else if (intent.type === 'block') {
       enemy.block += intent.amount;
@@ -707,6 +740,7 @@ export function combatView(combat, { targetUid } = {}) {
       uid: e.uid, typeId: e.typeId, hp: e.hp, maxHp: e.maxHp, block: e.block, immune: e.immune, immuneBroken: e.immuneBroken,
       alive: alive(e), shielded: isShielded(c, e), intent: alive(e) ? effectiveIntent(e) : null,
       rule: e.rule?.type ?? null, phase: e.phase, weakTurns: e.weak?.turns ?? 0,
+      nextImmune: nextImmune(e), // Tauschkrebs: Zeichen für die nächste Runde
       elite: e.elite?.rule ?? null, // Phase 9
       poisonTurns: e.poison?.turns ?? 0,
     })),

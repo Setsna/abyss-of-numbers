@@ -1,0 +1,8 @@
+{
+  "formats": [
+    { "format": "wall", "ladder": "wall" },
+    { "format": "sequence", "ladder": "seq" }
+  ],
+  "freeMistakes": 2,
+  "pearls": [6, 10]
+}

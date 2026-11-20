@@ -1,11 +1,11 @@
 // Beute nach einem Sieg (Plan Etappe 5, Schritt 6): Erfahrung, Perlen, ggf. neue Stufe,
 // eine von drei Karten oder „Keine Karte“, darunter bis zu 5 Übungsaufgaben mit Lösung.
 // Keine Quote, keine Zeit, kein Vergleich (A7).
-import { wayText } from '../text.js?v=01d505e2';
-import { ICON } from '../icons.js?v=01d505e2';
-import { renderCard } from '../components/card.js?v=01d505e2';
-import { renderAsset } from '../assets.js?v=01d505e2';
-import { addWorld } from '../components/world.js?v=01d505e2';
+import { wayText } from '../text.js?v=ac66dd10';
+import { ICON } from '../icons.js?v=ac66dd10';
+import { renderCard } from '../components/card.js?v=ac66dd10';
+import { renderAsset } from '../assets.js?v=ac66dd10';
+import { addWorld } from '../components/world.js?v=ac66dd10';
 
 export function mountReward(root, { config, t, reward, onPick, levels = {}, areaId = null }) {
   root.innerHTML = `
@@ -34,7 +34,7 @@ export function mountReward(root, { config, t, reward, onPick, levels = {}, area
   const ref = Object.fromEntries([...root.querySelectorAll('[data-ref]')].map((el) => [el.dataset.ref, el]));
   addWorld(root.querySelector('.screen'), `area.${areaId ?? config.areas.order[0]}`); // Spielwelt dahinter (D25)
   // Schatz (Phase 5, Etappe 2): eigenes Wort, keine Erfahrung
-  root.querySelector('.reward-word').textContent = reward.treasure ? t('reward.treasureWord') : reward.event ? t('reward.eventWord') : t('result.winWord'); // Ereignis (Phase 9)
+  root.querySelector('.reward-word').textContent = reward.treasure ? t('reward.treasureWord') : reward.riddle ? t('reward.riddleWord') : reward.event ? t('reward.eventWord') : t('result.winWord'); // Ereignis (Phase 9)
   ref.xp.textContent = t('reward.xp', { n: reward.xp });
   ref.xp.hidden = reward.xp === 0;
   ref.pearls.textContent = t('reward.pearls', { n: reward.pearls });

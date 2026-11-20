@@ -1,12 +1,12 @@
 // Zahlenmauer in der Sprechblase (Phase 5, Etappe 4; Korallenmauer). Drei Reihen Steine:
-import { formatNumber } from '../../engine/math/format.js?v=01d505e2';
+import { formatNumber } from '../../engine/math/format.js?v=ac66dd10';
 // oben die Spitze (Zelle 5), Mitte 3 und 4, unten die Grundsteine 0 bis 2. Gegebene und schon
 // gefüllte Steine zeigen ihre Zahl, der gesuchte Stein leuchtet mit „?“, spätere leere Steine
-// bleiben leer. solution: der gesuchte Stein zeigt die richtige Zahl.
+// bleiben leer. solution: der gesuchte Stein zeigt die richtige Zahl; all (Rätselraum): auch die späteren.
 
 const ROWS = [[5], [3, 4], [0, 1, 2]];
 
-export function renderNumberWall(task, { solution = false, t } = {}) {
+export function renderNumberWall(task, { solution = false, all = false, t } = {}) {
   const { cells, hidden } = task.wall;
   const i = task.stepIndex - (task.stepOffset ?? 0); // Muräne: Suchschritt vorweg
   const current = hidden[i];
@@ -25,7 +25,7 @@ export function renderNumberWall(task, { solution = false, t } = {}) {
       if (cell === current) {
         stone.classList.add(solution ? 'is-solved' : 'is-current');
         stone.textContent = solution ? formatNumber(cells[cell]) : '?';
-      } else if (known) {
+      } else if (known || (solution && all)) {
         stone.textContent = formatNumber(cells[cell]);
       } else {
         stone.classList.add('is-empty');

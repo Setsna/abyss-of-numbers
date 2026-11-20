@@ -3,7 +3,8 @@
     "reef",
     "caves",
     "city",
-    "trench"
+    "trench",
+    "temple"
   ],
   "areas": {
     "reef": {
@@ -73,6 +74,24 @@
                       "puffer"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "parrotFish",
+                      "crab"
+                    ],
+                    [
+                      "seahorse",
+                      "jelly"
+                    ],
+                    [
+                      "seahorse",
+                      "crab",
+                      "urchin"
+                    ]
+                  ]
                 }
               ]
             },
@@ -121,6 +140,24 @@
                       "crab",
                       "urchin",
                       "puffer"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "parrotFish",
+                      "crab"
+                    ],
+                    [
+                      "seahorse",
+                      "jelly"
+                    ],
+                    [
+                      "seahorse",
+                      "crab",
+                      "urchin"
                     ]
                   ]
                 }
@@ -181,6 +218,24 @@
                       "puffer"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "parrotFish",
+                      "crab"
+                    ],
+                    [
+                      "seahorse",
+                      "jelly"
+                    ],
+                    [
+                      "seahorse",
+                      "crab",
+                      "urchin"
+                    ]
+                  ]
                 }
               ]
             },
@@ -231,6 +286,24 @@
                       "puffer"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "parrotFish",
+                      "crab"
+                    ],
+                    [
+                      "seahorse",
+                      "jelly"
+                    ],
+                    [
+                      "seahorse",
+                      "crab",
+                      "urchin"
+                    ]
+                  ]
                 }
               ],
               "level": 2,
@@ -279,6 +352,24 @@
                         "crab",
                         "urchin",
                         "puffer"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 4,
+                    "groups": [
+                      [
+                        "parrotFish",
+                        "crab"
+                      ],
+                      [
+                        "seahorse",
+                        "jelly"
+                      ],
+                      [
+                        "seahorse",
+                        "crab",
+                        "urchin"
                       ]
                     ]
                   }
@@ -377,6 +468,24 @@
                           "puffer"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -431,6 +540,24 @@
                           "puffer"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -483,6 +610,24 @@
                           "crab",
                           "urchin",
                           "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
                         ]
                       ]
                     }
@@ -542,6 +687,24 @@
                           "puffer"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -590,6 +753,24 @@
                             "crab",
                             "urchin",
                             "puffer"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "parrotFish",
+                            "crab"
+                          ],
+                          [
+                            "seahorse",
+                            "jelly"
+                          ],
+                          [
+                            "seahorse",
+                            "crab",
+                            "urchin"
                           ]
                         ]
                       }
@@ -674,6 +855,24 @@
                           "puffer"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -722,6 +921,24 @@
                           "crab",
                           "urchin",
                           "puffer"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
                         ]
                       ]
                     }
@@ -781,6 +998,24 @@
                           "puffer"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "parrotFish",
+                          "crab"
+                        ],
+                        [
+                          "seahorse",
+                          "jelly"
+                        ],
+                        [
+                          "seahorse",
+                          "crab",
+                          "urchin"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -829,6 +1064,24 @@
                             "crab",
                             "urchin",
                             "puffer"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "parrotFish",
+                            "crab"
+                          ],
+                          [
+                            "seahorse",
+                            "jelly"
+                          ],
+                          [
+                            "seahorse",
+                            "crab",
+                            "urchin"
                           ]
                         ]
                       }
@@ -937,6 +1190,24 @@
                       "snakeEel"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "grottoCrab",
+                      "stoneFish"
+                    ],
+                    [
+                      "glowJelly",
+                      "snakeEel"
+                    ],
+                    [
+                      "glowJelly",
+                      "stoneFish",
+                      "lanternFish"
+                    ]
+                  ]
                 }
               ]
             },
@@ -988,6 +1259,24 @@
                       "caveIsopod",
                       "crab",
                       "snakeEel"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "grottoCrab",
+                      "stoneFish"
+                    ],
+                    [
+                      "glowJelly",
+                      "snakeEel"
+                    ],
+                    [
+                      "glowJelly",
+                      "stoneFish",
+                      "lanternFish"
                     ]
                   ]
                 }
@@ -1051,6 +1340,24 @@
                       "snakeEel"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "grottoCrab",
+                      "stoneFish"
+                    ],
+                    [
+                      "glowJelly",
+                      "snakeEel"
+                    ],
+                    [
+                      "glowJelly",
+                      "stoneFish",
+                      "lanternFish"
+                    ]
+                  ]
                 }
               ]
             },
@@ -1104,6 +1411,24 @@
                       "snakeEel"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "grottoCrab",
+                      "stoneFish"
+                    ],
+                    [
+                      "glowJelly",
+                      "snakeEel"
+                    ],
+                    [
+                      "glowJelly",
+                      "stoneFish",
+                      "lanternFish"
+                    ]
+                  ]
                 }
               ],
               "level": 2,
@@ -1155,6 +1480,24 @@
                         "caveIsopod",
                         "crab",
                         "snakeEel"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 4,
+                    "groups": [
+                      [
+                        "grottoCrab",
+                        "stoneFish"
+                      ],
+                      [
+                        "glowJelly",
+                        "snakeEel"
+                      ],
+                      [
+                        "glowJelly",
+                        "stoneFish",
+                        "lanternFish"
                       ]
                     ]
                   }
@@ -1255,6 +1598,24 @@
                           "snakeEel"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1312,6 +1673,24 @@
                           "snakeEel"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -1367,6 +1746,24 @@
                           "caveIsopod",
                           "crab",
                           "snakeEel"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
                         ]
                       ]
                     }
@@ -1429,6 +1826,24 @@
                           "snakeEel"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -1480,6 +1895,24 @@
                             "caveIsopod",
                             "crab",
                             "snakeEel"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "grottoCrab",
+                            "stoneFish"
+                          ],
+                          [
+                            "glowJelly",
+                            "snakeEel"
+                          ],
+                          [
+                            "glowJelly",
+                            "stoneFish",
+                            "lanternFish"
                           ]
                         ]
                       }
@@ -1566,6 +1999,24 @@
                           "snakeEel"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -1617,6 +2068,24 @@
                           "caveIsopod",
                           "crab",
                           "snakeEel"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
                         ]
                       ]
                     }
@@ -1679,6 +2148,24 @@
                           "snakeEel"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "grottoCrab",
+                          "stoneFish"
+                        ],
+                        [
+                          "glowJelly",
+                          "snakeEel"
+                        ],
+                        [
+                          "glowJelly",
+                          "stoneFish",
+                          "lanternFish"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -1730,6 +2217,24 @@
                             "caveIsopod",
                             "crab",
                             "snakeEel"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "grottoCrab",
+                            "stoneFish"
+                          ],
+                          [
+                            "glowJelly",
+                            "snakeEel"
+                          ],
+                          [
+                            "glowJelly",
+                            "stoneFish",
+                            "lanternFish"
                           ]
                         ]
                       }
@@ -1838,6 +2343,24 @@
                       "seahorseKnight"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "pillarWorm",
+                      "armorCrab"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish",
+                      "shellWarden"
+                    ]
+                  ]
                 }
               ]
             },
@@ -1889,6 +2412,24 @@
                       "armorCrab",
                       "stoneFish",
                       "seahorseKnight"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "pillarWorm",
+                      "armorCrab"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish",
+                      "shellWarden"
                     ]
                   ]
                 }
@@ -1952,6 +2493,24 @@
                       "seahorseKnight"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "pillarWorm",
+                      "armorCrab"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish",
+                      "shellWarden"
+                    ]
+                  ]
                 }
               ]
             },
@@ -2005,6 +2564,24 @@
                       "seahorseKnight"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "pillarWorm",
+                      "armorCrab"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish"
+                    ],
+                    [
+                      "wardenCrab",
+                      "statueFish",
+                      "shellWarden"
+                    ]
+                  ]
                 }
               ],
               "level": 2,
@@ -2056,6 +2633,24 @@
                         "armorCrab",
                         "stoneFish",
                         "seahorseKnight"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 4,
+                    "groups": [
+                      [
+                        "pillarWorm",
+                        "armorCrab"
+                      ],
+                      [
+                        "wardenCrab",
+                        "statueFish"
+                      ],
+                      [
+                        "wardenCrab",
+                        "statueFish",
+                        "shellWarden"
                       ]
                     ]
                   }
@@ -2156,6 +2751,24 @@
                           "seahorseKnight"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -2213,6 +2826,24 @@
                           "seahorseKnight"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -2268,6 +2899,24 @@
                           "armorCrab",
                           "stoneFish",
                           "seahorseKnight"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
                         ]
                       ]
                     }
@@ -2330,6 +2979,24 @@
                           "seahorseKnight"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -2381,6 +3048,24 @@
                             "armorCrab",
                             "stoneFish",
                             "seahorseKnight"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "pillarWorm",
+                            "armorCrab"
+                          ],
+                          [
+                            "wardenCrab",
+                            "statueFish"
+                          ],
+                          [
+                            "wardenCrab",
+                            "statueFish",
+                            "shellWarden"
                           ]
                         ]
                       }
@@ -2467,6 +3152,24 @@
                           "seahorseKnight"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -2518,6 +3221,24 @@
                           "armorCrab",
                           "stoneFish",
                           "seahorseKnight"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
                         ]
                       ]
                     }
@@ -2580,6 +3301,24 @@
                           "seahorseKnight"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "pillarWorm",
+                          "armorCrab"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish"
+                        ],
+                        [
+                          "wardenCrab",
+                          "statueFish",
+                          "shellWarden"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -2631,6 +3370,24 @@
                             "armorCrab",
                             "stoneFish",
                             "seahorseKnight"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "pillarWorm",
+                            "armorCrab"
+                          ],
+                          [
+                            "wardenCrab",
+                            "statueFish"
+                          ],
+                          [
+                            "wardenCrab",
+                            "statueFish",
+                            "shellWarden"
                           ]
                         ]
                       }
@@ -2739,6 +3496,24 @@
                       "deepJelly"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "deepJelly"
+                    ],
+                    [
+                      "blackShark",
+                      "vampireSquid"
+                    ],
+                    [
+                      "blackShark",
+                      "deepJelly",
+                      "giantIsopod"
+                    ]
+                  ]
                 }
               ]
             },
@@ -2790,6 +3565,24 @@
                       "giantIsopod",
                       "seahorseKnight",
                       "deepJelly"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "deepJelly"
+                    ],
+                    [
+                      "blackShark",
+                      "vampireSquid"
+                    ],
+                    [
+                      "blackShark",
+                      "deepJelly",
+                      "giantIsopod"
                     ]
                   ]
                 }
@@ -2853,6 +3646,24 @@
                       "deepJelly"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "deepJelly"
+                    ],
+                    [
+                      "blackShark",
+                      "vampireSquid"
+                    ],
+                    [
+                      "blackShark",
+                      "deepJelly",
+                      "giantIsopod"
+                    ]
+                  ]
                 }
               ]
             },
@@ -2906,6 +3717,24 @@
                       "deepJelly"
                     ]
                   ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "deepJelly"
+                    ],
+                    [
+                      "blackShark",
+                      "vampireSquid"
+                    ],
+                    [
+                      "blackShark",
+                      "deepJelly",
+                      "giantIsopod"
+                    ]
+                  ]
                 }
               ],
               "level": 2,
@@ -2957,6 +3786,24 @@
                         "giantIsopod",
                         "seahorseKnight",
                         "deepJelly"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 4,
+                    "groups": [
+                      [
+                        "deepDevil",
+                        "deepJelly"
+                      ],
+                      [
+                        "blackShark",
+                        "vampireSquid"
+                      ],
+                      [
+                        "blackShark",
+                        "deepJelly",
+                        "giantIsopod"
                       ]
                     ]
                   }
@@ -3056,6 +3903,24 @@
                           "deepJelly"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -3113,6 +3978,24 @@
                           "deepJelly"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -3168,6 +4051,24 @@
                           "giantIsopod",
                           "seahorseKnight",
                           "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
                         ]
                       ]
                     }
@@ -3230,6 +4131,24 @@
                           "deepJelly"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -3281,6 +4200,24 @@
                             "giantIsopod",
                             "seahorseKnight",
                             "deepJelly"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "deepDevil",
+                            "deepJelly"
+                          ],
+                          [
+                            "blackShark",
+                            "vampireSquid"
+                          ],
+                          [
+                            "blackShark",
+                            "deepJelly",
+                            "giantIsopod"
                           ]
                         ]
                       }
@@ -3367,6 +4304,24 @@
                           "deepJelly"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
+                        ]
+                      ]
                     }
                   ]
                 },
@@ -3418,6 +4373,24 @@
                           "giantIsopod",
                           "seahorseKnight",
                           "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
                         ]
                       ]
                     }
@@ -3480,6 +4453,24 @@
                           "deepJelly"
                         ]
                       ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "deepJelly"
+                        ],
+                        [
+                          "blackShark",
+                          "vampireSquid"
+                        ],
+                        [
+                          "blackShark",
+                          "deepJelly",
+                          "giantIsopod"
+                        ]
+                      ]
                     }
                   ],
                   "level": 2,
@@ -3533,6 +4524,24 @@
                             "deepJelly"
                           ]
                         ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "deepDevil",
+                            "deepJelly"
+                          ],
+                          [
+                            "blackShark",
+                            "vampireSquid"
+                          ],
+                          [
+                            "blackShark",
+                            "deepJelly",
+                            "giantIsopod"
+                          ]
+                        ]
                       }
                     ]
                   }
@@ -3560,6 +4569,1160 @@
                 {
                   "type": "boss",
                   "encounter": "trenchBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "temple": {
+      "price": 25,
+      "curriculum": "temple",
+      "background": "area.temple",
+      "intro": "areas.temple.intro",
+      "noIntro": true,
+      "rankFrom": "trench",
+      "layers": [
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "swapCrab"
+                ]
+              ],
+              "level": 1
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "templeGuard",
+                  "swapCrab"
+                ],
+                [
+                  "swapCrab",
+                  "chainEel"
+                ]
+              ],
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "chainEel",
+                      "deepJelly"
+                    ],
+                    [
+                      "templeGuard",
+                      "vampireSquid"
+                    ],
+                    [
+                      "swapCrab",
+                      "giantIsopod"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "templeGuard",
+                      "chainEel",
+                      "swapCrab"
+                    ],
+                    [
+                      "riddleStatue",
+                      "swapCrab",
+                      "anglerFish"
+                    ],
+                    [
+                      "chainEel",
+                      "templeGuard",
+                      "deepJelly"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "swapCrab"
+                    ],
+                    [
+                      "blackShark",
+                      "chainEel"
+                    ],
+                    [
+                      "blackShark",
+                      "templeGuard",
+                      "riddleStatue"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "combat",
+              "pool": [
+                [
+                  "riddleStatue",
+                  "templeGuard"
+                ],
+                [
+                  "riddleStatue",
+                  "chainEel"
+                ]
+              ],
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "chainEel",
+                      "deepJelly"
+                    ],
+                    [
+                      "templeGuard",
+                      "vampireSquid"
+                    ],
+                    [
+                      "swapCrab",
+                      "giantIsopod"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "templeGuard",
+                      "chainEel",
+                      "swapCrab"
+                    ],
+                    [
+                      "riddleStatue",
+                      "swapCrab",
+                      "anglerFish"
+                    ],
+                    [
+                      "chainEel",
+                      "templeGuard",
+                      "deepJelly"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "swapCrab"
+                    ],
+                    [
+                      "blackShark",
+                      "chainEel"
+                    ],
+                    [
+                      "blackShark",
+                      "templeGuard",
+                      "riddleStatue"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "choices": [
+                "riddle",
+                "combat",
+                "event"
+              ],
+              "pool": [
+                [
+                  "riddleStatue",
+                  "swapCrab"
+                ],
+                [
+                  "templeGuard",
+                  "chainEel"
+                ]
+              ],
+              "level": 2,
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "chainEel",
+                      "deepJelly"
+                    ],
+                    [
+                      "templeGuard",
+                      "vampireSquid"
+                    ],
+                    [
+                      "swapCrab",
+                      "giantIsopod"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "templeGuard",
+                      "chainEel",
+                      "swapCrab"
+                    ],
+                    [
+                      "riddleStatue",
+                      "swapCrab",
+                      "anglerFish"
+                    ],
+                    [
+                      "chainEel",
+                      "templeGuard",
+                      "deepJelly"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "swapCrab"
+                    ],
+                    [
+                      "blackShark",
+                      "chainEel"
+                    ],
+                    [
+                      "blackShark",
+                      "templeGuard",
+                      "riddleStatue"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "elite",
+              "fromDepth": 3,
+              "pool": [
+                [
+                  "swapCrab",
+                  "templeGuard"
+                ],
+                [
+                  "chainEel",
+                  "riddleStatue"
+                ]
+              ],
+              "deepPools": [
+                {
+                  "fromDepth": 2,
+                  "groups": [
+                    [
+                      "chainEel",
+                      "deepJelly"
+                    ],
+                    [
+                      "templeGuard",
+                      "vampireSquid"
+                    ],
+                    [
+                      "swapCrab",
+                      "giantIsopod"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 3,
+                  "groups": [
+                    [
+                      "templeGuard",
+                      "chainEel",
+                      "swapCrab"
+                    ],
+                    [
+                      "riddleStatue",
+                      "swapCrab",
+                      "anglerFish"
+                    ],
+                    [
+                      "chainEel",
+                      "templeGuard",
+                      "deepJelly"
+                    ]
+                  ]
+                },
+                {
+                  "fromDepth": 4,
+                  "groups": [
+                    [
+                      "deepDevil",
+                      "swapCrab"
+                    ],
+                    [
+                      "blackShark",
+                      "chainEel"
+                    ],
+                    [
+                      "blackShark",
+                      "templeGuard",
+                      "riddleStatue"
+                    ]
+                  ]
+                }
+              ],
+              "level": 2,
+              "fallback": {
+                "type": "combat",
+                "pool": [
+                  [
+                    "swapCrab",
+                    "templeGuard"
+                  ],
+                  [
+                    "chainEel",
+                    "riddleStatue"
+                  ]
+                ],
+                "level": 2,
+                "deepPools": [
+                  {
+                    "fromDepth": 2,
+                    "groups": [
+                      [
+                        "chainEel",
+                        "deepJelly"
+                      ],
+                      [
+                        "templeGuard",
+                        "vampireSquid"
+                      ],
+                      [
+                        "swapCrab",
+                        "giantIsopod"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 3,
+                    "groups": [
+                      [
+                        "templeGuard",
+                        "chainEel",
+                        "swapCrab"
+                      ],
+                      [
+                        "riddleStatue",
+                        "swapCrab",
+                        "anglerFish"
+                      ],
+                      [
+                        "chainEel",
+                        "templeGuard",
+                        "deepJelly"
+                      ]
+                    ]
+                  },
+                  {
+                    "fromDepth": 4,
+                    "groups": [
+                      [
+                        "deepDevil",
+                        "swapCrab"
+                      ],
+                      [
+                        "blackShark",
+                        "chainEel"
+                      ],
+                      [
+                        "blackShark",
+                        "templeGuard",
+                        "riddleStatue"
+                      ]
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "shop"
+            },
+            {
+              "type": "rest"
+            }
+          ]
+        },
+        {
+          "rooms": [
+            {
+              "type": "boss",
+              "encounter": "templeBoss",
+              "level": 2
+            }
+          ]
+        }
+      ],
+      "moreLayouts": [
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "swapCrab"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "shop"
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "templeGuard",
+                      "swapCrab"
+                    ],
+                    [
+                      "swapCrab",
+                      "chainEel"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "riddleStatue",
+                      "templeGuard"
+                    ],
+                    [
+                      "riddleStatue",
+                      "chainEel"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "choices": [
+                    "riddle",
+                    "combat",
+                    "event"
+                  ],
+                  "pool": [
+                    [
+                      "riddleStatue",
+                      "swapCrab"
+                    ],
+                    [
+                      "templeGuard",
+                      "chainEel"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "swapCrab",
+                      "templeGuard"
+                    ],
+                    [
+                      "chainEel",
+                      "riddleStatue"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "swapCrab",
+                        "templeGuard"
+                      ],
+                      [
+                        "chainEel",
+                        "riddleStatue"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "chainEel",
+                            "deepJelly"
+                          ],
+                          [
+                            "templeGuard",
+                            "vampireSquid"
+                          ],
+                          [
+                            "swapCrab",
+                            "giantIsopod"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "templeGuard",
+                            "chainEel",
+                            "swapCrab"
+                          ],
+                          [
+                            "riddleStatue",
+                            "swapCrab",
+                            "anglerFish"
+                          ],
+                          [
+                            "chainEel",
+                            "templeGuard",
+                            "deepJelly"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "deepDevil",
+                            "swapCrab"
+                          ],
+                          [
+                            "blackShark",
+                            "chainEel"
+                          ],
+                          [
+                            "blackShark",
+                            "templeGuard",
+                            "riddleStatue"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "templeBoss",
+                  "level": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "layers": [
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "swapCrab"
+                    ]
+                  ],
+                  "level": 1
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "templeGuard",
+                      "swapCrab"
+                    ],
+                    [
+                      "swapCrab",
+                      "chainEel"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "combat",
+                  "pool": [
+                    [
+                      "riddleStatue",
+                      "templeGuard"
+                    ],
+                    [
+                      "riddleStatue",
+                      "chainEel"
+                    ]
+                  ],
+                  "level": 2,
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "rest"
+                },
+                {
+                  "type": "elite",
+                  "fromDepth": 3,
+                  "pool": [
+                    [
+                      "riddleStatue",
+                      "swapCrab"
+                    ],
+                    [
+                      "templeGuard",
+                      "chainEel"
+                    ]
+                  ],
+                  "deepPools": [
+                    {
+                      "fromDepth": 2,
+                      "groups": [
+                        [
+                          "chainEel",
+                          "deepJelly"
+                        ],
+                        [
+                          "templeGuard",
+                          "vampireSquid"
+                        ],
+                        [
+                          "swapCrab",
+                          "giantIsopod"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 3,
+                      "groups": [
+                        [
+                          "templeGuard",
+                          "chainEel",
+                          "swapCrab"
+                        ],
+                        [
+                          "riddleStatue",
+                          "swapCrab",
+                          "anglerFish"
+                        ],
+                        [
+                          "chainEel",
+                          "templeGuard",
+                          "deepJelly"
+                        ]
+                      ]
+                    },
+                    {
+                      "fromDepth": 4,
+                      "groups": [
+                        [
+                          "deepDevil",
+                          "swapCrab"
+                        ],
+                        [
+                          "blackShark",
+                          "chainEel"
+                        ],
+                        [
+                          "blackShark",
+                          "templeGuard",
+                          "riddleStatue"
+                        ]
+                      ]
+                    }
+                  ],
+                  "level": 2,
+                  "fallback": {
+                    "type": "combat",
+                    "pool": [
+                      [
+                        "riddleStatue",
+                        "swapCrab"
+                      ],
+                      [
+                        "templeGuard",
+                        "chainEel"
+                      ]
+                    ],
+                    "level": 2,
+                    "deepPools": [
+                      {
+                        "fromDepth": 2,
+                        "groups": [
+                          [
+                            "chainEel",
+                            "deepJelly"
+                          ],
+                          [
+                            "templeGuard",
+                            "vampireSquid"
+                          ],
+                          [
+                            "swapCrab",
+                            "giantIsopod"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 3,
+                        "groups": [
+                          [
+                            "templeGuard",
+                            "chainEel",
+                            "swapCrab"
+                          ],
+                          [
+                            "riddleStatue",
+                            "swapCrab",
+                            "anglerFish"
+                          ],
+                          [
+                            "chainEel",
+                            "templeGuard",
+                            "deepJelly"
+                          ]
+                        ]
+                      },
+                      {
+                        "fromDepth": 4,
+                        "groups": [
+                          [
+                            "deepDevil",
+                            "swapCrab"
+                          ],
+                          [
+                            "blackShark",
+                            "chainEel"
+                          ],
+                          [
+                            "blackShark",
+                            "templeGuard",
+                            "riddleStatue"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "shop"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "choices": [
+                    "riddle",
+                    "event"
+                  ]
+                },
+                {
+                  "type": "rest"
+                }
+              ]
+            },
+            {
+              "rooms": [
+                {
+                  "type": "boss",
+                  "encounter": "templeBoss",
                   "level": 2
                 }
               ]

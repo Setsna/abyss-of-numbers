@@ -1,7 +1,7 @@
 // Gegner im Szenenpanel: Absicht, Immunität, Bild, Name, Leben, Schutz, Lebensbalken.
-import { ICON, OP_ICON } from '../icons.js?v=01d505e2';
-import { renderAsset } from '../assets.js?v=01d505e2';
-import { OPERATOR_SIGN } from '../../engine/math/format.js?v=01d505e2';
+import { ICON, OP_ICON } from '../icons.js?v=ac66dd10';
+import { renderAsset } from '../assets.js?v=ac66dd10';
+import { OPERATOR_SIGN } from '../../engine/math/format.js?v=ac66dd10';
 
 export function renderEnemy(e, { t, selected }) {
   const name = t(`enemies.${e.typeId}.name`);
@@ -16,6 +16,7 @@ export function renderEnemy(e, { t, selected }) {
   if (e.intent) parts.push(t(e.intent.type === 'attack' ? 'hud.intentAttack' : 'hud.intentBlock', { n: e.intent.amount }));
   const broken = e.immune && e.immuneBroken > 0; // Panzerknacker (Phase 5, Etappe 3)
   if (e.immune) parts.push(broken ? t('hud.immuneBroken', { op: OPERATOR_SIGN[e.immune], n: e.immuneBroken }) : t('hud.immune', { op: OPERATOR_SIGN[e.immune] }));
+  if (e.nextImmune) parts.push(t('hud.immuneNext', { op: OPERATOR_SIGN[e.nextImmune] })); // Tauschkrebs (Phase 9)
   if (e.shielded) parts.push(t('hud.shielded'));
   if (e.rule === 'hidden') parts.push(t('hud.hidden'));
   if (e.elite) parts.push(t(`elite.${e.elite}`, { name }));
@@ -33,6 +34,11 @@ export function renderEnemy(e, { t, selected }) {
     const title = broken ? t('hud.immuneBroken', { op: OPERATOR_SIGN[e.immune], n: e.immuneBroken }) : t('hud.immune', { op: OPERATOR_SIGN[e.immune] });
     row.insertAdjacentHTML('beforeend',
       `<span class="immune${broken ? ' is-broken' : ''}" title="${title}">${OP_ICON[e.immune].replaceAll('#fbfbf7', '#14161f')}${broken ? `<b class="immune-turns">${e.immuneBroken}</b>` : ''}</span>`);
+  }
+  // Tauschkrebs, Tempelhüter (Phase 9): kleines Zeichen für die Immunität der nächsten Runde
+  if (e.nextImmune && e.alive) {
+    row.insertAdjacentHTML('beforeend',
+      `<span class="immune-next" title="${t('hud.immuneNext', { op: OPERATOR_SIGN[e.nextImmune] })}"><b aria-hidden="true">→</b>${OP_ICON[e.nextImmune].replaceAll('#fbfbf7', '#14161f')}</span>`);
   }
 
   const art = document.createElement('div');

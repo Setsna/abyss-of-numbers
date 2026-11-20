@@ -602,6 +602,12 @@
 .station-dives[data-n="3"] .porthole, .station-dives[data-n="4"] .porthole { width: calc(160 * var(--u)); }
 .station-dives[data-n="3"] .porthole-window, .station-dives[data-n="4"] .porthole-window { width: calc(132 * var(--u)); border-width: calc(10 * var(--u)); }
 .station-dives[data-n="3"] .porthole-label, .station-dives[data-n="4"] .porthole-label { font-size: calc(20 * var(--u)); }
+/* Fünftes Gebiet (Tempel, Phase 9, Etappe 7): Größe wie bei vier, aber drei oben und zwei darunter
+   (fünf in einer Reihe passen auf dem iPad quer nur mit zu kleiner Schrift) */
+.station-dives[data-n="5"] { gap: calc(18 * var(--u)); max-width: calc(522 * var(--u)); margin-inline: auto; }
+.station-dives[data-n="5"] .porthole { width: calc(160 * var(--u)); }
+.station-dives[data-n="5"] .porthole-window { width: calc(132 * var(--u)); border-width: calc(10 * var(--u)); }
+.station-dives[data-n="5"] .porthole-label { font-size: calc(20 * var(--u)); }
 .porthole.is-soon .porthole-window { filter: grayscale(1) brightness(0.7); }
 .porthole.is-soon .porthole-label { background: var(--disabled-fill); color: var(--disabled-text); font-size: calc(20 * var(--u)); }
 
@@ -729,6 +735,13 @@
 .station-ask-btns .btn-go { margin-inline: 0; }
 .station-ask-btns .btn { min-width: calc(200 * var(--u)); font-size: calc(28 * var(--u)); }
 .station-ask-btns .btn:not(.btn-go) { background: var(--paper); }
+/* Kauf in der Station (Durchsicht Etappe 8): Bild des Stücks und „Danach hast du … Perlen.“ */
+.station-ask-pic { width: calc(220 * var(--u)); aspect-ratio: 4 / 3; position: relative; }
+.station-ask-pic[hidden] { display: none; }
+.station-ask-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 calc(4 * var(--u)) calc(6 * var(--u)) rgb(8 42 66 / 0.5)); }
+.station .station-ask-sub { margin: 0; font-size: calc(26 * var(--u)); gap: calc(8 * var(--u)); }
+.station-ask-sub[hidden] { display: none; }
+.station-ask-sub svg { width: 1.1em; height: 1.1em; }
 
 /* Station mit Konto (19.11.2026): wer angemeldet ist und „Abmelden“, oben rechts gegenüber der Überschrift
    (unten links läge es auf Stufe und Perlen) */
@@ -829,6 +842,95 @@
 .event-btn:disabled { background: var(--disabled-fill); color: var(--disabled-text); box-shadow: none; }
 .event-cost { display: inline-flex; align-items: center; gap: calc(6 * var(--u)); font-size: max(1rem, 0.62em); font-weight: 700; }
 .event-cost svg { width: 1.1em; height: 1.1em; }
+/* Rätselraum im Tempel (Phase 9, Etappe 7): wie der Ereignisraum, oben Tempel und Truhe, unten die Aufgabe
+   auf Papier. Die Aufgabe braucht mehr Platz als die Knöpfe des Ereignisses, deshalb ist das Bild kleiner. */
+/* Höhe fest auf den Bildschirm: sonst wächst die Seite mit der Lösung und „Weiter“ rutscht unter den Rand */
+.riddle-screen { grid-template-rows: minmax(0, 1fr); }
+.riddle-screen .comic-page { grid-template-rows: minmax(0, 40fr) minmax(0, 60fr); }
+.riddle-screen.is-failed .comic-page { grid-template-rows: minmax(0, 23fr) minmax(0, 77fr); }
+.riddle-scene { position: relative; overflow: hidden; min-height: 0; }
+.riddle-scene .riddle-word {
+  position: absolute; z-index: 3; top: 8%; left: 50%; transform: translateX(-50%) rotate(-3deg); margin: 0;
+  font-size: calc(46 * var(--u)); white-space: nowrap; /* kleiner als die Aufgabe: die Rechnung ist der Held */
+  background: var(--sea-deep); border: var(--line) solid var(--ink); border-radius: calc(14 * var(--u));
+  padding: calc(4 * var(--u)) calc(22 * var(--u)) calc(1 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgb(8 42 66 / 0.55);
+}
+/* Truhe absolut im Bild: ein echtes Bild bringt seine eigene Größe mit und darf die Zeile nicht strecken */
+.riddle-chest {
+  position: absolute; z-index: 2; left: 50%; bottom: calc(3% + 52 * var(--u)); transform: translateX(-50%); /* über dem Schloss */
+  height: min(60%, calc(94% - 96 * var(--u))); aspect-ratio: 1; /* darf das Schild oben leicht berühren */
+  display: grid; place-items: end center;
+}
+.riddle-chest img { width: 100%; height: 100%; object-fit: contain; display: block; filter: drop-shadow(0 calc(8 * var(--u)) calc(10 * var(--u)) rgb(8 42 66 / 0.6)); }
+/* Schloss: ein Rad je Schritt auf einem Papierschild unter der Truhe; gelöst grün mit Haken, aktuell gelb */
+.riddle-lock {
+  position: absolute; z-index: 3; left: 50%; bottom: 3%; transform: translateX(-50%);
+  display: flex; gap: calc(8 * var(--u)); padding: calc(6 * var(--u)) calc(10 * var(--u));
+  background: var(--paper); border: var(--line) solid var(--ink); border-radius: calc(999 * var(--u));
+}
+.riddle-wheel {
+  width: calc(34 * var(--u)); height: calc(34 * var(--u)); border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--paper); border: var(--line-thin) solid var(--ink); color: var(--ink);
+}
+.riddle-wheel.is-now { background: var(--sun); }
+.riddle-wheel.is-open { background: var(--heal); }
+.riddle-wheel svg { width: 76%; height: 76%; }
+@media (prefers-reduced-motion: no-preference) {
+  .riddle-wheel.is-fresh { animation: riddle-click 420ms cubic-bezier(0.16, 1, 0.3, 1); }
+}
+@keyframes riddle-click { from { transform: rotate(-120deg) scale(0.6); } to { transform: none; } }
+.riddle-body {
+  position: relative;
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 0%, rgb(143 211 255 / 0.28), transparent 70%),
+    linear-gradient(180deg, var(--sea) 0%, var(--sea-deep) 75%, var(--sea-night) 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: calc(20 * var(--u)); padding: calc(22 * var(--u)) calc(24 * var(--u)) calc(14 * var(--u));
+  min-height: 0;
+}
+/* Sprechblase wie im Ereignisraum, Spitze nach oben zur Truhe */
+.riddle-text {
+  position: relative; flex: none; margin: 0; max-width: calc(820 * var(--u));
+  background: var(--paper); color: var(--ink); border: var(--line) solid var(--ink); border-radius: calc(20 * var(--u));
+  padding: calc(8 * var(--u)) calc(22 * var(--u));
+  font-weight: 700; font-size: calc(25 * var(--u)); line-height: 1.3; text-align: center; text-wrap: balance;
+}
+.riddle-text::before, .riddle-text::after {
+  content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+  border-style: solid; border-color: transparent; border-top: 0;
+}
+.riddle-text::before { top: calc(-22 * var(--u)); border-width: 0 calc(16 * var(--u)) calc(22 * var(--u)); border-bottom-color: var(--ink); }
+.riddle-text::after { top: calc(-15 * var(--u)); border-width: 0 calc(11 * var(--u)) calc(16 * var(--u)); border-bottom-color: var(--paper); }
+.riddle-task {
+  width: min(calc(760 * var(--u)), 100%); min-height: 0;
+  background: var(--paper); border: var(--line) solid var(--ink); border-radius: calc(28 * var(--u));
+  padding: calc(12 * var(--u)) calc(20 * var(--u)) calc(16 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgb(8 42 66 / 0.45);
+  text-align: center;
+}
+.riddle-task .answers { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.riddle-task .answer { min-height: calc(68 * var(--u)); font-size: calc(36 * var(--u)); }
+.riddle-task .eq { font-size: calc(50 * var(--u)); }
+.riddle-task .btn-go { margin-top: calc(10 * var(--u)); }
+.riddle-task .bubble-ask { font-size: calc(28 * var(--u)); }
+.riddle-task .steps-dots { display: none; } /* den Fortschritt zeigt das Schloss */
+/* Lösung beim Scheitern: dichter, damit „Weiter“ im Bild bleibt */
+.riddle-task.solution { padding-top: calc(8 * var(--u)); padding-bottom: calc(12 * var(--u)); }
+.riddle-task.solution .steps-dots { display: none; }
+.riddle-task.solution .nwall-stone { height: calc(44 * var(--u)); font-size: calc(28 * var(--u)); }
+.riddle-task.solution .way { margin: 0; font-size: calc(24 * var(--u)); }
+/* Mauer im Rätsel größer als in der Sprechblase: hier ist sie die ganze Aufgabe */
+.riddle-task .nwall { gap: calc(6 * var(--u)); }
+.riddle-task .nwall-row { gap: calc(8 * var(--u)); }
+.riddle-task .nwall-stone { min-width: calc(112 * var(--u)); height: calc(54 * var(--u)); font-size: calc(32 * var(--u)); }
+@media (orientation: portrait) {
+  .riddle-screen .comic-page { grid-template-rows: minmax(0, 46fr) minmax(0, 54fr); }
+  .riddle-screen.is-failed .comic-page { grid-template-rows: minmax(0, 34fr) minmax(0, 66fr); }
+  .riddle-task .answers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* Gebiet geschafft mit Seestern und neuem Gebiet (Phase 9): zwei Zeilen, damit der Knopf im Bild bleibt */
 .comic-next { gap: calc(10 * var(--u)); padding: calc(12 * var(--u)); }
 .comic-next .cleared-next { font-size: calc(23 * var(--u)); padding: calc(6 * var(--u)) calc(12 * var(--u)); gap: calc(4 * var(--u)); line-height: 1.25; }
@@ -887,3 +989,104 @@
 .station-news-cards { display: flex; flex-wrap: wrap; gap: calc(14 * var(--u)); justify-content: center; max-width: 100%; }
 .station-news-cards .card { width: calc(170 * var(--u)); min-height: calc(240 * var(--u)); }
 .station-news .btn-go { min-width: calc(220 * var(--u)); font-size: calc(30 * var(--u)); }
+
+/* Station ausbauen (Phase 9, Etappe 8): gekaufte Stücke im Bild, unter Held und Bullaugen */
+.station-decor { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.station-piece { position: absolute; display: flex; align-items: flex-end; justify-content: center; }
+.station-piece img { width: 100%; height: auto; display: block; filter: drop-shadow(0 calc(4 * var(--u)) calc(6 * var(--u)) rgb(8 42 66 / 0.5)); }
+.station-piece .ph { height: calc(56 * var(--u)); font-size: calc(14 * var(--u)); background-color: rgb(251 251 247 / 0.7); } /* bis die Bilder da sind */
+@media (prefers-reduced-motion: no-preference) {
+  body:not(.is-calm) .station-piece.is-new { animation: piece-in 520ms cubic-bezier(0.16, 1, 0.3, 1); }
+}
+/* Lautwort „Gebaut!“ über dem eben gekauften Stück (Durchsicht Etappe 8, P1) */
+.station-boom {
+  position: absolute; z-index: 4; pointer-events: none; text-align: center; white-space: nowrap;
+  font-family: var(--font-loud); font-size: calc(64 * var(--u)); letter-spacing: 0.02em; line-height: 1;
+  color: var(--sun); -webkit-text-stroke: calc(4 * var(--u)) var(--ink); paint-order: stroke fill;
+  translate: 0 -70%; rotate: -6deg; opacity: 0;
+  animation: built-word 1400ms var(--ease-out) 380ms forwards;
+}
+body.is-calm .station-boom { animation-name: built-word-calm; animation-delay: 0ms; }
+@media (prefers-reduced-motion: reduce) { .station-boom { animation-name: built-word-calm; animation-delay: 0ms; } }
+@keyframes built-word {
+  0% { opacity: 0; scale: 0.5; }
+  20% { opacity: 1; scale: 1.1; }
+  35% { scale: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; scale: 1; }
+}
+@keyframes built-word-calm { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes piece-in { from { transform: translateY(calc(-30 * var(--u))) scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* drei Stellen statt zwei: etwas kleinere Schrift, damit „Ausrüstung“ passt */
+.station-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.station .station-tools .spot { font-size: calc(24 * var(--u)); gap: calc(10 * var(--u)); padding-inline: calc(10 * var(--u)); }
+.station .station-tools .spot-icon { width: calc(54 * var(--u)); height: calc(54 * var(--u)); flex: none; }
+.station .station-tools .spot-icon svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); }
+
+/* Liste zum Ausbauen: dunkles Meer über der Station wie „Neue Karten“, Stücke als Papierkarten */
+.station-build {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: calc(14 * var(--u));
+  background: rgba(8, 42, 66, 0.86); padding: calc(20 * var(--u)) calc(24 * var(--u));
+}
+.station-build[hidden] { display: none; }
+.station-build-head { display: flex; align-items: center; gap: calc(20 * var(--u)); flex-wrap: wrap; justify-content: center; }
+.station-build-title {
+  margin: 0; font-family: var(--font-loud); font-size: calc(52 * var(--u)); color: var(--sun); line-height: 1;
+  -webkit-text-stroke: calc(4 * var(--u)) var(--ink); paint-order: stroke fill; transform: rotate(-2deg);
+}
+.station .station-build-pearls { font-size: calc(24 * var(--u)); }
+.station-build-pearls svg { width: 1.2em; height: 1.2em; }
+/* Zu teures Stück angetippt (Durchsicht Etappe 8, P1): Hinweis in der Kachel statt Name und Wirkung,
+   vorgelesen über die unsichtbare Statuszeile */
+.station-build-hint { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
+.station-item { position: relative; }
+.station-item-short {
+  position: absolute; inset: calc(6 * var(--u)) calc(6 * var(--u)) calc(66 * var(--u));
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  margin: 0; font-weight: 700; font-size: calc(21 * var(--u)); line-height: 1.25;
+  background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(8 * var(--u));
+  padding: calc(6 * var(--u));
+}
+.station-item-short[hidden] { display: none; }
+.station-build-list {
+  list-style: none; margin: 0; padding: calc(4 * var(--u)); width: 100%; min-height: 0; flex: 1 1 auto; overflow-y: auto;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: calc(12 * var(--u)); align-content: start;
+}
+.station-item {
+  display: flex; flex-direction: column; align-items: center; gap: calc(6 * var(--u));
+  background: var(--paper); border: var(--line) solid var(--ink); border-radius: var(--radius);
+  padding: calc(8 * var(--u)) calc(8 * var(--u)) calc(10 * var(--u)); text-align: center;
+}
+.station-item-pic { width: 100%; aspect-ratio: 2 / 1; display: grid; place-items: center; position: relative; }
+/* feste Bildfläche: hohe Stücke (Periskop, Flagge) dürfen die Kachel nicht strecken */
+.station-item-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+.station-item-pic .ph { font-size: calc(14 * var(--u)); }
+.station-item-name { margin: 0; font-weight: 700; font-size: calc(22 * var(--u)); line-height: 1.15; }
+.station-item-effect {
+  margin: 0; font-size: calc(18 * var(--u)); line-height: 1.25; font-weight: 700;
+  background: var(--sun-3); border-radius: calc(8 * var(--u)); padding: calc(4 * var(--u)) calc(6 * var(--u));
+}
+.station-item-buy, .station-item-owned { margin-top: auto; }
+.station-item-buy {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 0; width: 100%; min-height: calc(52 * var(--u)); font-size: calc(22 * var(--u));
+  padding-inline: calc(4 * var(--u)); gap: calc(4 * var(--u)); white-space: nowrap;
+}
+.station-item-buy-word { margin-right: calc(2 * var(--u)); }
+.station-item-buy:not(.btn-go) { background: var(--disabled-fill); color: var(--disabled-text); }
+.station-item-buy svg { flex: none; width: calc(24 * var(--u)); height: calc(24 * var(--u)); }
+.station-item-owned { display: inline-flex; align-items: center; gap: calc(6 * var(--u)); font-weight: 700; font-size: calc(18 * var(--u)); min-height: calc(52 * var(--u)); }
+.station-item-owned svg { width: calc(28 * var(--u)); height: calc(28 * var(--u)); }
+.station-item.is-owned { background: var(--sand-light); } /* nicht Grün: Grün heißt „richtig“ und „Heilung“ */
+.station-build-back { flex: none; background: var(--paper); min-width: calc(220 * var(--u)); font-size: calc(28 * var(--u)); }
+@media (orientation: portrait) {
+  /* vier Spalten aus je zwei halben; steht in der letzten Reihe nur ein Paar, rückt es in die Mitte */
+  .station-build-list { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: calc(10 * var(--u)); }
+  .station-item { grid-column: span 2; }
+  .station-item:nth-child(4n+1):nth-last-child(2) { grid-column: 3 / span 2; }
+  .station-item-name { font-size: calc(20 * var(--u)); hyphens: auto; }
+  .station-item-buy-word { display: none; } /* hoch zu schmal; vorgelesen wird „… kaufen“ */
+  .station-item-short { font-size: calc(18 * var(--u)); line-height: 1.2; inset-inline: calc(4 * var(--u)); }
+}

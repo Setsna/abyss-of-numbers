@@ -11,7 +11,7 @@
 //   - Vorlagen: "layers" ist Vorlage 0, "moreLayouts": [{ layers }] weitere; der Seed wählt eine (map.layout).
 //   - Gruppen je Tiefe: Kampfräume haben "pool" (ab Tiefe 1) und "deepPools": [{ fromDepth, groups }].
 //   - Räume ab einer Tiefe: "fromDepth" mit "fallback" (Raum-Spezifikation, die darunter gilt).
-import { createRng, deriveSeed } from '../rng.js?v=01d505e2';
+import { createRng, deriveSeed } from '../rng.js?v=ac66dd10';
 
 export function nextSlots(slot, nextCount, count) {
   const wanted = nextCount < count ? [slot - 1, slot] : [slot, slot + 1];
@@ -35,6 +35,17 @@ export function groupsAt(spec, depth) {
 }
 
 // config wird für die Boss-Begegnungen (bosses.json) gebraucht.
+// Vorratskammer (Phase 9, Etappe 8): Der späteste Schatz- oder Ereignisraum wird zum Ruheplatz (bei gleicher
+// Schicht der mit dem kleinsten Platz). Ohne solchen Raum bleibt die Karte gleich. Kennungen und Wege bleiben.
+export function addExtraRest(map) {
+  const pick = map.rooms.filter((r) => r.type === 'treasure' || r.type === 'event')
+    .sort((a, b) => (b.layer - a.layer) || (a.slot - b.slot))[0];
+  return {
+    ...map,
+    rooms: map.rooms.map((r) => (r === pick ? { id: r.id, layer: r.layer, slot: r.slot, type: 'rest', next: r.next.slice() } : r)),
+  };
+}
+
 export function generateMap(areaConfig, seed, config, depth = 1) {
   const rng = createRng(deriveSeed(seed, 'map'));
   const layouts = layoutsOf(areaConfig);

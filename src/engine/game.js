@@ -5,19 +5,20 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=01d505e2';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=01d505e2';
-import { wayForKey } from './math/ways.js?v=01d505e2';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=01d505e2';
-import { nextCurrent, answerCode } from './combat/current.js?v=01d505e2';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=01d505e2';
-import { generateMap } from './dungeon/map.js?v=01d505e2';
-import { createSave } from './save/save.js?v=01d505e2';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=01d505e2';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=01d505e2';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=01d505e2';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=01d505e2';
-import { rollEvent, optionCost } from './dungeon/events.js?v=01d505e2';
+import { createRng, deriveSeed } from './rng.js?v=ac66dd10';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=ac66dd10';
+import { wayForKey } from './math/ways.js?v=ac66dd10';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=ac66dd10';
+import { nextCurrent, answerCode } from './combat/current.js?v=ac66dd10';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=ac66dd10';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=ac66dd10';
+import { createSave } from './save/save.js?v=ac66dd10';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=ac66dd10';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=ac66dd10';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=ac66dd10';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=ac66dd10';
+import { rollEvent, optionCost } from './dungeon/events.js?v=ac66dd10';
+import { createRiddle } from './dungeon/riddle.js?v=ac66dd10';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -52,7 +53,9 @@ export function createGame({ config, save, seed }) {
   const SHIELD_PARTS = new Set(Object.values(config.bosses.bosses).flatMap((b) => b.shieldedBy ?? []));
   const BOOK = config.areas.order.flatMap((areaId) => {
     const area = config.areas.areas[areaId];
-    const own = [...new Set(area.layers.flatMap((l) => l.rooms.flatMap((r) => (r.pool ?? (r.fallback?.pool ?? [])).flat())))];
+    // alle Vorlagen, Grundgruppen zuerst, dann die Gruppen je Tiefe (neue Gegner ab Tiefe 4); Gäste stehen bei ihrem eigenen Gebiet
+    const rooms = [area.layers, ...(area.moreLayouts ?? []).map((l) => l.layers)].flatMap((ls) => ls.flatMap((l) => l.rooms.flatMap((r) => [r, ...(r.fallback ? [r.fallback] : [])])));
+    const own = [...new Set([...rooms.flatMap((r) => (r.pool ?? []).flat()), ...rooms.flatMap((r) => (r.deepPools ?? []).flatMap((x) => x.groups.flat()))])];
     const boss = area.layers.at(-1).rooms[0].encounter;
     const bosses = (config.bosses.encounters[boss] ?? []).filter((id) => !SHIELD_PARTS.has(id));
     return [...own.map((typeId) => ({ typeId, areaId, boss: false })), ...bosses.map((typeId) => ({ typeId, areaId, boss: true }))];
@@ -64,7 +67,8 @@ export function createGame({ config, save, seed }) {
     const l = lauf();
     if (!l) return null;
     if (state.map?.seed !== l.seed || state.map?.areaId !== l.gebiet) {
-      state.map = { seed: l.seed, areaId: l.gebiet, data: generateMap(config.areas.areas[l.gebiet], l.seed, config, l.tiefe ?? 1) };
+      const map = generateMap(config.areas.areas[l.gebiet], l.seed, config, l.tiefe ?? 1);
+      state.map = { seed: l.seed, areaId: l.gebiet, data: l.vorrat ? addExtraRest(map) : map }; // Vorratskammer (Etappe 8)
     }
     return state.map.data;
   }
@@ -79,13 +83,16 @@ export function createGame({ config, save, seed }) {
 
   function beginCombat({ enemyTypeIds, level, areaId, hp, combatSeed, roomId = null, boss = false, untimedTasks = 0, enemyPower = 1, depth = 1, elite = null }) {
     const s = state.save;
+    // Werkstatt (Etappe 8): Schutz nur im ersten Kampf des Tauchgangs
+    let workshopBlock = 0;
+    if (roomId !== null && lauf()?.werkstatt) { workshopBlock = stationEffect('diveStartBlock'); delete lauf().werkstatt; }
     const taskPlan = planFor({ areaId, level, boss, inDive: roomId !== null });
     const tutorial = untimedTasks > 0 && roomId !== null;
     state.combat = createCombat({
       config,
       enemyTypeIds,
       // Stärke der Figur, Ausrüstung (Etappe 7) und Talente (Phase 9); zweite Luft nur einmal je Tauchgang
-      hero: { ...heroStats(s, config), hp: Math.min(hp, maxHp(s, config)), secondWind: roomId !== null && !lauf()?.zweiteLuft ? heroStats(s, config).secondWind : 0 },
+      hero: { ...heroStats(s, config), startBlock: heroStats(s, config).startBlock + workshopBlock, hp: Math.min(hp, maxHp(s, config)), secondWind: roomId !== null && !lauf()?.zweiteLuft ? heroStats(s, config).secondWind : 0 },
       deck: deckList(s),
       moreTime: s.einstellung.mehrZeit,
       areaId,
@@ -111,32 +118,40 @@ export function createGame({ config, save, seed }) {
   // Aufgabenplan (Phase 6b, Regelwerk 7): im Tauchgang aus den Lernstufen des Kindes; der allererste
   // Kampf in einem Gebiet nutzt die untersten Stufen und zählt nicht (7.1 Nr. 6). Ohne Lernstufen
   // (Ausschalter, Testkampf) nach dem Raum: erster unten, sonst Mitte, Boss oben (7.6).
+  // Tempel (noIntro, Regelwerk 13.2): kein Einführungskampf; ohne Lernstufen auch der erste Kampf auf der Mitte.
   function planFor({ areaId, level, boss, inDive }) {
     const s = state.save;
     const cfg = config.game.learning;
     const cur = curriculumOf(config, s.klasse);
-    const kind = boss ? 'boss' : level === 1 ? 'intro' : 'normal';
-    if (!inDive || !cfg.enabled) return { ...planWithoutLearning(cur, areaId, kind, s.klasse), countable: false };
-    if (!isIntroduced(s.lernen, s.klasse, areaId)) {
+    const noIntro = Boolean(config.areas.areas[areaId]?.noIntro);
+    const kind = boss ? 'boss' : level === 1 && !noIntro ? 'intro' : 'normal';
+    // Messung (Nachtrag Etappe 7): Rand für stageRank aus einem anderen Gebiet (Tempel: Graben)
+    const rankFrom = config.areas.areas[areaId]?.rankFrom;
+    const rankBase = rankFrom ? Object.fromEntries(Object.entries(cur.windows[rankFrom] ?? {}).map(([l, w]) => [l, w[0]])) : undefined;
+    const extra = rankBase ? { rankBase } : {};
+    if (!inDive || !cfg.enabled) return { ...planWithoutLearning(cur, areaId, kind, s.klasse), countable: false, ...extra };
+    if (!noIntro && !isIntroduced(s.lernen, s.klasse, areaId)) {
       markIntroduced(s.lernen, s.klasse, areaId);
-      return { ...planWithoutLearning(cur, areaId, 'intro', s.klasse), countable: false };
+      return { ...planWithoutLearning(cur, areaId, 'intro', s.klasse), countable: false, ...extra };
     }
     const windows = { ...cur.windows[areaId] };
     const stageOf = Object.fromEntries(Object.entries(windows).map(([ladder, win]) => [ladder, stageFor(s.lernen, s.klasse, areaId, ladder, win)]));
     // Übungsaufgaben mit Stufe, älteste zuerst (Regelwerk 7.2)
     const practice = Object.entries(s.uebung).filter(([, e]) => e.stufe).sort((x, y) => x[1].t - y[1].t).map(([key, e]) => ({ key, stufe: e.stufe }));
     // Zähler der Mischregel aus dem Spielstand: er läuft über Kämpfe und Tauchgänge weiter (Review 7b, B1)
-    return { grade: s.klasse, stageOf, windows, countable: true, mixEvery: cfg.mixEvery, practice, mixCount: mixCounts(s.lernen, s.klasse, areaId) };
+    return { grade: s.klasse, stageOf, windows, countable: true, mixEvery: cfg.mixEvery, practice, mixCount: mixCounts(s.lernen, s.klasse, areaId), ...extra };
   }
 
-  // Gezählte Antwort verbuchen (Regelwerk 7.1); neue höchste Stufe bringt Perlen (7.7)
-  function countAnswer(ladder, correct) {
+  // Gezählte Antwort verbuchen (Regelwerk 7.1); neue höchste Stufe bringt Perlen (7.7).
+  // Ohne ctx aus dem laufenden Kampf; der Rätselraum reicht Gebiet, Fenster und eigene Liste herein.
+  function countAnswer(ladder, correct, ctx = null) {
     const s = state.save;
-    const info = state.combatInfo;
+    const info = ctx?.info ?? state.combatInfo;
     const cfg = config.game.learning;
-    const win = state.combat.taskPlan.windows[ladder];
-    const from = stageFor(s.lernen, s.klasse, info.areaId, ladder, win);
-    const { stufe, change } = recordAnswer(s.lernen, s.klasse, info.areaId, ladder, correct, win, cfg);
+    const win = ctx?.win ?? state.combat.taskPlan.windows[ladder];
+    const areaId = ctx?.areaId ?? info.areaId;
+    const from = stageFor(s.lernen, s.klasse, areaId, ladder, win);
+    const { stufe, change } = recordAnswer(s.lernen, s.klasse, areaId, ladder, correct, win, cfg);
     if (!change) return [];
     info.stageChanged.push(ladder);
     const events = [{ type: 'stageChanged', ladder, from, to: stufe }];
@@ -201,10 +216,15 @@ export function createGame({ config, save, seed }) {
         laden: {},
         tiefe: depth ?? maxDepth, // Tiefe des Tauchgangs (Phase 9)
       };
+      // Station (Etappe 8): Vorteile gelten für Tauchgänge, die nach dem Kauf beginnen
+      if (stationEffect('extraRest')) state.save.lauf.vorrat = true;
+      if (stationEffect('diveStartBlock')) state.save.lauf.werkstatt = true;
     }
     state.screen = 'map';
     // offene Kartenauswahl aus einem Ereignis (Perlen oder Leben schon bezahlt) kommt nach dem Neuladen wieder
-    if (l && l.beute) offerEventCards(l.beute);
+    if (l && l.beute) offerEventCards(l.beute, currentMap().rooms.find((r) => r.id === l.beute)?.type === 'riddle' ? { riddle: true, event: false } : {});
+    // offenes Rätsel (Phase 9, Etappe 7): gleicher Stein, verbrauchte Fehlversuche bleiben verbraucht
+    if (l && l.raetsel) openRiddle(l.raetsel.raum, l.raetsel);
     return [...events, { type: 'diveStarted', areaId, seed: lauf().seed, depth: lauf().tiefe, resumed: Boolean(l) }];
   }
 
@@ -224,6 +244,7 @@ export function createGame({ config, save, seed }) {
     }
     if (room.type === 'treasure') return [...events, ...openTreasure(roomId)];
     if (room.type === 'event') return [...events, ...openEvent(room)];
+    if (room.type === 'riddle') return [...events, ...openRiddle(roomId)];
     if (room.type === 'shop') return [...events, ...openShop(roomId)];
     l.versuche[roomId] = (l.versuche[roomId] ?? 0) + 1;
     const area = config.areas.areas[l.gebiet];
@@ -343,14 +364,104 @@ export function createGame({ config, save, seed }) {
     return events;
   }
 
-  // Kartenauswahl eines Ereignisses: aus dem Seed des Raums, deshalb nach dem Neuladen dieselbe
-  function offerEventCards(roomId) {
+  // Kartenauswahl eines Ereignisses oder Rätsels: aus dem Seed des Raums, deshalb nach dem Neuladen dieselbe
+  function offerEventCards(roomId, extra = {}) {
     const l = lauf();
     const cards = rollRewardCards(state.save, l.gebiet, createRng(deriveSeed(l.seed, `event:${roomId}:cards`)), config, { depth: l.tiefe });
-    state.reward = { cards, xp: 0, pearls: 0, levelUps: 0, practice: [], lightningHits: 0, event: true, item: null, cardLevelUps: [] };
+    state.reward = { cards, xp: 0, pearls: 0, levelUps: 0, practice: [], lightningHits: 0, event: true, item: null, cardLevelUps: [], ...extra };
     state.afterReward = 'map';
     state.screen = 'reward';
     return cards;
+  }
+
+  // ---------- Rätselraum (Phase 9, Etappe 7; Regelwerk 13.4) ----------
+  // Im Spielstand steht nur lauf.raetsel { raum, stufe, schritt, frei, versucht }; die Aufgabe entsteht aus dem Seed.
+  function openRiddle(roomId, saved = null) {
+    const l = lauf();
+    const curriculumId = config.areas.areas[l.gebiet].curriculum;
+    const r = createRiddle({ config, save: state.save, curriculumId, runSeed: l.seed, roomId, stufe: saved?.stufe });
+    l.raetsel = saved ?? { raum: roomId, stufe: r.stufe, schritt: 0, frei: config.riddles.freeMistakes, versucht: [] };
+    state.riddle = { ...r, curriculumId, wrongChoices: [], mistake: null, result: null, info: { stageChanged: [], stageUps: [] } };
+    state.screen = 'riddle';
+    return [{ type: 'riddleOpened', roomId, format: r.format }];
+  }
+
+  function answerRiddle({ choiceIndex }) {
+    const r = state.riddle;
+    const rec = lauf().raetsel;
+    if (r.result) return reject('phase');
+    const st = r.steps[rec.schritt];
+    if (!Number.isInteger(choiceIndex) || choiceIndex < 0 || choiceIndex >= st.choices.length || r.wrongChoices.includes(choiceIndex)) return reject('command');
+    const correct = choiceIndex === st.correctIndex;
+    const events = [{ type: 'riddleAnswered', stepIndex: rec.schritt, correct }];
+    // nur der erste Versuch je Stein oder Folge zählt (Regelwerk 7.1 Nr. 7)
+    const first = !rec.versucht[rec.schritt];
+    rec.versucht[rec.schritt] = 1;
+    if (first && config.game.learning.enabled && !r.info.stageChanged.includes(r.ladder)) {
+      events.push(...countAnswer(r.ladder, correct, { areaId: r.curriculumId, win: r.win, info: r.info }));
+    }
+    if (correct) {
+      r.wrongChoices = [];
+      r.mistake = null;
+      if (rec.schritt + 1 < r.steps.length) { rec.schritt += 1; return events; }
+      return [...events, ...riddleSolved()];
+    }
+    if (rec.frei > 0) {
+      rec.frei -= 1;
+      r.wrongChoices.push(choiceIndex);
+      r.mistake = st.choiceTypes?.[choiceIndex] ?? null; // Hinweis passend zum Fehler (Regelwerk 8)
+      return [...events, { type: 'riddleMistake', left: rec.frei, mistake: r.mistake }];
+    }
+    return [...events, ...riddleFailed(st)];
+  }
+
+  function riddleSolved() {
+    const l = lauf();
+    const r = state.riddle;
+    const [lo, hi] = config.riddles.pearls;
+    const pearls = createRng(deriveSeed(l.seed, `riddle:${r.roomId}:pearls`)).nextInt(lo, hi);
+    state.save.perlen += pearls;
+    delete l.raetsel;
+    state.riddle = null;
+    const events = [{ type: 'riddleSolved', roomId: r.roomId, pearls }, markCleared(r.roomId)];
+    l.beute = r.roomId; // bis die Karte gewählt ist: Neuladen kostet nichts
+    const cards = offerEventCards(r.roomId, { riddle: true, event: false, pearls });
+    return [...events, { type: 'rewardOffered', cards }];
+  }
+
+  // Nicht gelöst: Lösung mit Rechenweg zeigen, Aufgabe nur auf die Übungsliste (Regelwerk 13.4), kein Schaden
+  function riddleFailed(st) {
+    const l = lauf();
+    const r = state.riddle;
+    r.result = 'failed';
+    r.failedStep = l.raetsel.schritt;
+    r.mistake = null;
+    addPractice(state.save, [{ key: r.task.practiceKey, text: st.solutionText }], state.now, config);
+    delete l.raetsel;
+    return [{ type: 'riddleFailed', roomId: r.roomId, solutionText: st.solutionText }, markCleared(r.roomId)];
+  }
+
+  function leaveRiddle() {
+    if (!state.riddle?.result) return reject('phase');
+    state.riddle = null;
+    state.screen = 'map';
+    return [{ type: 'riddleLeft' }];
+  }
+
+  function riddleView() {
+    const r = state.riddle;
+    if (!r) return null;
+    const failed = r.result === 'failed';
+    const i = failed ? r.failedStep : lauf().raetsel.schritt;
+    const st = r.steps[i];
+    return {
+      roomId: r.roomId, format: r.format, ladder: r.ladder, stageId: r.task.stageId, practiceKey: r.task.practiceKey,
+      timeLimitMs: 0, freeMistakes: config.riddles.freeMistakes, freeLeft: failed ? 0 : lauf().raetsel.frei, stepIndex: i, steps: r.steps.length,
+      wall: r.task.wall ? clone(r.task.wall) : null, shown: r.task.shown?.slice() ?? null,
+      step: { prompt: st.prompt, display: st.display ?? null, cell: st.cell ?? null, choices: st.choices.slice(), correctIndex: st.correctIndex },
+      wrongChoices: r.wrongChoices.slice(), mistake: r.mistake, result: r.result,
+      solutionText: failed ? st.solutionText : null, way: failed ? (st.way ?? null) : null,
+    };
   }
 
   function eventView() {
@@ -398,6 +509,31 @@ export function createGame({ config, save, seed }) {
     rec.gegenstandGekauft = true;
     if (!state.save.ausruestung.besitz.includes(rec.gegenstand)) state.save.ausruestung.besitz.push(rec.gegenstand);
     return [{ type: 'itemBought', itemId: rec.gegenstand, price }];
+  }
+
+  // Station ausbauen (Phase 9, Etappe 8): Summe eines Vorteils über die gekauften Stücke
+  function stationEffect(key) {
+    return (state.save?.station ?? []).reduce((sum, id) => sum + (config.station[id]?.effect?.[key] ?? 0), 0);
+  }
+
+  function buyUpgrade({ upgradeId }) {
+    const s = state.save;
+    const item = config.station[upgradeId];
+    if (!item) return reject('unknownUpgrade');
+    if (s.station.includes(upgradeId)) return reject('owned');
+    if (s.perlen < item.price) return reject('pearls');
+    s.perlen -= item.price;
+    s.station.push(upgradeId);
+    return [{ type: 'upgradeBought', upgradeId, price: item.price }];
+  }
+
+  function stationView() {
+    const s = state.save;
+    return {
+      items: Object.entries(config.station).map(([id, it]) => ({
+        id, price: it.price, owned: s.station.includes(id), affordable: !s.station.includes(id) && s.perlen >= it.price, effect: it.effect ?? null,
+      })),
+    };
   }
 
   function removeCard({ cardId }) {
@@ -802,20 +938,21 @@ export function createGame({ config, save, seed }) {
   }
 
   // Befehle außerhalb des Kampfs; im Kampf werden sie mit „phase“ abgelehnt.
-  const MENU_COMMANDS = new Set(['ackNewCards', 'chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero']);
+  const MENU_COMMANDS = new Set(['ackNewCards', 'chooseTalent', 'chooseEventOption', 'start', 'chooseGrade', 'createHero', 'openLogbook', 'closeLogbook', 'spendPoint', 'resetPoints', 'dive', 'enterRoom', 'surface', 'setSetting', 'resetSave', 'buyCard', 'removeCard', 'leaveShop', 'buyItem', 'equipItem', 'unequipItem', 'editHero', 'cancelHeroEdit', 'changeHero', 'buyUpgrade']);
 
   // Erlaubte Befehle je Bildschirm.
   const COMMANDS = {
     title: { start, setSetting, resetSave },
     grade: { chooseGrade },
     heroCreate: { createHero },
-    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent, ackNewCards },
+    base: { dive, openLogbook, spendPoint, resetPoints, setSetting, equipItem, unequipItem, chooseTalent, ackNewCards, buyUpgrade },
     logbook: { openLogbook, closeLogbook, spendPoint, resetPoints, equipItem, unequipItem, editHero, chooseTalent },
     heroEdit: { changeHero, cancelHeroEdit },
     map: { enterRoom, surface },
     reward: { pickReward },
     shop: { buyCard, buyItem, removeCard, leaveShop },
     event: { chooseEventOption }, // Phase 9
+    riddle: { answerRiddle, leaveRiddle }, // Tempel (Phase 9, Etappe 7)
     areaCleared: { surface },
   };
 
@@ -865,6 +1002,8 @@ export function createGame({ config, save, seed }) {
         map: state.screen === 'map' ? mapView() : null,
         shop: state.screen === 'shop' ? shopView() : null,
         event: state.screen === 'event' ? eventView() : null,
+        riddle: state.screen === 'riddle' ? riddleView() : null,
+        station: state.screen === 'base' && s ? stationView() : null, // Ausbau (Etappe 8)
         cleared: state.cleared ? { ...state.cleared } : null,
         run: l ? { areaId: l.gebiet, depth: l.tiefe } : null,
         logbook: state.screen === 'logbook' ? { page: state.logbookPage } : null,

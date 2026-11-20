@@ -30,7 +30,7 @@
     "sequence": "Wie geht es weiter?",
     "complement": "Was fehlt?",
     "chain": "Kette: Glied {n} von {of}",
-    "wall": "Welche Zahl gehört in den hellen Stein?",
+    "wall": "Welche Zahl gehört in den Stein mit dem ?",
     "match": "Welches Ergebnis gehört dazu?",
     "stepOf": "Schritt {n} von {of}",
     "wallLabel": "Zahlenmauer: {stones}",
@@ -210,6 +210,58 @@
     "trenchLord": {
       "name": "Herr des Grabens",
       "book": "Er trägt eine Krone aus Stellenwertmaterial."
+    },
+    "parrotFish": {
+      "name": "Papageifisch",
+      "book": "Seine Schuppen sind bunte Rechenstäbe in verschiedenen Längen."
+    },
+    "seahorse": {
+      "name": "Seepferdchen",
+      "book": "Auf seinem Bauch sind zehn Punkte wie in einem Zehnerfeld."
+    },
+    "grottoCrab": {
+      "name": "Grottenkrebs",
+      "book": "Sein Panzer ist eine Stellenwerttafel mit drei Spalten."
+    },
+    "glowJelly": {
+      "name": "Leuchtqualle",
+      "book": "Ihr Schirm ist ein Spiegel: Links und rechts sieht sie gleich aus."
+    },
+    "pillarWorm": {
+      "name": "Säulenwurm",
+      "book": "Er wohnt in einem Messbecher mit Strichen."
+    },
+    "wardenCrab": {
+      "name": "Wächterkrabbe",
+      "book": "Auf ihrem Rücken liegen Punkte in einem Dreieck."
+    },
+    "deepDevil": {
+      "name": "Tiefseeteufel",
+      "book": "Er trägt ein Rechenrad mit vielen Feldern."
+    },
+    "blackShark": {
+      "name": "Schwarzer Hai",
+      "book": "Auf seiner Flosse stehen Striche in Fünferbündeln, wie bei einer Strichliste."
+    },
+    "templeGuard": {
+      "name": "Tempelwächter",
+      "book": "Seine Rüstung ist aus bunten Steckwürfeln gebaut."
+    },
+    "chainEel": {
+      "name": "Kettenaal",
+      "book": "Auf seinem Rücken liegen Dominosteine in einer langen Reihe."
+    },
+    "riddleStatue": {
+      "name": "Rätselstatue",
+      "book": "Sie ist aus Würfeln, Kugeln und Pyramiden gebaut."
+    },
+    "swapCrab": {
+      "name": "Tauschkrebs",
+      "book": "Er sammelt Münzen und Scheine aus Spielgeld."
+    },
+    "templeKeeper": {
+      "name": "Tempelhüter",
+      "book": "Auf seinem Panzer ist eine Uhr mit Strichen statt Zahlen."
     }
   },
   "hero": {
@@ -232,7 +284,7 @@
     "sequence": "Tippe die nächste Zahl an.",
     "complement": "Tippe die fehlende Zahl an.",
     "chain": "Rechne und tippe das Ergebnis an. Dann geht die Kette weiter.",
-    "wall": "Tippe die Zahl für den hellen Stein an.",
+    "wall": "Tippe die Zahl für den Stein mit dem Fragezeichen an.",
     "match": "Tippe das passende Ergebnis an.",
     "twoStep": "Rechne erst den ersten Teil, dann weiter.",
     "pointBeforeLine": "Erst mal oder geteilt, dann plus oder minus.",
@@ -328,7 +380,8 @@
     "streak": "Serie {n}",
     "cardLevel": "Stufe {n}",
     "poison": "vergiftet, noch {n} Züge",
-    "thorns": "Dornen, noch {n} Züge"
+    "thorns": "Dornen, noch {n} Züge",
+    "immuneNext": "nächste Runde immun gegen {op}"
   },
   "reward": {
     "xp": "+{n} Erfahrung",
@@ -340,7 +393,8 @@
     "lightning": "Blitzschnell-Treffer: {n}",
     "treasureWord": "Schatz!",
     "cardLevelUp": "{name} ist stärker geworden!",
-    "eventWord": "Neue Karte!"
+    "eventWord": "Neue Karte!",
+    "riddleWord": "Truhe offen!"
   },
   "learning": {
     "up": {
@@ -437,7 +491,12 @@
       "bossDefeated": "Der Herr des Grabens ist besiegt.",
       "intro": "Hier kommt alles vor, was du schon kannst. Zeig, was du gelernt hast!"
     },
-    "introOk": "Los geht’s!"
+    "introOk": "Los geht’s!",
+    "temple": {
+      "name": "Versunkener Tempel",
+      "bossDefeated": "Der Tempelhüter ist besiegt.",
+      "intro": "Im Tempel kommt alles dran, was du schon kannst. Jeder Gegner hat eine eigene Regel."
+    }
   },
   "map": {
     "title": "{area}",
@@ -449,7 +508,8 @@
       "treasure": "Schatz",
       "shop": "Händler",
       "elite": "Starker Gegner",
-      "event": "Überraschung"
+      "event": "Überraschung",
+      "riddle": "Rätsel"
     },
     "done": "geschafft",
     "roomLabel": "{type}, {state}",
@@ -673,7 +733,12 @@
     "rule": {
       "caveMoray": "Die Höhlenmuräne versteckt sich. Finde sie zuerst am Zahlenstrahl. Dann trifft deine Karte doppelt.",
       "cityWarden": "Der Wächter rechnet in zwei Schritten. Rechne erst den ersten Teil, dann weiter.",
-      "trenchLord": "Beim Herrn des Grabens gilt: Punkt vor Strich. Erst mal, dann plus oder minus."
+      "trenchLord": "Beim Herrn des Grabens gilt: Punkt vor Strich. Erst mal, dann plus oder minus.",
+      "templeGuard": "Der Tempelwächter rechnet in zwei Schritten. Rechne erst den ersten Teil, dann weiter.",
+      "chainEel": "Gegen den Kettenaal wird jede Rechnung eine Kette. Rechne Glied für Glied.",
+      "riddleStatue": "Die Rätselstatue versteckt sich. Finde sie zuerst am Zahlenstrahl. Dann trifft deine Karte doppelt.",
+      "swapCrab": "Der Tauschkrebs wechselt jede Runde, wogegen er geschützt ist. Das kleine Zeichen zeigt, was als Nächstes kommt.",
+      "templeKeeper": "Der Tempelhüter wechselt jede Runde seinen Schutz. Hat er nur noch halb so viel Leben, gilt: Punkt vor Strich."
     }
   },
   "items": {
@@ -852,5 +917,74 @@
     "newOne": "Neue Karte entdeckt!",
     "newMany": "{n} neue Karten entdeckt!",
     "newOk": "Super!"
+  },
+  "riddle": {
+    "word": "Rätseltruhe!",
+    "text": "Die Truhe hat ein Zahlenschloss. Löse das Rätsel, dann springt sie auf.",
+    "tryAgain": "Noch nicht. Versuch es noch einmal.",
+    "failed": "Die Truhe bleibt zu. Das Rätsel übst du später noch einmal.",
+    "chestAlt": "Truhe mit Zahlenschloss",
+    "stepRight": "Richtig! Ein Rad ist offen.",
+    "partialOne": "1 Stein hast du geschafft!",
+    "partial": "{n} Steine hast du geschafft!",
+    "seqSame": "Immer {d}.",
+    "lockLabel": "Schloss: {n} von {of} Rädern offen"
+  },
+  "station": {
+    "button": "Ausbauen",
+    "title": "Station ausbauen",
+    "buy": "Kaufen",
+    "owned": "Steht da",
+    "ask": "{name} kaufen?",
+    "yes": "Ja, kaufen",
+    "no": "Lieber nicht",
+    "bought": "{name} steht jetzt in deiner Station!",
+    "effect": {
+      "diveStartBlock": "Im ersten Kampf jedes Tauchgangs hast du {n} Schutz.",
+      "extraRest": "Auf der Seekarte gibt es einen Ruheplatz mehr."
+    },
+    "items": {
+      "lamps": {
+        "name": "Lichterkette"
+      },
+      "flag": {
+        "name": "Flagge"
+      },
+      "plants": {
+        "name": "Algengarten"
+      },
+      "workshop": {
+        "name": "Werkstatt"
+      },
+      "shells": {
+        "name": "Muschelregal"
+      },
+      "aquarium": {
+        "name": "Aquarium"
+      },
+      "pantry": {
+        "name": "Vorratskammer"
+      },
+      "periscope": {
+        "name": "Periskop"
+      },
+      "chest": {
+        "name": "Schatztruhe"
+      },
+      "pet": {
+        "name": "Kleiner Krake"
+      }
+    },
+    "badge": "Genug Perlen!",
+    "have": "Du hast {n} Perlen.",
+    "back": "Zurück",
+    "buyLabel": "{name} für {price} Perlen kaufen",
+    "after": "Danach hast du {n} Perlen.",
+    "short": "{name}: Dir fehlen noch {n} Perlen. Perlen findest du beim Tauchen.",
+    "shortOne": "{name}: Dir fehlt noch 1 Perle. Perlen findest du beim Tauchen.",
+    "shortLabel": "{name}, {price} Perlen, dir fehlen noch {n}",
+    "built": "Gebaut!",
+    "tileShort": "Dir fehlen noch {n} Perlen. Tauch weiter!",
+    "tileShortOne": "Dir fehlt noch 1 Perle. Tauch weiter!"
   }
 }

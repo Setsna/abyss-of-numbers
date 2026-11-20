@@ -270,5 +270,231 @@
         "amount": 9
       }
     ]
+  },
+  "parrotFish": {
+    "hp": 22,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "block",
+        "amount": 5
+      }
+    ]
+  },
+  "seahorse": {
+    "hp": 22,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "block",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 7
+      }
+    ]
+  },
+  "grottoCrab": {
+    "hp": 29,
+    "immune": "add",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "block",
+        "amount": 5
+      }
+    ]
+  },
+  "glowJelly": {
+    "hp": 25,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 6
+      }
+    ]
+  },
+  "pillarWorm": {
+    "hp": 30,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "block",
+        "amount": 6
+      },
+      {
+        "type": "attack",
+        "amount": 12
+      }
+    ]
+  },
+  "wardenCrab": {
+    "hp": 34,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "block",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      }
+    ]
+  },
+  "deepDevil": {
+    "hp": 34,
+    "immune": "add",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 10
+      },
+      {
+        "type": "block",
+        "amount": 6
+      }
+    ]
+  },
+  "blackShark": {
+    "hp": 28,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "attack",
+        "amount": 7
+      }
+    ]
+  },
+  "templeGuard": {
+    "hp": 29,
+    "immune": "mul",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "block",
+        "amount": 7
+      },
+      {
+        "type": "attack",
+        "amount": 10
+      }
+    ],
+    "rule": {
+      "type": "taskModifier",
+      "format": "twoStep"
+    }
+  },
+  "chainEel": {
+    "hp": 26,
+    "immune": "div",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "attack",
+        "amount": 7
+      }
+    ],
+    "rule": {
+      "type": "taskModifier",
+      "format": "chain"
+    }
+  },
+  "riddleStatue": {
+    "hp": 34,
+    "immune": "sub",
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 7
+      },
+      {
+        "type": "block",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      }
+    ],
+    "rule": {
+      "type": "hidden",
+      "find": "numberLine",
+      "multiplier": 2
+    }
+  },
+  "swapCrab": {
+    "hp": 27,
+    "immune": null,
+    "pattern": [
+      {
+        "type": "attack",
+        "amount": 8
+      },
+      {
+        "type": "attack",
+        "amount": 9
+      },
+      {
+        "type": "block",
+        "amount": 6
+      }
+    ],
+    "rule": {
+      "type": "rotatingImmunity",
+      "order": [
+        "add",
+        "sub",
+        "mul",
+        "div"
+      ]
+    }
   }
 }

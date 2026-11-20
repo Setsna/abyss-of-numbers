@@ -116,6 +116,32 @@
       "thornCoral",
       "armorBubble",
       "deepQuake"
+    ],
+    "temple": [
+      "currentStrike",
+      "undertow",
+      "waveSlam",
+      "deepRift",
+      "shieldBubble",
+      "whirlpool",
+      "harpoon",
+      "conchHorn",
+      "kelpPotion",
+      "shellCracker",
+      "bubbleChain",
+      "coralWall",
+      "pearlFind",
+      "inkCloud",
+      "wavebreaker",
+      "floodWave",
+      "airSupply",
+      "poisonAlgae",
+      "calmCurrent",
+      "streakWave",
+      "twinHarpoon",
+      "thornCoral",
+      "armorBubble",
+      "deepQuake"
     ]
   },
   "firstRewardIncludes": "whirlpool"

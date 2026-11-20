@@ -2,21 +2,24 @@
 // mit Name, Stufe und Perlen; im Bild drei Stellen zum Antippen:
 //   Bullaugen – je offenem Gebiet ein Fenster mit dem Gebietsbild und einem gelben Knopf (Abtauchen),
 //   Logbuch   – mit dem Schild „freie Punkte“,
-//   Ausrüstung – öffnet die Logbuch-Seite „Ausrüstung“.
+//   Ausrüstung – öffnet die Logbuch-Seite „Ausrüstung“,
+//   Ausbauen  – Liste der Stücke für Perlen (Phase 9, Etappe 8); gekaufte Stücke stehen im Stationsbild.
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=01d505e2';
-import { renderAsset, assetUrl } from '../assets.js?v=01d505e2';
-import { homeAreaId, worldLayer } from '../components/world.js?v=01d505e2';
-import { renderCard } from '../components/card.js?v=01d505e2';
+import { ICON } from '../icons.js?v=ac66dd10';
+import { renderAsset, assetUrl } from '../assets.js?v=ac66dd10';
+import { homeAreaId, worldLayer } from '../components/world.js?v=ac66dd10';
+import { renderCard } from '../components/card.js?v=ac66dd10';
+import { isCalm } from '../app.js?v=ac66dd10';
 
-export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, account = null }) {
+export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onBuy = null, bought = null, account = null }) {
   const v = game.view();
   const p = v.profile;
   root.innerHTML = `
   <main class="screen base station">
     <section class="panel station-scene" aria-label="${t('base.title')}">
+      <div class="station-decor" data-ref="decor" aria-hidden="true"></div>
       <p class="caption" data-ref="text"></p>
       <div class="station-hero">
         <div class="station-art" data-ref="hero"></div>
@@ -27,6 +30,7 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
       <div class="station-tools">
         <button class="spot base-logbook" type="button" data-ref="logbook"></button>
         <button class="spot" type="button" data-ref="gear"></button>
+        <button class="spot" type="button" data-ref="build"></button>
       </div>
       <div class="title-who station-who" data-ref="who" hidden>
         <span data-ref="whoName"></span>
@@ -37,8 +41,19 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
         <div class="station-news-cards" data-ref="newsCards"></div>
         <button class="btn btn-go" type="button" data-ref="newsOk"></button>
       </div>
+      <div class="station-build" data-ref="buildPanel" role="dialog" aria-modal="true" aria-labelledby="station-build-title" hidden>
+        <div class="station-build-head">
+          <h2 class="station-build-title" id="station-build-title" data-ref="buildTitle"></h2>
+          <span class="chip station-build-pearls" data-ref="buildPearls"></span>
+        </div>
+        <p class="station-build-hint" data-ref="buildHint" role="status"></p>
+        <ul class="station-build-list" data-ref="buildList"></ul>
+        <button class="btn station-build-back" type="button" data-ref="buildBack"></button>
+      </div>
       <div class="station-ask" data-ref="ask" role="dialog" aria-modal="true" hidden>
+        <div class="station-ask-pic" data-ref="askPic" hidden></div>
         <p class="station-ask-text" data-ref="askText"></p>
+        <p class="chip station-ask-sub" data-ref="askSub" hidden></p>
         <div class="station-ask-btns">
           <button class="btn btn-go" type="button" data-ref="askYes"></button>
           <button class="btn" type="button" data-ref="askNo"></button>
@@ -61,7 +76,7 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
     <span class="chip">${t('hud.level', { n: p.stufe })}</span>
     <span class="chip" aria-label="${t('hud.pearls', { n: p.perlen })}">${ICON.pearl}<span>${p.perlen}</span></span>
     <span class="chip chip-stars" aria-label="${p.stars === 1 ? t('base.starsOne') : t('base.stars', { n: p.stars })}">${ICON.star}<span>${p.stars}</span></span>`;
-  ref.text.textContent = t('base.text');
+  ref.text.textContent = bought ? t('station.bought', { name: t(`station.items.${bought}.name`) }) : t('base.text');
 
   let busy = false;
   const once = (fn) => () => { if (busy) return; busy = true; fn(); };
@@ -69,13 +84,26 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
   // Nachfrage im Fenster der Station: beim Wechsel des Gebiets (der laufende Tauchgang endet, Gesammeltes bleibt)
   // und beim Abmelden. Ja führt onYes aus, Nein schließt das Fenster.
   let onYes = null;
-  function ask(text, yes, no, fn) {
+  let askFrom = null; // Knopf, der die Nachfrage geöffnet hat: bekommt beim Schließen den Fokus zurück
+  // Offenes Fenster (Nachfrage vor der Liste vor der Station): alles andere ist gesperrt (inert),
+  // damit Tab und Vorlesen im Fenster bleiben (Durchsicht Etappe 8, P3).
+  function updateInert() {
+    const top = !ref.ask.hidden ? ref.ask : !ref.buildPanel.hidden ? ref.buildPanel : null;
+    for (const el of scene.children) el.inert = top ? el !== top : false;
+  }
+  function ask(text, yes, no, fn, { pic = null, sub = null, from = null } = {}) {
     onYes = fn;
+    askFrom = from ?? document.activeElement;
     ref.askDepths.hidden = true;
+    ref.askPic.replaceChildren(...(pic ? [pic] : []));
+    ref.askPic.hidden = !pic;
+    ref.askSub.hidden = !sub;
+    if (sub) { ref.askSub.innerHTML = `${ICON.pearl}<span></span>`; ref.askSub.lastChild.textContent = sub; }
     ref.askText.textContent = text;
     ref.askYes.textContent = yes;
     ref.askNo.textContent = no;
     ref.ask.hidden = false;
+    updateInert();
     ref.askNo.focus({ preventScroll: true });
   }
   const askSwitch = (areaId, name) => ask(
@@ -111,7 +139,11 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
     }));
     ref.askDepths.hidden = false;
   };
-  ref.askNo.addEventListener('click', () => { ref.ask.hidden = true; onYes = null; });
+  ref.askNo.addEventListener('click', () => {
+    ref.ask.hidden = true; onYes = null;
+    updateInert();
+    askFrom?.focus?.({ preventScroll: true });
+  });
   ref.askYes.addEventListener('click', () => { if (busy || !onYes) return; busy = true; onYes(); });
 
   if (account) {
@@ -200,6 +232,157 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
   ref.gear.innerHTML = `<span class="spot-icon">${ICON.helmet}</span><span class="spot-label"></span>`;
   ref.gear.querySelector('.spot-label').textContent = t('base.gear');
   ref.gear.addEventListener('click', once(() => onLogbook('gear')));
+
+  // Station ausbauen (Phase 9, Etappe 8): gekaufte Stücke auf ihren Plätzen (hoch eigene Plätze, falls vorhanden)
+  const pieces = (v.station?.items.filter((x) => x.owned) ?? []).map((it) => {
+    const piece = document.createElement('div');
+    piece.className = `station-piece${it.id === bought ? ' is-new' : ''}`;
+    piece.dataset.id = it.id;
+    piece.append(renderAsset(`station.${it.id}`, t(`station.items.${it.id}.name`)));
+    ref.decor.append(piece);
+    return piece;
+  });
+  // Plätze nach Ausrichtung; dreht das Kind das iPad auf der Station, wandern die Stücke mit (Durchsicht Etappe 8).
+  // Ist die Station schon abgebaut, meldet sich der Zuhörer beim nächsten Drehen ab.
+  const portraitQuery = matchMedia('(orientation: portrait)');
+  const place = () => {
+    if (!scene.isConnected) { portraitQuery.removeEventListener('change', place); return; }
+    for (const piece of pieces) {
+      const cfg = config.station[piece.dataset.id];
+      const slot = (portraitQuery.matches && cfg.slotPortrait) || cfg.slot;
+      piece.style.left = `${slot.x * 100}%`;
+      piece.style.top = `${slot.y * 100}%`;
+      piece.style.width = `${slot.w * 100}%`;
+    }
+  };
+  place();
+  if (pieces.length) portraitQuery.addEventListener('change', place);
+
+  // Eben gekauft (Durchsicht Etappe 8, P1): Lautwort „Gebaut!“ am Stück, die Perlen zählen herunter.
+  // Der Klang kommt über das Ereignis upgradeBought (sounds.json). Weniger Bewegung: Wort nur ein- und ausblenden, Zahl sofort.
+  if (bought && config.station[bought]) {
+    const piece = pieces.find((x) => x.dataset.id === bought);
+    if (piece) {
+      const word = document.createElement('span');
+      word.className = 'station-boom';
+      word.setAttribute('aria-hidden', 'true');
+      word.textContent = t('station.built');
+      word.style.left = piece.style.left;
+      word.style.top = piece.style.top;
+      word.style.width = piece.style.width;
+      scene.append(word); // über Karten und Held, unter den Fenstern
+      word.addEventListener('animationend', () => word.remove());
+    }
+    const num = ref.hud.querySelector('.chip:nth-child(2) > span');
+    const from = p.perlen + config.station[bought].price;
+    if (num && !isCalm()) {
+      const ms = 700;
+      num.textContent = String(from);
+      setTimeout(() => {
+        const start = performance.now();
+        const tick = (now) => {
+          const k = Math.min(1, (now - start) / ms);
+          num.textContent = String(Math.round(from - (from - p.perlen) * (1 - (1 - k) ** 3)));
+          if (k < 1 && num.isConnected) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }, 300);
+    }
+  }
+
+  ref.build.innerHTML = `<span class="spot-icon">${ICON.build}</span><span class="spot-label"></span>`;
+  ref.build.querySelector('.spot-label').textContent = t('station.button');
+  if (v.station?.items.some((x) => x.affordable)) {
+    const badge = document.createElement('span');
+    badge.className = 'badge spot-badge';
+    badge.textContent = t('station.badge');
+    ref.build.append(badge);
+  }
+  ref.buildTitle.textContent = t('station.title');
+  ref.buildPearls.innerHTML = `${ICON.pearl}<span></span>`;
+  ref.buildPearls.lastChild.textContent = t('station.have', { n: p.perlen });
+  ref.buildBack.textContent = t('station.back');
+  ref.buildList.replaceChildren(...(v.station?.items ?? []).map((it) => {
+    const li = document.createElement('li');
+    li.className = `station-item${it.owned ? ' is-owned' : ''}`;
+    const name = t(`station.items.${it.id}.name`);
+    const pic = document.createElement('div');
+    pic.className = 'station-item-pic';
+    pic.append(renderAsset(`station.${it.id}`, name));
+    const title = document.createElement('p');
+    title.className = 'station-item-name';
+    title.textContent = name;
+    li.append(pic, title);
+    if (it.effect) {
+      const [key, n] = Object.entries(it.effect)[0];
+      const fx = document.createElement('p');
+      fx.className = 'station-item-effect';
+      fx.textContent = t(`station.effect.${key}`, { n });
+      li.append(fx);
+    }
+    if (it.owned) {
+      const done = document.createElement('p');
+      done.className = 'station-item-owned';
+      done.innerHTML = ICON.check;
+      done.append(t('station.owned'));
+      li.append(done);
+    } else {
+      const buy = document.createElement('button');
+      buy.type = 'button';
+      buy.className = `btn station-item-buy${it.affordable ? ' btn-go' : ' is-short'}`;
+      buy.innerHTML = `<span class="station-item-buy-word"></span>${ICON.pearl}<span></span>`;
+      buy.firstChild.textContent = t('station.buy');
+      buy.lastChild.textContent = String(it.price);
+      const missing = it.price - p.perlen;
+      if (it.affordable) {
+        buy.setAttribute('aria-label', t('station.buyLabel', { name, price: it.price }));
+        buy.addEventListener('click', () => {
+          if (busy) return;
+          const pic = renderAsset(`station.${it.id}`, name);
+          ask(t('station.ask', { name }), t('station.yes'), t('station.no'), () => onBuy?.(it.id), {
+            pic, sub: t('station.after', { n: p.perlen - it.price }), from: buy,
+          });
+        });
+      } else {
+        // Zu wenig Perlen (Durchsicht Etappe 8, P1): grau, aber antippbar – sagt, wie viele fehlen und woher Perlen kommen
+        buy.setAttribute('aria-disabled', 'true');
+        buy.setAttribute('aria-label', t('station.shortLabel', { name, price: it.price, n: missing }));
+        // Der Hinweis legt sich als Blase über Bild und Name der Kachel (dort schaut das Kind hin);
+        // vorgelesen wird er über die versteckte Statuszeile der Liste.
+        const short = document.createElement('p');
+        short.className = 'station-item-short';
+        short.hidden = true;
+        short.textContent = missing === 1 ? t('station.tileShortOne') : t('station.tileShort', { n: missing });
+        li.append(short);
+        buy.addEventListener('click', () => {
+          if (busy) return;
+          for (const other of ref.buildList.querySelectorAll('.station-item-short')) other.hidden = other !== short;
+          ref.buildHint.textContent = missing === 1 ? t('station.shortOne', { name }) : t('station.short', { name, n: missing });
+        });
+      }
+      li.append(buy);
+    }
+    return li;
+  }));
+  ref.build.addEventListener('click', () => {
+    if (busy) return;
+    ref.buildHint.textContent = '';
+    for (const el of ref.buildList.querySelectorAll('.station-item-short')) el.hidden = true;
+    ref.buildPanel.hidden = false;
+    updateInert();
+    ref.buildBack.focus({ preventScroll: true });
+  });
+  ref.buildBack.addEventListener('click', () => {
+    ref.buildPanel.hidden = true;
+    updateInert();
+    ref.build.focus({ preventScroll: true });
+  });
+  // Escape schließt das oberste Fenster (erst die Nachfrage, dann die Liste)
+  scene.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || busy) return;
+    if (!ref.ask.hidden) { e.preventDefault(); ref.askNo.click(); }
+    else if (!ref.buildPanel.hidden) { e.preventDefault(); ref.buildBack.click(); }
+  });
 
   root.querySelector('.porthole:not(:disabled)')?.focus({ preventScroll: true });
 }
