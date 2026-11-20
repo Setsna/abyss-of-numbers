@@ -467,7 +467,12 @@
     "F-TEIL-b": "Das Einmaleins hilft hier."
   },
   "save": {
-    "unavailable": "Speichern geht gerade nicht. Du kannst trotzdem spielen."
+    "unavailable": "Speichern geht gerade nicht. Du kannst trotzdem spielen.",
+    "newerTitle": "Das Spiel ist neu!",
+    "newerText": "Tippe auf „Neu laden“. Dein Spielstand ist noch da. Kommt diese Seite wieder, warte ein paar Minuten.",
+    "reload": "Neu laden",
+    "corruptTitle": "Dein Spielstand lässt sich nicht öffnen.",
+    "corruptText": "Sag deiner Lehrerin oder deinem Lehrer Bescheid. Es ist nichts gelöscht."
   },
   "areas": {
     "reef": {

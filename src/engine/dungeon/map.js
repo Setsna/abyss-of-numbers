@@ -11,7 +11,7 @@
 //   - Vorlagen: "layers" ist Vorlage 0, "moreLayouts": [{ layers }] weitere; der Seed wählt eine (map.layout).
 //   - Gruppen je Tiefe: Kampfräume haben "pool" (ab Tiefe 1) und "deepPools": [{ fromDepth, groups }].
 //   - Räume ab einer Tiefe: "fromDepth" mit "fallback" (Raum-Spezifikation, die darunter gilt).
-import { createRng, deriveSeed } from '../rng.js?v=805614a5';
+import { createRng, deriveSeed } from '../rng.js?v=91f88903';
 
 export function nextSlots(slot, nextCount, count) {
   const wanted = nextCount < count ? [slot - 1, slot] : [slot, slot + 1];

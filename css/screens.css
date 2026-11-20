@@ -690,6 +690,15 @@
 .login-info { font-size: calc(18 * var(--u)); color: var(--muted); font-weight: 700; text-align: center; }
 .login-privacy { text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; }
 
+/* Halt vor dem Spiel (Update-Sicherheit): Stand aus einer neueren Fassung oder nicht lesbar */
+.stop-box { gap: calc(14 * var(--u)); }
+.stop-title { margin: 0; font-weight: 700; font-size: calc(34 * var(--u)); line-height: 1.2; text-align: center; }
+.stop-text { margin: 0; font-weight: 700; font-size: calc(24 * var(--u)); line-height: 1.35; text-align: center; }
+.stop-box .btn { min-width: calc(280 * var(--u)); font-size: calc(30 * var(--u)); }
+.stop-box .btn-go { margin-inline: 0; }
+.stop-logout { background: var(--paper); }
+.stop-logout[hidden] { display: none; }
+
 /* Wer angemeldet ist, unten links auf dem Titel; daneben „Abmelden“ */
 .title-who {
   position: absolute; z-index: 1; left: calc(16 * var(--u)); bottom: calc(14 * var(--u));

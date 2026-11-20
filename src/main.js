@@ -4,31 +4,32 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=805614a5';
-import { createStorage, STORAGE_KEY } from './platform/storage.js?v=805614a5';
-import { createAccount, accountBackend } from './platform/account.js?v=805614a5';
-import { FIREBASE } from './platform/firebase-config.js?v=805614a5';
-import { createAudio } from './platform/audio.js?v=805614a5';
-import { validateConfig } from './engine/config/validate.js?v=805614a5';
-import { createSave } from './engine/save/save.js?v=805614a5';
-import { createGame } from './engine/game.js?v=805614a5';
-import { setTexts, t } from './ui/text.js?v=805614a5';
-import { setManifest } from './ui/assets.js?v=805614a5';
-import { isLocalHost } from './ui/app.js?v=805614a5';
-import { mountCombat } from './ui/screens/combat.js?v=805614a5';
-import { mountReward } from './ui/screens/reward.js?v=805614a5';
-import { mountShop } from './ui/screens/shop.js?v=805614a5';
-import { mountEvent } from './ui/screens/event.js?v=805614a5';
-import { mountRiddle } from './ui/screens/riddle.js?v=805614a5';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=805614a5';
-import { mountBase } from './ui/screens/base.js?v=805614a5';
-import { mountTitle } from './ui/screens/title.js?v=805614a5';
-import { mountLogin } from './ui/screens/login.js?v=805614a5';
-import { mountGrade } from './ui/screens/grade.js?v=805614a5';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=805614a5';
-import { mountLogbook } from './ui/screens/logbook.js?v=805614a5';
-import { mountAdult } from './ui/screens/adult.js?v=805614a5';
-import { createRng } from './engine/rng.js?v=805614a5';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=91f88903';
+import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=91f88903';
+import { createAccount, accountBackend } from './platform/account.js?v=91f88903';
+import { FIREBASE } from './platform/firebase-config.js?v=91f88903';
+import { createAudio } from './platform/audio.js?v=91f88903';
+import { validateConfig } from './engine/config/validate.js?v=91f88903';
+import { createSave } from './engine/save/save.js?v=91f88903';
+import { createGame } from './engine/game.js?v=91f88903';
+import { setTexts, t } from './ui/text.js?v=91f88903';
+import { setManifest } from './ui/assets.js?v=91f88903';
+import { isLocalHost } from './ui/app.js?v=91f88903';
+import { mountCombat } from './ui/screens/combat.js?v=91f88903';
+import { mountReward } from './ui/screens/reward.js?v=91f88903';
+import { mountShop } from './ui/screens/shop.js?v=91f88903';
+import { mountEvent } from './ui/screens/event.js?v=91f88903';
+import { mountRiddle } from './ui/screens/riddle.js?v=91f88903';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=91f88903';
+import { mountBase } from './ui/screens/base.js?v=91f88903';
+import { mountTitle } from './ui/screens/title.js?v=91f88903';
+import { mountLogin } from './ui/screens/login.js?v=91f88903';
+import { mountStop } from './ui/screens/stop.js?v=91f88903';
+import { mountGrade } from './ui/screens/grade.js?v=91f88903';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=91f88903';
+import { mountLogbook } from './ui/screens/logbook.js?v=91f88903';
+import { mountAdult } from './ui/screens/adult.js?v=91f88903';
+import { createRng } from './engine/rng.js?v=91f88903';
 
 const app = document.getElementById('app');
 
@@ -147,6 +148,17 @@ function runGame(config, session = null) {
   const backend = session ? accountBackend(session.account.S, STORAGE_KEY, browserBackend()) : browserBackend();
   const storage = createStorage(backend, config);
   const { save, status } = storage.load();
+  // Update-Sicherheit (20.11.2026): Stammt der Stand aus einer neueren Fassung oder lässt er sich im Konto nicht lesen,
+  // beginnt kein neues Spiel – ein neuer Held würde den echten Stand im Konto überschreiben. Nichts wird geschrieben.
+  const verdict = loadVerdict(status, Boolean(session));
+  if (verdict !== 'play') {
+    mountStop(app, {
+      t, kind: verdict === 'reload' ? 'newer' : 'corrupt',
+      onReload: () => location.reload(),
+      onLogout: session?.title?.onLogout ?? null,
+    });
+    return;
+  }
   if (status === 'unavailable') showNotice(t('save.unavailable'));
   const game = createGame({ config, save, seed: Date.now() % 1000000007 });
   const audio = setupAudio(config, save?.einstellung);

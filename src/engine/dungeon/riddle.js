@@ -1,10 +1,10 @@
 // Rätselraum im Tempel (Phase 9, Etappe 7; Regelwerk 13.4): eine Truhe mit Zahlenschloss.
 // Die Aufgabe entsteht aus dem Seed des Raums, deshalb ist sie nach dem Neuladen dieselbe.
-import { createRng, deriveSeed } from '../rng.js?v=805614a5';
-import { generateTask } from '../math/generate.js?v=805614a5';
-import { curriculumOf, stageAt, stageWithoutLearning } from '../math/ladders/index.js?v=805614a5';
-import { resolveCurriculum } from '../combat/combat.js?v=805614a5';
-import { stageFor } from '../learning/learning.js?v=805614a5';
+import { createRng, deriveSeed } from '../rng.js?v=91f88903';
+import { generateTask } from '../math/generate.js?v=91f88903';
+import { curriculumOf, stageAt, stageWithoutLearning } from '../math/ladders/index.js?v=91f88903';
+import { resolveCurriculum } from '../combat/combat.js?v=91f88903';
+import { stageFor } from '../learning/learning.js?v=91f88903';
 
 // Zahlenmauer oder Zahlenfolge (je zur Hälfte) auf der Stufe des Kindes im Gebiet;
 // ohne Lernstufen (Ausschalter) die mittlere Stufe des Fensters (Regelwerk 7.6).

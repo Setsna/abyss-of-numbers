@@ -1,8 +1,8 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=805614a5';
-import { createRiddle } from '../dungeon/riddle.js?v=805614a5';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=805614a5';
+import { generateMap } from '../dungeon/map.js?v=91f88903';
+import { createRiddle } from '../dungeon/riddle.js?v=91f88903';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=91f88903';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.
@@ -244,6 +244,28 @@ function validateRun(l, config, fail, save) {
 
 // Hebt ältere Stände auf die aktuelle Version (Prüfschwerpunkt 1). Unbekannte Versionen bleiben,
 // wie sie sind; validateSave meldet sie dann. notes: kurze Hinweise, was geändert wurde.
+// Reparieren statt ablehnen (Update-Sicherheit, 20.11.2026). Zwei Angaben des laufenden Tauchgangs dürfen einen
+// Stand nicht unbrauchbar machen, weil das Spiel sie ohne Verlust neu bilden kann:
+//   lauf.leben    kleiner als 1 (Fehler der Fassung vom 20.11.2026: Sieg mit 0 Leben nach einem Dornentreffer):
+//                 auf 1 gehoben.
+//   lauf.raetsel  passt nicht mehr zum Spiel (beschädigt, oder das Rätsel entsteht nach einem Update anders):
+//                 verworfen. Der Raum ist noch nicht erledigt, das Rätsel beginnt beim Betreten neu.
+// Alles andere bleibt Sache von validateSave. Aufruf nach migrateSave (storage.js). Liefert Notizen.
+export function repairSave(save, config) {
+  const notes = [];
+  if (!isObj(save) || !isObj(save.lauf)) return notes;
+  const l = save.lauf;
+  if (Number.isInteger(l.leben) && l.leben < 1) {
+    l.leben = 1;
+    notes.push('lauf.leben: auf 1 gehoben');
+  }
+  if (l.raetsel !== undefined && validateSave(save, config).some((e) => e.startsWith('lauf.raetsel'))) {
+    delete l.raetsel;
+    notes.push('lauf.raetsel: passte nicht mehr, das Rätsel beginnt neu');
+  }
+  return notes;
+}
+
 export function migrateSave(raw, config) {
   const notes = [];
   if (!isObj(raw) || !Number.isInteger(raw.version)) return { save: raw, notes };

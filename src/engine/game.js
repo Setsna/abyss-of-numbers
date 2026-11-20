@@ -5,20 +5,20 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=805614a5';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=805614a5';
-import { wayForKey } from './math/ways.js?v=805614a5';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=805614a5';
-import { nextCurrent, answerCode } from './combat/current.js?v=805614a5';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=805614a5';
-import { generateMap, addExtraRest } from './dungeon/map.js?v=805614a5';
-import { createSave } from './save/save.js?v=805614a5';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=805614a5';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=805614a5';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=805614a5';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=805614a5';
-import { rollEvent, optionCost } from './dungeon/events.js?v=805614a5';
-import { createRiddle } from './dungeon/riddle.js?v=805614a5';
+import { createRng, deriveSeed } from './rng.js?v=91f88903';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=91f88903';
+import { wayForKey } from './math/ways.js?v=91f88903';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=91f88903';
+import { nextCurrent, answerCode } from './combat/current.js?v=91f88903';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=91f88903';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=91f88903';
+import { createSave } from './save/save.js?v=91f88903';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=91f88903';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=91f88903';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=91f88903';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=91f88903';
+import { rollEvent, optionCost } from './dungeon/events.js?v=91f88903';
+import { createRiddle } from './dungeon/riddle.js?v=91f88903';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -653,7 +653,8 @@ export function createGame({ config, save, seed }) {
       state.afterReward = null;
       return events;
     }
-    l.leben = Math.min(maxHp(s, config), state.combat.hero.hp + heroStats(s, config).healAfterWin); // Talent Proviant
+    // Talent Proviant; nie unter 1 (ein Stand mit 0 Leben wäre ungültig und ließe sich nicht mehr laden)
+    l.leben = Math.max(1, Math.min(maxHp(s, config), state.combat.hero.hp + heroStats(s, config).healAfterWin));
     events.push(markCleared(info.roomId));
     state.afterReward = 'map';
     if (info.boss) {

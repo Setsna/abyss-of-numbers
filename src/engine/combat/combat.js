@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=805614a5';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=805614a5';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=805614a5';
-import { chooseSource } from '../learning/learning.js?v=805614a5';
-import { crossPlace } from '../math/places.js?v=805614a5';
-import { neighborWay } from '../math/ways.js?v=805614a5';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=805614a5';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=805614a5';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=805614a5';
-import { cardEffect } from '../cards/effect.js?v=805614a5';
+import { createRng, deriveSeed } from '../rng.js?v=91f88903';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=91f88903';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=91f88903';
+import { chooseSource } from '../learning/learning.js?v=91f88903';
+import { crossPlace } from '../math/places.js?v=91f88903';
+import { neighborWay } from '../math/ways.js?v=91f88903';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=91f88903';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=91f88903';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=91f88903';
+import { cardEffect } from '../cards/effect.js?v=91f88903';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -88,6 +88,8 @@ export function createCombat({ config, enemyTypeIds, hero, deck, moreTime = 'off
     secondWind: hero.secondWind ?? 0,
     streak: 0, // Serie richtiger Antworten in Folge (Etappe 8, M13); die Zeit wird nie kürzer
   };
+  // Schutzregel schon in der ersten Runde: beginnt die Reihe mit einer Rechenart, die alle anderen schützen, rückt sie weiter
+  for (const [e, index] of rotationPlan(combat, { first: true })) { e.rotation.index = index; e.immune = immuneAt(e, index); }
   combat.startEvents = startTurn(combat);
   // Tüftlerin, Korallenpanzer (Phase 5, Etappe 7): Schutz zu Beginn des Kampfs
   if (hero.startBlock) combat.hero.block = hero.startBlock;
@@ -108,22 +110,76 @@ function rotationFor(rule, ops) {
   const order = rule.order.filter((op) => [...ops].some((o) => o !== op));
   return order.length ? { rotation: { order, index: 0 }, immune: order[0] } : { rotation: null, immune: null };
 }
-const nextImmune = (e) => (e.rotation ? e.rotation.order[(e.rotation.index + 1) % e.rotation.order.length] : null);
+const immuneAt = (e, index) => e.rotation.order[index % e.rotation.order.length];
+
+// Schutzregel im Kampf (Konzept Jahresausbau, Gegnergruppen): Nie sind alle Gegner eines Kampfs gegen dieselbe
+// Rechenart immun. Ein Gegner mit wechselnder Immunität überspringt deshalb eine Rechenart, gegen die schon
+// alle anderen lebenden Gegner immun sind. immuneOf liefert die Immunität der anderen (siehe rotationPlan).
+function freeIndex(c, enemy, from, immuneOf) {
+  const others = c.enemies.filter((o) => o !== enemy && alive(o));
+  const taken = (op) => others.length > 0 && others.every((o) => immuneOf(o) === op);
+  for (let i = from; i < from + enemy.rotation.order.length; i++) if (!taken(immuneAt(enemy, i))) return i;
+  return from; // jede Rechenart der Reihe ist vergeben (Reihe mit nur einer Rechenart): wie ohne die Regel
+}
+
+// Der nächste Wechsel aller Gegner mit wechselnder Immunität, in der Reihenfolge, in der sie wechseln:
+// Wer später dran ist, sieht schon die neue Immunität der früheren. Dieselbe Rechnung bestimmt den Wechsel
+// (startTurn) und das Zeichen „als Nächstes“ (Ansicht und Ereignis), damit das Zeichen immer stimmt.
+function rotationPlan(c, { first = false } = {}) {
+  const plan = new Map(); // Gegner → neuer Platz in seiner Reihe
+  const immuneOf = (o) => (plan.has(o) ? immuneAt(o, plan.get(o)) : o.immune);
+  for (const e of c.enemies) {
+    if (e.rotation && alive(e)) plan.set(e, freeIndex(c, e, first ? e.rotation.index : e.rotation.index + 1, immuneOf));
+  }
+  return plan;
+}
+const nextImmune = (c, e, plan = rotationPlan(c)) => (plan.has(e) ? immuneAt(e, plan.get(e)) : null);
+
+// Schutzregel auch mitten in der Runde: Wird im Zug des Kindes ein Gegner besiegt und sind danach alle übrigen
+// gegen dieselbe Rechenart immun, rückt der Gegner mit wechselnder Immunität sofort weiter (Ereignis wie beim
+// Wechsel zu Rundenbeginn). Grenze: Stirbt ein Gegner erst im Gegnerzug (Gift, Dornen), kann das Zeichen
+// „als Nächstes“ der Runde davor etwas anderes gezeigt haben; die neue Immunität steht dann zu Rundenbeginn da.
+function settleRotation(c) {
+  const events = [];
+  const moved = [];
+  for (const [e, index] of rotationPlan(c, { first: true })) {
+    if (index === e.rotation.index) continue;
+    e.rotation.index = index;
+    e.immune = immuneAt(e, index);
+    const event = { type: 'immunityRotated', enemyUid: e.uid, immune: e.immune, next: null };
+    events.push(event);
+    moved.push([e, event]);
+  }
+  if (moved.length) {
+    const after = rotationPlan(c);
+    for (const [e, event] of moved) event.next = nextImmune(c, e, after);
+  }
+  return events;
+}
 
 function startTurn(c) {
   c.turn += 1;
   // Panzerknacker (Phase 5, Etappe 3): aufgehobene Immunität zählt die eigenen Züge herunter
   const restored = [];
+  const plan = c.turn > 1 ? rotationPlan(c) : new Map();
+  const rotated = [];
   for (const e of c.enemies) {
     if (e.immuneBroken > 0) {
       e.immuneBroken -= 1;
       if (e.immuneBroken === 0) restored.push({ type: 'immunityRestored', enemyUid: e.uid });
     }
-    if (c.turn > 1 && e.rotation && alive(e)) {
-      e.rotation.index += 1;
-      e.immune = e.rotation.order[e.rotation.index % e.rotation.order.length];
-      restored.push({ type: 'immunityRotated', enemyUid: e.uid, immune: e.immune, next: nextImmune(e) });
+    if (plan.has(e)) {
+      e.rotation.index = plan.get(e);
+      e.immune = immuneAt(e, e.rotation.index);
+      const event = { type: 'immunityRotated', enemyUid: e.uid, immune: e.immune, next: null };
+      restored.push(event);
+      rotated.push([e, event]);
     }
+  }
+  // das Zeichen für die übernächste Runde erst, wenn alle gewechselt haben
+  if (rotated.length) {
+    const after = rotationPlan(c);
+    for (const [e, event] of rotated) event.next = nextImmune(c, e, after);
   }
   if (c.blockKeep > 0) c.blockKeep -= 1; else c.hero.block = 0;
   c.slowNext = 0;
@@ -397,6 +453,8 @@ function fitsPractice(c, op, win, p) {
 const COUNTED_FORMATS = new Set(['solve', ...Object.keys(FORMAT_LADDER), 'match']);
 // Wirkungen mit Schaden an dem einen gewählten Ziel: vor ihnen gilt „erst finden“ (Regelwerk 13.3)
 const SINGLE_HITS = new Set(['damage', 'damageBlock', 'damageTwo', 'poison']);
+// Wirkungen, deren Schaden wie „damage“ zählt (Kraft, Serie, Tempo-Bonus; Plan Etappe 5)
+const DAMAGE_EFFECTS = new Set(['damage', 'damageBlock', 'damageTwo', 'damageAll']);
 
 function markCounts(c, task) {
   const current = (ladder) => (c.taskPlan.stageOf[ladder] ? stageAt(c.curriculum, ladder, c.taskPlan.stageOf[ladder]).id : null);
@@ -440,7 +498,9 @@ function playCard(c, { cardUid, targetUid }) {
   const alt = def.task.ifLadder;
   if (alt && c.taskPlan.stageOf[alt]) spec.format = Object.keys(FORMAT_LADDER).find((f) => FORMAT_LADDER[f] === alt);
   // Flächenkarte (Ziel alle): gilt für einen lebenden Gegner eine Formatregel, nimmt sie diese (Regelwerk 13.3, Review Etappe 5–8)
-  const rule = target?.rule ?? (def.target === 'enemies' ? c.enemies.find((e) => alive(e) && e.rule?.type === 'taskModifier')?.rule : undefined);
+  // … und zwar von einem, den die Karte auch trifft (nicht geschützt, nicht gegen ihre Rechenart immun).
+  const rule = target?.rule ?? (def.target === 'enemies'
+    ? c.enemies.find((e) => alive(e) && !isShielded(c, e) && !immuneTo(e, def) && e.rule?.type === 'taskModifier')?.rule : undefined);
   // Wächter, Herr des Grabens: Rechenkarten gegen sie bekommen ein anderes Format
   if (rule?.type === 'taskModifier' && spec.format === 'solve') spec.format = rule.format;
   const ownLadder = FORMAT_LADDER[spec.format];
@@ -488,7 +548,10 @@ function playCard(c, { cardUid, targetUid }) {
 function applyCorrect(c, def, pending, multiplier) {
   const events = [];
   const fx = effectOf(c, pending.cardId); // Wirkung der Kartenstufe
-  const amountFor = (base) => (c.config.game.tempo.appliesTo.includes(fx.type) ? applyMultiplier(base, multiplier) : base);
+  // Bonus (Tempo oder „gefunden“, Regel hidden) je Wirkungsart aus tempo.appliesTo. Schaden an allen, an zweien und
+  // Schaden mit Schutz zählen wie „damage“ (Plan Etappe 5); vorher ging der Bonus bei diesen Karten verloren.
+  const amountFor = (base, kind = DAMAGE_EFFECTS.has(fx.type) ? 'damage' : fx.type) => (
+    c.config.game.tempo.appliesTo.includes(kind) ? applyMultiplier(base, multiplier) : base);
   // Schaden mit Kraft, Serie und Tempo-Bonus; perStreak (Serienwelle): je Stufe der laufenden Serie mehr
   const damageNow = () => amountFor(fx.amount + (fx.perStreak ?? 0) * c.streak + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c));
   const strike = (target, dmg) => {
@@ -501,7 +564,11 @@ function applyCorrect(c, def, pending, multiplier) {
     const target = c.enemies.find((e) => e.uid === pending.targetUid);
     const dmg = damageNow();
     strike(target, dmg);
-    if (fx.type === 'damageBlock') { c.hero.block += fx.block; events.push({ type: 'blockGained', amount: fx.block }); }
+    if (fx.type === 'damageBlock') {
+      const block = amountFor(fx.block, 'block'); // Wellenbrecher: der Schutz bekommt den Bonus wie eine Schutzkarte
+      c.hero.block += block;
+      events.push({ type: 'blockGained', amount: block });
+    }
     if (fx.type === 'damageTwo') {
       const second = c.enemies.find((e) => e !== target && alive(e) && !isShielded(c, e) && !immuneTo(e, def));
       if (second) strike(second, dmg);
@@ -511,8 +578,10 @@ function applyCorrect(c, def, pending, multiplier) {
     for (const e of c.enemies.filter((x) => alive(x) && !isShielded(c, x) && !immuneTo(x, def))) strike(e, dmg);
   } else if (fx.type === 'poison') {
     const target = c.enemies.find((e) => e.uid === pending.targetUid);
-    target.poison = { amount: fx.amount, turns: fx.turns };
-    events.push({ type: 'poisoned', enemyUid: target.uid, amount: fx.amount, turns: fx.turns });
+    // Gift bekommt keinen Tempo-Bonus; nach „erst finden“ wirkt es aber mehrfach wie jede Karte (Regel hidden)
+    const amount = pending.task?.hiddenFind ? applyMultiplier(fx.amount, multiplier) : fx.amount;
+    target.poison = { amount, turns: fx.turns };
+    events.push({ type: 'poisoned', enemyUid: target.uid, amount, turns: fx.turns });
   } else if (fx.type === 'thorns') {
     c.hero.thorns = { amount: fx.amount, turns: fx.turns };
     events.push({ type: 'thornsGained', amount: fx.amount, turns: fx.turns });
@@ -667,39 +736,48 @@ function endTurn(c) {
     enemy.block = 0; // Schutz des Gegners verfällt, wenn er das nächste Mal handelt
     const intent = effectiveIntent(enemy);
     events.push({ type: 'enemyActed', enemyUid: enemy.uid, intent });
+    let thorned = false;
     if (intent.type === 'attack') {
       const r = hit(c.hero, intent.amount);
       events.push({ type: 'heroDamaged', amount: r.amount, blocked: r.blocked });
       if (c.hero.thorns && !isShielded(c, enemy)) { // Dornenkoralle (Phase 9); nicht durch den Schild anderer Gegner
         const t = hit(enemy, c.hero.thorns.amount);
         events.push({ type: 'thornsHit', enemyUid: enemy.uid, amount: t.amount });
-        if (!alive(enemy)) { events.push({ type: 'enemyDefeated', enemyUid: enemy.uid }); continue; } // besiegt: keine Elite-Regel, kein Gift mehr (Review Etappe 5–8)
-        checkPhase(enemy, events);
+        if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
+        else thorned = true;
       }
     } else if (intent.type === 'block') {
       enemy.block += intent.amount;
     }
-    advancePattern(enemy);
-    // Elitegegner (Phase 9, Etappe 2): Regel nach seinem Zug
-    if (enemy.elite) {
-      enemy.elite.acts += 1;
-      const { rule, cfg, acts } = enemy.elite;
-      if (rule === 'guard' && acts % cfg.every === 0) { enemy.block += cfg.block; events.push({ type: 'eliteGuard', enemyUid: enemy.uid, block: cfg.block }); }
-      if (rule === 'regen' && enemy.hp < enemy.maxHp) {
-        const healed = Math.min(cfg.heal, enemy.maxHp - enemy.hp);
-        enemy.hp += healed;
-        events.push({ type: 'eliteRegen', enemyUid: enemy.uid, healed });
+    // Ein von den Dornen besiegter Gegner tut nichts mehr: keine Elite-Regel (er stünde sonst wieder auf), kein Gift.
+    // Die Prüfung der Heldenleben weiter unten läuft trotzdem – übersprungen gewann der Held mit 0 Leben, und
+    // der Stand danach war ungültig (zweite Durchsicht, 20.11.2026).
+    if (alive(enemy)) {
+      advancePattern(enemy);
+      // Dornen können den Boss unter die Grenze der nächsten Phase drücken. Erst nach dem Weiterzählen prüfen,
+      // damit die neue Phase mit ihrem ersten Zug beginnt (wie nach einer Karte oder nach Gift).
+      if (thorned) checkPhase(enemy, events);
+      // Elitegegner (Phase 9, Etappe 2): Regel nach seinem Zug
+      if (enemy.elite) {
+        enemy.elite.acts += 1;
+        const { rule, cfg, acts } = enemy.elite;
+        if (rule === 'guard' && acts % cfg.every === 0) { enemy.block += cfg.block; events.push({ type: 'eliteGuard', enemyUid: enemy.uid, block: cfg.block }); }
+        if (rule === 'regen' && enemy.hp < enemy.maxHp) {
+          const healed = Math.min(cfg.heal, enemy.maxHp - enemy.hp);
+          enemy.hp += healed;
+          events.push({ type: 'eliteRegen', enemyUid: enemy.uid, healed });
+        }
       }
+      if (enemy.poison) { // Giftalge (Phase 9)
+        const lost = Math.min(enemy.hp, enemy.poison.amount);
+        enemy.hp -= lost;
+        events.push({ type: 'poisonTick', enemyUid: enemy.uid, amount: lost });
+        if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
+        else checkPhase(enemy, events); // Gift kann den Boss unter die Grenze der nächsten Phase drücken
+        if (enemy.poison && --enemy.poison.turns <= 0) enemy.poison = null;
+      }
+      if (enemy.weak && --enemy.weak.turns <= 0) { enemy.weak = null; events.push({ type: 'weakEnded', enemyUid: enemy.uid }); }
     }
-    if (enemy.poison && alive(enemy)) { // Giftalge (Phase 9)
-      const lost = Math.min(enemy.hp, enemy.poison.amount);
-      enemy.hp -= lost;
-      events.push({ type: 'poisonTick', enemyUid: enemy.uid, amount: lost });
-      if (!alive(enemy)) events.push({ type: 'enemyDefeated', enemyUid: enemy.uid });
-      else checkPhase(enemy, events); // Gift kann den Boss unter die Grenze der nächsten Phase drücken
-      if (enemy.poison && --enemy.poison.turns <= 0) enemy.poison = null;
-    }
-    if (enemy.weak && --enemy.weak.turns <= 0) { enemy.weak = null; events.push({ type: 'weakEnded', enemyUid: enemy.uid }); }
     if (c.hero.hp <= 0 && c.secondWind > 0) {
       // Talent Zweite Luft (Phase 9): einmal je Tauchgang mit secondWind Leben weiter
       c.hero.hp = c.secondWind;
@@ -728,7 +806,10 @@ export function combatDispatch(combat, command) {
   if (combat.phase === 'won' || combat.phase === 'lost') return reject('phase');
   const handler = HANDLERS[command?.type];
   if (!handler) return reject('command');
-  return handler(combat, command);
+  const events = handler(combat, command);
+  // Gegner besiegt und der Kampf läuft weiter: Schutzregel sofort wiederherstellen (siehe settleRotation)
+  if (combat.phase !== 'won' && combat.phase !== 'lost' && events.some((e) => e.type === 'enemyDefeated')) events.push(...settleRotation(combat));
+  return events;
 }
 
 // Darstellung für die Oberfläche. Mit { targetUid } enthält jede Handkarte
@@ -736,6 +817,7 @@ export function combatDispatch(combat, command) {
 export function combatView(combat, { targetUid } = {}) {
   const c = combat;
   const target = c.enemies.find((e) => e.uid === targetUid && alive(e)) ?? null;
+  const rotation = rotationPlan(c); // nächster Wechsel der Immunitäten, für das Zeichen am Gegner
   return {
     phase: c.phase,
     turn: c.turn,
@@ -746,7 +828,7 @@ export function combatView(combat, { targetUid } = {}) {
       uid: e.uid, typeId: e.typeId, hp: e.hp, maxHp: e.maxHp, block: e.block, immune: e.immune, immuneBroken: e.immuneBroken,
       alive: alive(e), shielded: isShielded(c, e), intent: alive(e) ? effectiveIntent(e) : null,
       rule: e.rule?.type ?? null, phase: e.phase, weakTurns: e.weak?.turns ?? 0,
-      nextImmune: nextImmune(e), // Tauschkrebs: Zeichen für die nächste Runde
+      nextImmune: nextImmune(c, e, rotation), // Tauschkrebs: Zeichen für die nächste Runde
       elite: e.elite?.rule ?? null, // Phase 9
       poisonTurns: e.poison?.turns ?? 0,
     })),
