@@ -1,5 +1,5 @@
 // Zahlenmauer in der Sprechblase (Phase 5, Etappe 4; Korallenmauer). Drei Reihen Steine:
-import { formatNumber } from '../../engine/math/format.js?v=6e7c9173';
+import { formatNumber } from '../../engine/math/format.js?v=83dff991';
 // oben die Spitze (Zelle 5), Mitte 3 und 4, unten die Grundsteine 0 bis 2. Gegebene und schon
 // gefüllte Steine zeigen ihre Zahl, der gesuchte Stein leuchtet mit „?“, spätere leere Steine
 // bleiben leer. solution: der gesuchte Stein zeigt die richtige Zahl; all (Rätselraum): auch die späteren.

@@ -3,10 +3,10 @@
 // Vornamen aus dem Lehrerbereich, Ausgabe fertige Tabellen als Daten. Das Modul erzeugt kein HTML; der
 // Lehrerbereich und die Vorschau zeichnen jede Tabelle mit einer allgemeinen Funktion.
 //   Table = { id, title, columns: [{ key, label }], rows: [{ cells: { key: Text oder Zahl }, child? }], note? }
-import { migrateSave, repairSave, validateSave, SAVE_VERSION } from '../engine/save/save.js?v=6e7c9173';
-import { starCount } from '../engine/progression/depth.js?v=6e7c9173';
-import { dayKey } from '../engine/progression/statistics.js?v=6e7c9173';
-import { curriculumOf } from '../engine/math/ladders/index.js?v=6e7c9173';
+import { migrateSave, repairSave, validateSave, SAVE_VERSION } from '../engine/save/save.js?v=83dff991';
+import { starCount } from '../engine/progression/depth.js?v=83dff991';
+import { dayKey } from '../engine/progression/statistics.js?v=83dff991';
+import { curriculumOf } from '../engine/math/ladders/index.js?v=83dff991';
 
 const OPS = ['add', 'sub', 'mul', 'div'];
 const HELP_MIN = 6; // ab so vielen Antworten in statistik.letzte

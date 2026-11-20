@@ -4,11 +4,11 @@
 // zeigt das Spiel die ganze Lösung mit Rechenweg und einen Knopf zum Weitertauchen.
 // Nach der Impeccable-Durchsicht (20.11.2026): Das Schloss zeigt je Schritt ein Rad, das nach einem
 // richtigen Stein grün einrastet; der Satz oben steht als Sprechblase wie im Ereignisraum.
-import { worldLayer } from '../components/world.js?v=6e7c9173';
-import { createTaskPanel } from '../components/task-panel.js?v=6e7c9173';
-import { renderAsset } from '../assets.js?v=6e7c9173';
-import { wayText, hintAsk } from '../text.js?v=6e7c9173';
-import { formatNumber } from '../../engine/math/format.js?v=6e7c9173';
+import { worldLayer } from '../components/world.js?v=83dff991';
+import { createTaskPanel } from '../components/task-panel.js?v=83dff991';
+import { renderAsset } from '../assets.js?v=83dff991';
+import { wayText, hintAsk } from '../text.js?v=83dff991';
+import { formatNumber } from '../../engine/math/format.js?v=83dff991';
 
 const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
