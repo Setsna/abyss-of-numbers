@@ -5,11 +5,11 @@
 // nächsthöheren Stelle um 1 daneben, F-COMP-c an der Rechenstelle um 1 daneben (A-9),
 // F-COMP-d die letzte Ziffer der ersten Zahl genannt (37 + ? = 40 → 7), F-COMP-e nur bis zum
 // nächsten Zehner (bei glatten Zahlen: Hunderter) ergänzt (37 + ? = 100 → 3).
-import { drawUntil } from './common.js?v=dc004222';
-import { pickChoices, commonRound } from '../mistakes.js?v=dc004222';
-import { calcPlace, digitAt } from '../places.js?v=dc004222';
-import { wayFor } from '../ways.js?v=dc004222';
-import { formatNumber } from '../format.js?v=dc004222';
+import { drawUntil } from './common.js?v=e3e07a37';
+import { pickChoices, commonRound } from '../mistakes.js?v=e3e07a37';
+import { calcPlace, digitAt } from '../places.js?v=e3e07a37';
+import { wayFor } from '../ways.js?v=e3e07a37';
+import { formatNumber } from '../format.js?v=e3e07a37';
 
 const nextMult = (a, k) => Math.ceil((a + 1) / k) * k;
 

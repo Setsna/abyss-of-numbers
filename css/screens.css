@@ -550,14 +550,16 @@
 }
 .station-scene .caption { max-width: 60%; }
 /* Tagesauftrag (Phase 10, Etappe 5): Stand in einer eigenen Zeile unter dem Auftrag */
-.station-scene .caption .mission-progress { display: block; margin-top: calc(4 * var(--u)); font-weight: 700; }
+.station-scene .caption .mission-progress { display: inline-flex; align-items: center; gap: calc(8 * var(--u)); margin-left: 0.5em; vertical-align: middle; white-space: nowrap; font-weight: 700; } /* in derselben Zeile wie der Satz (sonst liegt das Schild quer auf dem ersten Bullauge) */
+.station-scene .caption .mission-pill { padding: calc(2 * var(--u)) calc(12 * var(--u)); border: var(--line-thin) solid var(--ink); border-radius: 999px; background: var(--paper); font-variant-numeric: tabular-nums; }
+.station-scene .caption .mission-reward { display: inline-flex; align-items: center; gap: calc(4 * var(--u)); }
+.station-scene .caption .mission-reward svg { width: calc(26 * var(--u)); height: calc(26 * var(--u)); }
 .station-scene .caption.is-mission { font-size: calc(22 * var(--u)); } /* eine Stufe kleiner als die übliche Ansage (24u) */
 /* Lautwort „Geschafft!“ beim Tagesauftrag: am Schild oben links */
 .station-boom.is-mission { left: 4%; top: 22%; width: auto; }
 /* Hochformat: Auftrag über die volle Breite in zwei Zeilen, Stand in derselben Zeile (sonst verdeckt das Schild den Kopf der Heldin) */
 @media (orientation: portrait) {
   .station-scene .caption.is-mission { max-width: calc(100% - 2 * var(--line)); }
-  .station-scene .caption .mission-progress { display: inline; margin: 0 0 0 0.5em; white-space: nowrap; }
 }
 .station-hero {
   grid-area: hero; position: relative; z-index: 2; min-height: 0;

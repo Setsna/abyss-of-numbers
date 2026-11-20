@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=dc004222';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=dc004222';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=dc004222';
-import { chooseSource } from '../learning/learning.js?v=dc004222';
-import { crossPlace } from '../math/places.js?v=dc004222';
-import { neighborWay } from '../math/ways.js?v=dc004222';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=dc004222';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=dc004222';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=dc004222';
-import { cardEffect } from '../cards/effect.js?v=dc004222';
+import { createRng, deriveSeed } from '../rng.js?v=e3e07a37';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=e3e07a37';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=e3e07a37';
+import { chooseSource } from '../learning/learning.js?v=e3e07a37';
+import { crossPlace } from '../math/places.js?v=e3e07a37';
+import { neighborWay } from '../math/ways.js?v=e3e07a37';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=e3e07a37';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=e3e07a37';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=e3e07a37';
+import { cardEffect } from '../cards/effect.js?v=e3e07a37';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -890,10 +890,10 @@ function finishRescue(c) {
   if (!saved) {
     c.hero.hp = 0;
     c.phase = 'lost';
-    return [{ type: 'rescueEnded', saved: false, hp: 0 }, { type: 'combatLost' }];
+    return [{ type: 'rescueEnded', saved: false, outcome: 'failed', hp: 0 }, { type: 'combatLost' }];
   }
   c.hero.hp = Math.max(1, Math.ceil(c.hero.maxHp * cfg.hpShare));
-  const events = [{ type: 'rescueEnded', saved: true, hp: c.hero.hp }];
+  const events = [{ type: 'rescueEnded', saved: true, outcome: 'saved', hp: c.hero.hp }]; // outcome: Klang (sounds.json)
   // Dornen oder Gift haben im selben Zug den letzten Gegner besiegt: gewonnen statt neuer Runde
   if (c.enemies.every((e) => !alive(e))) {
     c.phase = 'won';

@@ -582,8 +582,20 @@
 .steps-dots i { width: calc(18 * var(--u)); height: calc(18 * var(--u)); border-radius: 50%; border: var(--line-thin) solid var(--ink); background: var(--paper); }
 .steps-dots i.is-done { background: var(--heal); }
 .steps-dots i.is-now { background: var(--sun); }
-/* Rettungsaufgabe (Phase 10): nicht geschaffte Aufgabe, grau statt rot (kein Druck) */
-.steps-dots i.is-missed { background: color-mix(in srgb, var(--ink) 35%, var(--paper)); }
+/* Rettungsaufgabe (Phase 10; Durchsicht Etappe 6): drei Luftblasen statt Punkte. Richtig = gefüllt mit Haken,
+   falsch = zerplatzt (gestrichelter Rand, kleiner), jetzt = gelber Rand. Kein Rot (kein Druck). */
+.steps-dots.is-air { gap: calc(14 * var(--u)); margin: calc(2 * var(--u)) 0; align-items: center; }
+.steps-dots.is-air .air-note { margin-left: calc(6 * var(--u)); font-weight: 700; font-size: calc(22 * var(--u)); }
+.steps-dots.is-air i { position: relative; width: calc(30 * var(--u)); height: calc(30 * var(--u)); border-width: var(--line-thin); background: var(--paper); display: grid; place-items: center; }
+.steps-dots.is-air i::after { content: ''; position: absolute; top: 18%; left: 20%; width: 26%; height: 22%; border-radius: 50%; background: var(--shield); }
+.steps-dots.is-air i.is-now { outline: var(--line-thin) solid var(--sun); outline-offset: calc(2 * var(--u)); }
+.steps-dots.is-air i.is-done { background: var(--shield); }
+.steps-dots.is-air i.is-done::after { display: none; }
+.steps-dots.is-air i.is-done svg { width: 78%; height: 78%; }
+.steps-dots.is-air i.is-popped { background: transparent; border-style: dashed; border-color: color-mix(in srgb, var(--ink) 55%, var(--paper)); transform: scale(0.72); }
+.steps-dots.is-air i.is-popped::after { display: none; }
+/* Rettung: Karten ruhen, solange gerechnet wird */
+.hand.is-locked .card { opacity: 0.45; filter: saturate(0.4); }
 .free-note { margin: 0; text-align: center; font-weight: 700; font-size: calc(22 * var(--u)); color: var(--sea-deep); }
 /* Rechenweg nach einem Fehler (Phase 6b, Regelwerk 8.1): eine Zeile unter der Rechnung */
 /* Rechenweg als eigener Block auf blassem Sonnengelb wie der Kartenhinweis: ein Satz, der erklärt

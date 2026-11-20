@@ -3,14 +3,14 @@
 // zeigen kleine Bilder die Gegner, damit die Wahl des Wegs eine Entscheidung ist.
 // Oben: Leben, Stufe, Perlen und „Auftauchen“. Ruheplatz: kurze Meldung „+25 Leben“.
 // Seit Phase 5, Etappe 2 auch Schatz und Händler (eigene Bildschirme: Beute bzw. Laden).
-import { ICON } from '../icons.js?v=dc004222';
-import { renderAsset, assetUrl } from '../assets.js?v=dc004222';
-import { worldLayer, bossOfArea } from '../components/world.js?v=dc004222';
+import { ICON } from '../icons.js?v=e3e07a37';
+import { renderAsset, assetUrl } from '../assets.js?v=e3e07a37';
+import { worldLayer, bossOfArea } from '../components/world.js?v=e3e07a37';
 
 const ROOM_ICON = { combat: ICON.attack, rest: ICON.rest, boss: ICON.boss, treasure: ICON.treasure, shop: ICON.shop, elite: ICON.star, event: ICON.dice, riddle: ICON.riddle }; // elite, event: Phase 9; riddle: Tempel
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-export function mountMap(root, { t, config, game, onEnter, onSurface, onExplain }) {
+export function mountMap(root, { t, config, game, onEnter, onSurface, onExplain, onBeforeEnter = () => {} }) {
   root.innerHTML = `
   <main class="screen sea">
     <header class="sea-bar">
@@ -132,6 +132,7 @@ export function mountMap(root, { t, config, game, onEnter, onSurface, onExplain 
   function enter(roomId) {
     if (busy) return;
     busy = true;
+    onBeforeEnter(); // Uhr stellen (Spieltag, Tagesauftrag), bevor der Raum betreten wird (Abschlussreview Phase 10, I2a)
     const events = game.dispatch({ type: 'enterRoom', roomId });
     const rest = events.find((e) => e.type === 'restUsed');
     if (rest) {

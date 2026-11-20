@@ -1,4 +1,4 @@
-import { offerable } from '../progression/progression.js?v=dc004222';
+import { offerable } from '../progression/progression.js?v=e3e07a37';
 // Händler (Konzept 10 und 11; Phase 5, Etappe 2): Karten gegen Perlen kaufen und eine Karte
 // gegen Perlen abgeben. Das Angebot wird nicht gespeichert, sondern aus dem Seed des Raums neu
 // erzeugt; gespeichert ist nur, was gekauft und ob schon abgegeben wurde (save.lauf.laden).

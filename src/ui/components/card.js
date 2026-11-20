@@ -2,9 +2,9 @@
 // pastelliger Rand in der Farbe der Kartenart (Angriff, Schutz, Heilung, Sonstiges), oben rechts das Rechenzeichen
 // oder Format, unten rechts auf dem Bild die Wirkung als Plakette, darunter Name und Wirkung als Text.
 // Kosten als gelbe Perle links oben, Sterne für die Kartenstufe, Stempel mit dem Grund für „geht nicht“.
-import { ICON, OP_ICON } from '../icons.js?v=dc004222';
-import { assetUrl } from '../assets.js?v=dc004222';
-import { cardEffect } from '../../engine/cards/effect.js?v=dc004222';
+import { ICON, OP_ICON } from '../icons.js?v=e3e07a37';
+import { assetUrl } from '../assets.js?v=e3e07a37';
+import { cardEffect } from '../../engine/cards/effect.js?v=e3e07a37';
 
 // Kartenart je Wirkung; alles andere ist „Sonstiges“
 const KIND = { damage: 'attack', damagePerStep: 'attack', damageBlock: 'attack', damageAll: 'attack', damageTwo: 'attack', block: 'block', heal: 'heal' };

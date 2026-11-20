@@ -25,6 +25,7 @@
     "stepJudged:timeout": "wrong",
     "rescueJudged:correct": "correct",
     "missionSeen": "chestOpened",
+    "rescueEnded:saved": "levelUp",
     "rescueJudged:wrong": "wrong",
     "treasureOpened": "chestOpened",
     "levelUp": "levelUp",

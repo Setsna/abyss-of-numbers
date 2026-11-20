@@ -882,16 +882,22 @@
       "div": "Geteilt"
     },
     "progress": "{stand} von {ziel}",
+    "short": "{stand}/{ziel}",
+    "reward": "Belohnung: {n} Perlen",
     "done": "Auftrag geschafft! +{n} Perlen",
     "doneWord": "Geschafft!",
     "doneLater": "Auftrag geschafft! Morgen gibt es einen neuen."
   },
   "rescue": {
     "boom": "Rettungsring!",
-    "caption": "Dir geht die Luft aus! Löse {needed} von {total} Aufgaben richtig. Dann tauchst du weiter.",
+    "caption": "Dir geht die Luft aus! Löse {needed} von {total} Aufgaben richtig.",
     "saved": "Geschafft! Du tauchst mit {hp} Leben weiter.",
     "failed": "Das hat nicht gereicht. Du tauchst auf. Alles Gesammelte bleibt.",
-    "stepOf": "Aufgabe {n} von {of}"
+    "stepOf": "Aufgabe {n} von {of}",
+    "savedWord": "Gerettet!",
+    "needOne": "Noch 1 richtig!",
+    "needMany": "Noch {n} richtig!",
+    "lastChance": "Das war die letzte Chance."
   },
   "talents": {
     "title": "Talente",

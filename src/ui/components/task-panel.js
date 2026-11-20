@@ -4,8 +4,8 @@
 // (Frage oben, `task.display` als große Zeile).
 // Seit Etappe 4 mehrschrittig (Kette, Mauer, Zuordnen): Punkte zeigen den Fortschritt, nach einem
 // freien Fehlversuch bleibt der falsche Knopf gesperrt und ein Satz nennt die übrigen Versuche.
-import { renderNumberLine } from './number-line.js?v=dc004222';
-import { renderNumberWall } from './number-wall.js?v=dc004222';
+import { renderNumberLine } from './number-line.js?v=e3e07a37';
+import { renderNumberWall } from './number-wall.js?v=e3e07a37';
 
 const BUBBLE_HTML = `
   <div class="timer" data-ref="timer" aria-hidden="true"><i></i><i></i><i></i><b data-ref="fill"></b></div>
@@ -79,21 +79,37 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
 
   const freeText = (left) => t(left === 0 ? 'ask.freeNone' : left === 1 ? 'ask.freeMistake' : 'ask.freeMistakes', { n: left });
 
-  // progress (Rettungsaufgabe, Phase 10): Liste aus 'right' | 'wrong' | 'now' | 'open', ein Punkt je Aufgabe
-  const DOT = { right: 'is-done', wrong: 'is-missed', now: 'is-now', open: '' };
+  // progress (Rettungsaufgabe, Phase 10): Liste aus 'right' | 'wrong' | 'now' | 'open', eine Luftblase je Aufgabe
+  // (Durchsicht Etappe 6): richtig = gefüllt mit Haken, falsch = zerplatzt (gestrichelt), jetzt = gelber Rand.
+  const AIR = { right: 'is-done', wrong: 'is-popped', now: 'is-now', open: '' };
+  const CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 12.5l3.6 3.6L17.5 8.5" fill="none" stroke="#14161f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  let progressLabel = '';
+  function renderAir(progress) {
+    ref.dots.hidden = false;
+    ref.dots.classList.add('is-air');
+    ref.dots.replaceChildren(...progress.map((state) => {
+      const d = document.createElement('i');
+      if (AIR[state]) d.className = AIR[state];
+      if (state === 'right') d.innerHTML = CHECK;
+      return d;
+    }));
+    // „Noch 2 richtig!“ in derselben Zeile wie die Blasen, damit das Aufgabenfeld nicht höher wird
+    if (progressLabel) {
+      const note = document.createElement('span');
+      note.className = 'air-note';
+      note.setAttribute('aria-hidden', 'true');
+      note.textContent = progressLabel;
+      ref.dots.append(note);
+    }
+    ref.dots.setAttribute('role', 'img');
+    ref.dots.setAttribute('aria-label', progressLabel);
+  }
   function renderSteps(task, progress = null) {
     ref.note.hidden = !(task.steps && task.freeLeft < task.freeMistakes);
     if (!ref.note.hidden) ref.note.textContent = freeText(task.freeLeft);
-    if (progress) {
-      ref.dots.hidden = false;
-      ref.dots.replaceChildren(...progress.map((state) => {
-        const d = document.createElement('i');
-        if (DOT[state]) d.className = DOT[state];
-        return d;
-      }));
-      ref.dots.setAttribute('aria-label', t('rescue.stepOf', { n: Math.max(1, progress.indexOf('now') + 1), of: progress.length }));
-      return;
-    }
+    ref.dots.classList.remove('is-air');
+    ref.dots.removeAttribute('role');
+    if (progress) { renderAir(progress); return; }
     if (!task.steps) { ref.dots.hidden = true; return; }
     ref.dots.hidden = false;
     ref.dots.replaceChildren(...task.steps.map((_, i) => {
@@ -109,8 +125,9 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
     timerRoot: ref.timer,
     timerFill: ref.fill,
 
-    open(task, { progress = null } = {}) {
+    open(task, { progress = null, label = '', note = null } = {}) {
       current = task;
+      progressLabel = label;
       ref.way.hidden = true;
       ref.yours.hidden = true;
       const fmt = task.stepFormat ?? task.format; // zusammengesetzte Aufgaben: Format des aktuellen Schritts
@@ -134,6 +151,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
       else if (isWall) ref.line.replaceChildren(renderNumberWall(task, { t }));
       else ref.line.replaceChildren();
       renderSteps(task, progress);
+      if (note) { ref.note.textContent = note; ref.note.hidden = false; } // Rettung: „Noch 2 richtig, …“
       ref.answers.hidden = false;
       ref.answers.classList.toggle('is-equations', equations);
       ref.answers.classList.toggle('is-terms', fmt === 'compareTerms'); // kurze Rechnungen: 2 × 2
@@ -205,6 +223,10 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
       fitEq();
       ref.next.focus({ preventScroll: true });
     },
+
+    // Rettung (Durchsicht Etappe 6): Luftblasen sofort nach der Antwort umstellen, Satz unter den Blasen setzen
+    setProgress(progress, label = '') { progressLabel = label; renderAir(progress); },
+    setNote(text) { ref.note.textContent = text ?? ''; ref.note.hidden = !text; },
 
     nextVisible: () => !ref.next.hidden,
     // Liefert false, wenn „Weiter“ nicht sichtbar ist: Dann bleibt die Eingabetaste beim fokussierten Knopf.

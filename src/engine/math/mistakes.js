@@ -2,9 +2,9 @@
 // mistakesFor liefert die Kandidaten in der Reihenfolge der Tabelle; welche Typen eine Stufe
 // zeigt, steht in der Stufe (`mistakes`). pickChoices wählt drei falsche Antworten nach A-2,
 // A-4, A-5 und der Zusatzregel „gleiche Einerziffer“; aufgefüllte Nachbarwerte haben den Typ null.
-import { calcPlace, digitAt } from './places.js?v=dc004222';
-import { swapDigits } from './formats/common.js?v=dc004222';
-import { formatNumber } from './format.js?v=dc004222';
+import { calcPlace, digitAt } from './places.js?v=e3e07a37';
+import { swapDigits } from './formats/common.js?v=e3e07a37';
+import { formatNumber } from './format.js?v=e3e07a37';
 
 const crossesAdd = (a, b, p) => digitAt(a, p) + digitAt(b, p) >= 10;
 const crossesSub = (a, b, p) => digitAt(a, p) < digitAt(b, p);

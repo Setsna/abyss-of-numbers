@@ -1,18 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=dc004222';
-import { combatView } from '../../engine/combat/combat.js?v=dc004222';
-import { ICON } from '../icons.js?v=dc004222';
-import { renderAsset, assetUrl } from '../assets.js?v=dc004222';
-import { poseBox, dashDistance } from '../components/pose.js?v=dc004222';
-import { playEvents, wait, isCalm, needsSave } from '../app.js?v=dc004222';
-import { bindKeys } from '../input.js?v=dc004222';
-import { renderEnemy } from '../components/enemy.js?v=dc004222';
-import { renderCard, emptySlot } from '../components/card.js?v=dc004222';
-import { createTaskPanel } from '../components/task-panel.js?v=dc004222';
-import { startTimerBar } from '../components/timer-bar.js?v=dc004222';
-import { createTutorial } from '../tutorial.js?v=dc004222';
+import { wayText, hintAsk } from '../text.js?v=e3e07a37';
+import { combatView } from '../../engine/combat/combat.js?v=e3e07a37';
+import { ICON } from '../icons.js?v=e3e07a37';
+import { renderAsset, assetUrl } from '../assets.js?v=e3e07a37';
+import { poseBox, dashDistance } from '../components/pose.js?v=e3e07a37';
+import { playEvents, wait, isCalm, needsSave } from '../app.js?v=e3e07a37';
+import { bindKeys } from '../input.js?v=e3e07a37';
+import { renderEnemy } from '../components/enemy.js?v=e3e07a37';
+import { renderCard, emptySlot } from '../components/card.js?v=e3e07a37';
+import { createTaskPanel } from '../components/task-panel.js?v=e3e07a37';
+import { startTimerBar } from '../components/timer-bar.js?v=e3e07a37';
+import { createTutorial } from '../tutorial.js?v=e3e07a37';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -150,7 +150,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
 
     const foes = $('foes');
     foes.dataset.n = v.enemies.length;
-    if (!keepFoes) foes.replaceChildren(...v.enemies.map((e) => renderEnemy(e, { t, selected: e.uid === targetUid })));
+    if (!keepFoes) foes.replaceChildren(...v.enemies.map((e) => renderEnemy(e, { t, selected: e.uid === targetUid && v.phase !== 'rescue' })));
 
     const maxEnergy = config.game.hero.energy;
     $('energy').innerHTML = Array.from({ length: Math.max(maxEnergy, h.energy) },
@@ -162,6 +162,7 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     const hand = $('hand');
     hand.classList.toggle('is-discard', mode === 'discard');
     hand.classList.toggle('is-cycle', v.phase === 'cycle');
+    hand.classList.toggle('is-locked', v.phase === 'rescue'); // Rettung: Karten ruhen (Durchsicht Etappe 6)
     const slots = [];
     for (let k = 0; k < Math.max(handSize, v.hand.length); k++) {
       const c = v.hand[k];
@@ -170,6 +171,8 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
       slots.push(renderCard(c, cards[c.cardId], { t, why, picked: picked.has(c.uid), pending: c.uid === pendingUid }));
     }
     hand.replaceChildren(...slots);
+    // Rettung: Gegner und Karten sind keine Knöpfe mehr (sie würden nichts tun; Durchsicht Etappe 6)
+    if (v.phase === 'rescue') for (const b of [...foes.querySelectorAll('button'), ...hand.querySelectorAll('button')]) b.disabled = true;
 
     const playing = v.phase === 'player' && !busy;
     const discardBtn = $('discardBtn');
@@ -388,6 +391,9 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     // Rettungsaufgabe (Phase 10, Etappe 4): Lautwort zuerst, dann die Aufgabe ohne Zeitleiste (nichts bewegt sich über ihr)
     async rescueStarted(e) {
       foesTurn = false;
+      rescue = { total: e.total, needed: e.needed, results: [], failed: false };
+      // Erst den Rettungssatz zeigen und die Hand sperren, dann das Lautwort (vorher stand „Tippe eine Karte an.“)
+      shown = { ...live(), hero: shown.hero };
       render(shown);
       showBoom(t('rescue.boom'));
       // Das Lautwort steht auch bei „Weniger Bewegung“ 1 s (CSS still 1000ms); erst danach die Aufgabe öffnen
@@ -397,6 +403,8 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     },
     rescueTaskOpened(e) { openRescue(e.task); },
     async rescueJudged(e) {
+      rescue.results.push(e.outcome === 'correct' ? 'right' : 'wrong');
+      panel.setProgress(rescueProgress(false), rescueNeed());
       if (e.outcome === 'correct') {
         panel.markRight(task.correctIndex);
         await wait(500);
@@ -405,15 +413,21 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
         panel.markRight(task.correctIndex);
         await wait(600);
         showFeedback(e);
+        panel.setProgress(rescueProgress(false), rescueNeed());
       }
     },
     async rescueEnded(e) {
       panel.close();
       task = null;
+      if (!e.saved) { rescue.failed = true; return; } // nur eine Stimme: der Satz steht im Banner (Durchsicht Etappe 6)
+      // Höhepunkt der geschafften Rettung (Durchsicht Etappe 6): Lautwort, grüne Leben, Klang (sounds.json), Satz
+      const before = shown.hero.hp;
       shown.hero.hp = e.hp;
       render(shown);
-      $('caption').textContent = e.saved ? t('rescue.saved', { hp: e.hp }) : t('rescue.failed');
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Lesezeit, auch bei „Weniger Bewegung“ nicht gekürzt
+      $('caption').textContent = t('rescue.saved', { hp: e.hp });
+      showBoom(t('rescue.savedWord'));
+      floatAt($('hero'), `+${e.hp - Math.max(0, before)}`, 'is-heal');
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Lesezeit, auch bei „Weniger Bewegung“ nicht gekürzt
     },
     async secondWind() { // Talent Zweite Luft (Phase 9)
       showBoom(t('talents.secondWindBoom'));
@@ -555,11 +569,23 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
   }
 
   // Rettungsaufgabe: Punkte je Aufgabe aus dem Stand der Engine, ohne Zeitleiste
+  // Rettung: Stand für die Luftblasen und den Satz darunter (nur Oberfläche; die Engine entscheidet)
+  let rescue = null;
+  function rescueProgress(open) {
+    const n = rescue.results.length;
+    return Array.from({ length: rescue.total }, (_, i) => (i < n ? rescue.results[i] : open && i === n ? 'now' : 'open'));
+  }
+  function rescueNeed() {
+    const right = rescue.results.filter((x) => x === 'right').length;
+    const wrong = rescue.results.length - right;
+    if (wrong > rescue.total - rescue.needed) return t('rescue.lastChance');
+    const left = rescue.needed - right;
+    if (left <= 0) return ''; // geschafft: kein Satz, gleich kommt „Gerettet!“
+    return left === 1 ? t('rescue.needOne') : t('rescue.needMany', { n: left });
+  }
   function openRescue(next) {
     task = next;
-    const r = combatView(combat).rescue;
-    const progress = r ? Array.from({ length: r.total }, (_, i) => (i < r.results.length ? r.results[i] : i === r.results.length ? 'now' : 'open')) : null;
-    panel.open(task, { progress });
+    panel.open(task, { progress: rescueProgress(true), label: rescueNeed() });
     panel.timerRoot.hidden = true;
   }
 
@@ -648,7 +674,8 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     panel.close();
     timerBar?.stop();
     $('bannerWord').textContent = t(won ? 'result.winWord' : 'result.loseWord');
-    $('bannerText').textContent = t(won ? 'result.winText' : 'result.loseText');
+    // Nach einer nicht geschafften Rettung spricht nur das Banner (Durchsicht Etappe 6)
+    $('bannerText').textContent = t(won ? 'result.winText' : rescue?.failed ? 'rescue.failed' : 'result.loseText');
     // im Tauchgang führt die Niederlage zur Station, im Testkampf gibt es „Noch einmal“
     $('againBtn').textContent = t(won ? 'btn.next' : (game.view().screen === 'base' ? 'btn.toBase' : 'btn.again'));
     $('againBtn').dataset.won = String(won);

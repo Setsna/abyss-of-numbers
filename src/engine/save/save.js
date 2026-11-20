@@ -1,10 +1,10 @@
 // Spielstand (Architektur 6.3). Deutsche Feldnamen sind gewollt (Abgleich mit den anderen Plattformen).
 // Kein Name, kein Freitext, kein Code im Stand.
-import { generateMap } from '../dungeon/map.js?v=dc004222';
-import { createRiddle } from '../dungeon/riddle.js?v=dc004222';
-import { curriculumOf, stageById } from '../math/ladders/index.js?v=dc004222';
-import { validateStatistics } from '../progression/statistics.js?v=dc004222';
-import { validateMission } from '../progression/mission.js?v=dc004222';
+import { generateMap } from '../dungeon/map.js?v=e3e07a37';
+import { createRiddle } from '../dungeon/riddle.js?v=e3e07a37';
+import { curriculumOf, stageById } from '../math/ladders/index.js?v=e3e07a37';
+import { validateStatistics } from '../progression/statistics.js?v=e3e07a37';
+import { validateMission } from '../progression/mission.js?v=e3e07a37';
 
 // Version 2 (Phase 5, Etappe 2): lauf.laden für den Händler; neue Seekarte.
 // Version 3 (Phase 5, Etappe 7): ausruestung { besitz, angelegt }.

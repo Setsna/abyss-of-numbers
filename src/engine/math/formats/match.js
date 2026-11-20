@@ -3,9 +3,9 @@
 // („7 · 8 = ?“), als Antworten immer alle vier Ergebnisse (D12); schon zugeordnete Ergebnisse
 // zählen als falsch. Drei Schritte, das vierte Paar ergibt sich. Jeder Schritt trägt Leiter und
 // Stufe (für die Lernstufen, Etappe 4).
-import { generateFromStage } from '../generate.js?v=dc004222';
-import { placeCorrect, MAX_TRIES } from './common.js?v=dc004222';
-import { formatNumber } from '../format.js?v=dc004222';
+import { generateFromStage } from '../generate.js?v=e3e07a37';
+import { placeCorrect, MAX_TRIES } from './common.js?v=e3e07a37';
+import { formatNumber } from '../format.js?v=e3e07a37';
 
 const OPS = ['add', 'sub', 'mul', 'div'];
 

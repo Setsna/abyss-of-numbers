@@ -3,8 +3,8 @@
 //   { tag: 'JJJJ-MM-TT', art: 'uebung' | 'rechenart' | 'serie', leiter (nur rechenart), ziel, stand, geschafft, gemeldet }
 // Ein Auftrag je Spieltag; er entsteht, wenn das Kind an dem Tag zum ersten Mal die Station sieht (game.js).
 // Welche Art kommt, hängt nur vom Stand ab (kein Zufall). Der alte Auftrag verfällt still.
-import { dayKey } from './statistics.js?v=dc004222';
-import { curriculumOf } from '../math/ladders/index.js?v=dc004222';
+import { dayKey } from './statistics.js?v=e3e07a37';
+import { curriculumOf } from '../math/ladders/index.js?v=e3e07a37';
 
 const OPS = ['add', 'sub', 'mul', 'div'];
 const ARTS = ['uebung', 'rechenart', 'serie'];
@@ -48,8 +48,10 @@ export function chooseMission(save, config, day) {
 }
 
 // true, wenn ein neuer Auftrag angelegt wurde. Ohne gültige Zeit, ohne Spielstand oder ausgeschaltet: nichts.
+// Ausgeschaltet: ein vorhandener Auftrag wird verworfen (Abschlussreview Phase 10, I1), sonst bliebe er für immer stehen.
 export function ensureMission(save, config, now, tzOffsetMinutes = 0) {
-  if (!save || !config.game.mission?.enabled || !Number.isFinite(now) || !Number.isFinite(tzOffsetMinutes)) return false;
+  if (save && !config.game.mission?.enabled) { delete save.auftrag; return false; }
+  if (!save || !Number.isFinite(now) || !Number.isFinite(tzOffsetMinutes)) return false;
   const day = dayKey(now, tzOffsetMinutes);
   if (save.auftrag?.tag === day) return false;
   save.auftrag = chooseMission(save, config, day);
@@ -58,9 +60,10 @@ export function ensureMission(save, config, now, tzOffsetMinutes = 0) {
 
 // kind: 'practice' { correct } (Fehleraufgabe beantwortet), 'ladder' { ladder, correct } (Zählung der
 // Lernübersicht), 'answer' { correct } (jede Antwort im Kampf, für die Serie). Liefert missionDone beim Abschluss.
-export function noteMission(save, config, kind, { ladder = null, correct = false } = {}) {
+// day: heutiger Tag (JJJJ-MM-TT); ein Auftrag von einem anderen Tag zählt nicht mehr (Abschlussreview Phase 10, I2a).
+export function noteMission(save, config, kind, { ladder = null, correct = false } = {}, day = null) {
   const m = save.auftrag;
-  if (!m || m.geschafft) return [];
+  if (!m || m.geschafft || !config.game.mission?.enabled || (day !== null && day !== m.tag)) return [];
   if (m.art === 'uebung' && kind === 'practice' && correct) m.stand += 1;
   else if (m.art === 'rechenart' && kind === 'ladder' && correct && ladder === m.leiter) m.stand += 1;
   else if (m.art === 'serie' && kind === 'answer') m.stand = correct ? m.stand + 1 : 0;
@@ -75,7 +78,7 @@ export function noteMission(save, config, kind, { ladder = null, correct = false
 // Mischregel im Auftrag „Übungsliste“ (Regelwerk 14.3): zusätzliche Stelle für Fehleraufgaben, 0 = keine
 export function missionPracticeEvery(save, config) {
   const m = save.auftrag;
-  return m && m.art === 'uebung' && !m.geschafft ? config.game.mission.practiceEvery : 0;
+  return m && config.game.mission?.enabled && m.art === 'uebung' && !m.geschafft ? config.game.mission.practiceEvery : 0;
 }
 
 const isCount = (n) => Number.isInteger(n) && n >= 0;

@@ -5,22 +5,22 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=dc004222';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=dc004222';
-import { wayForKey } from './math/ways.js?v=dc004222';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=dc004222';
-import { nextCurrent, answerCode } from './combat/current.js?v=dc004222';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=dc004222';
-import { generateMap, addExtraRest } from './dungeon/map.js?v=dc004222';
-import { createSave } from './save/save.js?v=dc004222';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=dc004222';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=dc004222';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=dc004222';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=dc004222';
-import { rollEvent, optionCost } from './dungeon/events.js?v=dc004222';
-import { createRiddle } from './dungeon/riddle.js?v=dc004222';
-import { noteDive, noteDay, noteRun, noteAnswer, noteRescue } from './progression/statistics.js?v=dc004222';
-import { ensureMission, noteMission, missionPracticeEvery } from './progression/mission.js?v=dc004222';
+import { createRng, deriveSeed } from './rng.js?v=e3e07a37';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=e3e07a37';
+import { wayForKey } from './math/ways.js?v=e3e07a37';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=e3e07a37';
+import { nextCurrent, answerCode } from './combat/current.js?v=e3e07a37';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=e3e07a37';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=e3e07a37';
+import { createSave } from './save/save.js?v=e3e07a37';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=e3e07a37';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=e3e07a37';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=e3e07a37';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=e3e07a37';
+import { rollEvent, optionCost } from './dungeon/events.js?v=e3e07a37';
+import { createRiddle } from './dungeon/riddle.js?v=e3e07a37';
+import { noteDive, noteDay, noteRun, noteAnswer, noteRescue, dayKey } from './progression/statistics.js?v=e3e07a37';
+import { ensureMission, noteMission, missionPracticeEvery } from './progression/mission.js?v=e3e07a37';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -722,11 +722,12 @@ export function createGame({ config, save, seed }) {
       // Tagesauftrag (Phase 10, Etappe 5; Regelwerk 14.4): dieselben Stellen wie die Zählung, dazu Fehleraufgaben und Serie
       if (counting) {
         const right = e.outcome === 'correct';
+        const today = state.clockSet ? dayKey(state.now, state.tzOffset) : null; // Auftrag nur am eigenen Tag (I2a)
         const done = [];
-        if (e.type === 'answerJudged' && e.single && e.tally) done.push(...noteMission(state.save, config, 'ladder', { ladder: e.tally, correct: right }));
-        if (e.type === 'stepJudged' && e.first && e.ladder) done.push(...noteMission(state.save, config, 'ladder', { ladder: e.ladder, correct: right }));
-        if (e.type === 'answerJudged' && e.practice) done.push(...noteMission(state.save, config, 'practice', { correct: right }));
-        if (e.type === 'answerJudged') done.push(...noteMission(state.save, config, 'answer', { correct: right }));
+        if (e.type === 'answerJudged' && e.single && e.tally) done.push(...noteMission(state.save, config, 'ladder', { ladder: e.tally, correct: right }, today));
+        if (e.type === 'stepJudged' && e.first && e.ladder) done.push(...noteMission(state.save, config, 'ladder', { ladder: e.ladder, correct: right }, today));
+        if (e.type === 'answerJudged' && e.practice) done.push(...noteMission(state.save, config, 'practice', { correct: right }, today));
+        if (e.type === 'answerJudged') done.push(...noteMission(state.save, config, 'answer', { correct: right }, today));
         if (done.length) {
           state.combat.taskPlan.practiceEvery = 0; // ab der nächsten Aufgabe wieder Regelwerk 7.2
           extra.push(...done);
@@ -1084,7 +1085,7 @@ export function createGame({ config, save, seed }) {
         event: state.screen === 'event' ? eventView() : null,
         riddle: state.screen === 'riddle' ? riddleView() : null,
         station: state.screen === 'base' && s ? stationView() : null, // Ausbau (Etappe 8)
-        mission: state.screen === 'base' && s?.auftrag ? { ...s.auftrag } : null, // Tagesauftrag (Phase 10, Etappe 5)
+        mission: state.screen === 'base' && s?.auftrag && config.game.mission?.enabled ? { ...s.auftrag } : null, // Tagesauftrag (Phase 10, Etappe 5)
         cleared: state.cleared ? { ...state.cleared } : null,
         run: l ? { areaId: l.gebiet, depth: l.tiefe } : null,
         logbook: state.screen === 'logbook' ? { page: state.logbookPage } : null,

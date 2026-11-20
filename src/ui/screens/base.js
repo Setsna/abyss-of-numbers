@@ -7,11 +7,11 @@
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=dc004222';
-import { renderAsset, assetUrl } from '../assets.js?v=dc004222';
-import { homeAreaId, worldLayer } from '../components/world.js?v=dc004222';
-import { renderCard } from '../components/card.js?v=dc004222';
-import { isCalm } from '../app.js?v=dc004222';
+import { ICON } from '../icons.js?v=e3e07a37';
+import { renderAsset, assetUrl } from '../assets.js?v=e3e07a37';
+import { homeAreaId, worldLayer } from '../components/world.js?v=e3e07a37';
+import { renderCard } from '../components/card.js?v=e3e07a37';
+import { isCalm } from '../app.js?v=e3e07a37';
 
 export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null }) {
   const v = game.view();
@@ -88,9 +88,18 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
   else if (m) {
     ref.text.classList.add('is-mission');
     const op = m.leiter ? t(`mission.ops.${m.leiter}`) : '';
+    // Stand als Pille „2/6“ und daneben die Belohnung mit Perle (Durchsicht Etappe 6)
     const line = document.createElement('span');
     line.className = 'mission-progress';
-    line.textContent = t('mission.progress', { stand: m.stand, ziel: m.ziel });
+    const pill = document.createElement('span');
+    pill.className = 'mission-pill';
+    pill.textContent = t('mission.short', { stand: m.stand, ziel: m.ziel });
+    pill.setAttribute('aria-label', t('mission.progress', { stand: m.stand, ziel: m.ziel }));
+    const reward = document.createElement('span');
+    reward.className = 'mission-reward';
+    reward.setAttribute('aria-label', t('mission.reward', { n: config.game.mission.reward }));
+    reward.innerHTML = `<span aria-hidden="true">+${Number(config.game.mission.reward)}</span>${ICON.pearl}`;
+    line.append(pill, reward);
     ref.text.replaceChildren(t(`mission.${m.art}`, { ziel: m.ziel, op }), line);
   } else ref.text.textContent = t('base.text');
 
