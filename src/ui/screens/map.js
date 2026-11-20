@@ -3,9 +3,9 @@
 // zeigen kleine Bilder die Gegner, damit die Wahl des Wegs eine Entscheidung ist.
 // Oben: Leben, Stufe, Perlen und „Auftauchen“. Ruheplatz: kurze Meldung „+25 Leben“.
 // Seit Phase 5, Etappe 2 auch Schatz und Händler (eigene Bildschirme: Beute bzw. Laden).
-import { ICON } from '../icons.js?v=83dff991';
-import { renderAsset, assetUrl } from '../assets.js?v=83dff991';
-import { worldLayer, bossOfArea } from '../components/world.js?v=83dff991';
+import { ICON } from '../icons.js?v=36a3ca2d';
+import { renderAsset, assetUrl } from '../assets.js?v=36a3ca2d';
+import { worldLayer, bossOfArea } from '../components/world.js?v=36a3ca2d';
 
 const ROOM_ICON = { combat: ICON.attack, rest: ICON.rest, boss: ICON.boss, treasure: ICON.treasure, shop: ICON.shop, elite: ICON.star, event: ICON.dice, riddle: ICON.riddle }; // elite, event: Phase 9; riddle: Tempel
 const SVG_NS = 'http://www.w3.org/2000/svg';

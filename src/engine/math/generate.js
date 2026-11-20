@@ -2,22 +2,22 @@
 // Jede Aufgabe kommt aus einer Leiterstufe (config/curricula/class<N>.json → ladders); der Kampf
 // reicht die Stufen des Aufgabenplans als spec.stages herein. Formate: solve (Rechnung lösen),
 // pickTrue, pickFalse, dazu die Formate unter formats/.
-import { mistakesFor, pickChoices, commonRound } from './mistakes.js?v=83dff991';
-import { LADDERS, FORMAT_LADDER } from './ladders/index.js?v=83dff991';
-import { calcPlace } from './places.js?v=83dff991';
-import { formatExpression, formatEquation } from './format.js?v=83dff991';
-import { wayFor } from './ways.js?v=83dff991';
-import { placeCorrect, MAX_TRIES } from './formats/common.js?v=83dff991';
-import * as numberLine from './formats/number-line.js?v=83dff991';
-import * as sequence from './formats/sequence.js?v=83dff991';
-import * as complement from './formats/complement.js?v=83dff991';
-import * as chain from './formats/chain.js?v=83dff991';
-import * as wall from './formats/wall.js?v=83dff991';
-import * as match from './formats/match.js?v=83dff991';
-import * as twoStep from './formats/two-step.js?v=83dff991';
-import * as pointBeforeLine from './formats/point-before-line.js?v=83dff991';
-import * as compareTerms from './formats/compare-terms.js?v=83dff991';
-import * as divisibility from './formats/divisibility.js?v=83dff991';
+import { mistakesFor, pickChoices, commonRound } from './mistakes.js?v=36a3ca2d';
+import { LADDERS, FORMAT_LADDER } from './ladders/index.js?v=36a3ca2d';
+import { calcPlace } from './places.js?v=36a3ca2d';
+import { formatExpression, formatEquation } from './format.js?v=36a3ca2d';
+import { wayFor } from './ways.js?v=36a3ca2d';
+import { placeCorrect, MAX_TRIES } from './formats/common.js?v=36a3ca2d';
+import * as numberLine from './formats/number-line.js?v=36a3ca2d';
+import * as sequence from './formats/sequence.js?v=36a3ca2d';
+import * as complement from './formats/complement.js?v=36a3ca2d';
+import * as chain from './formats/chain.js?v=36a3ca2d';
+import * as wall from './formats/wall.js?v=36a3ca2d';
+import * as match from './formats/match.js?v=36a3ca2d';
+import * as twoStep from './formats/two-step.js?v=36a3ca2d';
+import * as pointBeforeLine from './formats/point-before-line.js?v=36a3ca2d';
+import * as compareTerms from './formats/compare-terms.js?v=36a3ca2d';
+import * as divisibility from './formats/divisibility.js?v=36a3ca2d';
 
 const FORMATS = { numberLine, sequence, complement, chain, wall, match, twoStep, pointBeforeLine, compareTerms, divisibility };
 const OPERATIONS = ['add', 'sub', 'mul', 'div'];

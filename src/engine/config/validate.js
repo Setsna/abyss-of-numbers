@@ -1,9 +1,9 @@
 // Prüft die geladene Konfiguration. Liefert Fehlertexte „Datei: Feld: Problem“;
 // eine leere Liste heißt: alles in Ordnung. Jede Etappe ergänzt ihre Regeln.
-import { CONFIG_FILES } from './files.js?v=83dff991';
-import { nextSlots } from '../dungeon/map.js?v=83dff991';
-import { REJECT_REASONS } from '../combat/combat.js?v=83dff991';
-import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=83dff991';
+import { CONFIG_FILES } from './files.js?v=36a3ca2d';
+import { nextSlots } from '../dungeon/map.js?v=36a3ca2d';
+import { REJECT_REASONS } from '../combat/combat.js?v=36a3ca2d';
+import { LADDERS, FORMAT_LADDER, FORMAT_KINDS } from '../math/ladders/index.js?v=36a3ca2d';
 
 function at(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
