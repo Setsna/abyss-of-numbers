@@ -1,18 +1,18 @@
 // Kampf-Bildschirm (Plan Etappe 4). Aufbau und Gestaltung aus dem Prototyp (Phase 3, DESIGN.md);
 // Regeln und Zustand kommen aus dem Spiel (game.js). Die Oberfläche schickt Befehle und spielt Ereignisse ab.
 // onWon/onLost: Knopf im Abschlussbanner (Weiter zur Beute bzw. Zur Station / Noch einmal).
-import { wayText, hintAsk } from '../text.js?v=36a3ca2d';
-import { combatView } from '../../engine/combat/combat.js?v=36a3ca2d';
-import { ICON } from '../icons.js?v=36a3ca2d';
-import { renderAsset, assetUrl } from '../assets.js?v=36a3ca2d';
-import { poseBox, dashDistance } from '../components/pose.js?v=36a3ca2d';
-import { playEvents, wait, isCalm, needsSave } from '../app.js?v=36a3ca2d';
-import { bindKeys } from '../input.js?v=36a3ca2d';
-import { renderEnemy } from '../components/enemy.js?v=36a3ca2d';
-import { renderCard, emptySlot } from '../components/card.js?v=36a3ca2d';
-import { createTaskPanel } from '../components/task-panel.js?v=36a3ca2d';
-import { startTimerBar } from '../components/timer-bar.js?v=36a3ca2d';
-import { createTutorial } from '../tutorial.js?v=36a3ca2d';
+import { wayText, hintAsk } from '../text.js?v=5d2bb76b';
+import { combatView } from '../../engine/combat/combat.js?v=5d2bb76b';
+import { ICON } from '../icons.js?v=5d2bb76b';
+import { renderAsset, assetUrl } from '../assets.js?v=5d2bb76b';
+import { poseBox, dashDistance } from '../components/pose.js?v=5d2bb76b';
+import { playEvents, wait, isCalm, needsSave } from '../app.js?v=5d2bb76b';
+import { bindKeys } from '../input.js?v=5d2bb76b';
+import { renderEnemy } from '../components/enemy.js?v=5d2bb76b';
+import { renderCard, emptySlot } from '../components/card.js?v=5d2bb76b';
+import { createTaskPanel } from '../components/task-panel.js?v=5d2bb76b';
+import { startTimerBar } from '../components/timer-bar.js?v=5d2bb76b';
+import { createTutorial } from '../tutorial.js?v=5d2bb76b';
 
 const STAGE_HTML = `
 <main class="stage">
@@ -717,7 +717,9 @@ export function mountCombat(root, { config, t, game, audio, onWon, onLost, tutor
     const def = cards[card.cardId];
     if (def.target === 'enemy' && !targetUid) { shake($('caption')); return; }
     if (!card.playable) { shake(b); return; }
-    const events = await run({ type: 'playCard', cardUid: uid, targetUid: def.target === 'enemy' ? targetUid : undefined });
+    // Blasenkette: ein angetippter Gegner ist ihr Ziel (Handytest 21.11.2026), sonst trifft sie den schwächsten
+    const aimed = def.target === 'enemy' || (def.effect.type === 'damagePerStep' && targetUid);
+    const events = await run({ type: 'playCard', cardUid: uid, targetUid: aimed ? targetUid : undefined });
     if (combat.phase === 'cycle' && combat.cycle.required === 0) await run({ type: 'confirmCycle', cardUids: [] });
     if (events[0]?.type === 'rejected') shake(b);
   });

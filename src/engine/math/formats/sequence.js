@@ -4,10 +4,10 @@
 // einen Zehner überschreiten müssen (crossTen).
 // Falsche Antworten: F-SEQ-a ein Schritt zu viel, F-SEQ-b an der Rechenstelle des Schritts um 1
 // daneben (A-9), F-SEQ-c falsche Richtung, F-SEQ-d letztes Glied wiederholt.
-import { drawUntil } from './common.js?v=36a3ca2d';
-import { pickChoices } from '../mistakes.js?v=36a3ca2d';
-import { calcPlace } from '../places.js?v=36a3ca2d';
-import { formatNumber } from '../format.js?v=36a3ca2d';
+import { drawUntil } from './common.js?v=5d2bb76b';
+import { pickChoices } from '../mistakes.js?v=5d2bb76b';
+import { calcPlace } from '../places.js?v=5d2bb76b';
+import { formatNumber } from '../format.js?v=5d2bb76b';
 
 function drawStart(v, st, rng) {
   const r = v.start;

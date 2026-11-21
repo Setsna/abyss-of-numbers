@@ -7,11 +7,11 @@
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=36a3ca2d';
-import { renderAsset, assetUrl } from '../assets.js?v=36a3ca2d';
-import { homeAreaId, worldLayer } from '../components/world.js?v=36a3ca2d';
-import { renderCard } from '../components/card.js?v=36a3ca2d';
-import { isCalm } from '../app.js?v=36a3ca2d';
+import { ICON } from '../icons.js?v=5d2bb76b';
+import { renderAsset, assetUrl } from '../assets.js?v=5d2bb76b';
+import { homeAreaId, worldLayer } from '../components/world.js?v=5d2bb76b';
+import { renderCard } from '../components/card.js?v=5d2bb76b';
+import { isCalm } from '../app.js?v=5d2bb76b';
 
 export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null }) {
   const v = game.view();

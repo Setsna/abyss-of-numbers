@@ -4,8 +4,8 @@
 // (Frage oben, `task.display` als große Zeile).
 // Seit Etappe 4 mehrschrittig (Kette, Mauer, Zuordnen): Punkte zeigen den Fortschritt, nach einem
 // freien Fehlversuch bleibt der falsche Knopf gesperrt und ein Satz nennt die übrigen Versuche.
-import { renderNumberLine } from './number-line.js?v=36a3ca2d';
-import { renderNumberWall } from './number-wall.js?v=36a3ca2d';
+import { renderNumberLine } from './number-line.js?v=5d2bb76b';
+import { renderNumberWall } from './number-wall.js?v=5d2bb76b';
 
 const BUBBLE_HTML = `
   <div class="timer" data-ref="timer" aria-hidden="true"><i></i><i></i><i></i><b data-ref="fill"></b></div>
@@ -32,6 +32,13 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
   let solutionAt = 0;
   const nextReady = () => !ref.next.hidden && performance.now() - solutionAt >= NEXT_GUARD_MS;
   ref.next.addEventListener('click', () => { if (nextReady()) onNext(); });
+
+  // Neue Antworten erscheinen dort, wo eben „Weiter“ oder die Antworten des letzten Kettenglieds waren:
+  // Tipps in den ersten ANSWER_GUARD_MS zählen nicht, sonst beantwortet schnelles Tippen gleich die nächste
+  // Aufgabe mit (Handytest 21.11.2026). Die Zeitleiste merkt davon nichts (unter einer halben Sekunde).
+  const ANSWER_GUARD_MS = 450;
+  let openedAt = 0;
+  const answerReady = () => performance.now() - openedAt >= ANSWER_GUARD_MS;
 
   // Rechnung so groß wie möglich, höchstens 64u, mindestens 44u (aus dem Prototyp).
   // Passt auch 44u nicht (lange Lösungssätze wie „14 liegt zwischen 10 und 20.“), darf die Zeile
@@ -162,7 +169,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
         b.innerHTML = `<span></span><span class="key">${k + 1}</span>`;
         b.firstChild.textContent = label;
         b.addEventListener('click', () => {
-          if (locked) return;
+          if (locked || !answerReady()) return;
           locked = true; // Doppeltipp: nur der erste zählt
           buttons.forEach((x) => { x.disabled = true; });
           onAnswer(k);
@@ -176,6 +183,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
       ref.next.hidden = true;
       bubble.hidden = false;
       locked = false;
+      openedAt = performance.now();
       if (!ref.eq.hidden) fitEq();
       fitAnswers();
     },
@@ -188,7 +196,7 @@ export function createTaskPanel(bubble, { t, onAnswer, onNext }) {
     },
 
     choose(k) {
-      if (locked || !buttons[k]) return false;
+      if (locked || !buttons[k] || !answerReady()) return false;
       buttons[k].click();
       return true;
     },

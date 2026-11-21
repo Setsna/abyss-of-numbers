@@ -1730,10 +1730,10 @@ function setStep(task, i) {
   task.wrongChoices = [];
   task.usedChoices = task.format === "match" ? task.steps.slice(0, i).map((x) => x.correctIndex) : [];
 }
-function hitWeakest(c, amount) {
+function hitChain(c, amount, preferredUid = null) {
   const targets = c.enemies.filter((e) => alive(e) && !isShielded(c, e));
   if (targets.length === 0) return [];
-  const target = targets.reduce((low, e) => e.hp < low.hp ? e : low);
+  const target = targets.find((e) => e.uid === preferredUid) ?? targets.reduce((low, e) => e.hp < low.hp ? e : low);
   const r = hit(target, amount);
   const events = [{ type: "damageDealt", targetUid: target.uid, amount: r.amount, blocked: r.blocked }];
   if (!alive(target)) events.push({ type: "enemyDefeated", enemyUid: target.uid });
@@ -1768,7 +1768,7 @@ function answerStep(c, outcome, choiceIndex) {
   if (outcome === "correct") {
     if (def.effect.type === "damagePerStep") {
       const fx = effectOf(c, pending.cardId);
-      events.push(...hitWeakest(c, fx.amount + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c)));
+      events.push(...hitChain(c, fx.amount + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c), pending.targetUid));
       if (c.enemies.every((e) => !alive(e))) {
         events.push({ type: "answerJudged", outcome: "correct", tierId: "normal", solutionText: task.solutionText, cardId: pending.cardId });
         setStreak(c, c.streak + 1, events);
@@ -1869,6 +1869,11 @@ function playCard(c, { cardUid, targetUid }) {
     target = c.enemies.find((e) => e.uid === targetUid && alive(e));
     if (!target) return reject("target");
   }
+  let chainTarget = null;
+  if (def.effect.type === "damagePerStep" && targetUid != null) {
+    chainTarget = c.enemies.find((e) => e.uid === targetUid && alive(e));
+    if (!chainTarget) return reject("target");
+  }
   const reason = blockedReason(c, def, target);
   if (reason) return reject(reason);
   c.hero.energy -= def.cost;
@@ -1927,7 +1932,7 @@ function playCard(c, { cardUid, targetUid }) {
     c.slowNext = 0;
   }
   if (c.forgiving) task.forgiving = true;
-  c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? null, task };
+  c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? chainTarget?.uid ?? null, task };
   c.phase = "task";
   events.push({ type: "taskOpened", task: clone(task) });
   return events;
@@ -5648,6 +5653,9 @@ function createTaskPanel(bubble, { t: t2, onAnswer, onNext }) {
   ref.next.addEventListener("click", () => {
     if (nextReady()) onNext();
   });
+  const ANSWER_GUARD_MS = 450;
+  let openedAt = 0;
+  const answerReady = () => performance.now() - openedAt >= ANSWER_GUARD_MS;
   function fitEq() {
     ref.eq.classList.remove("is-long");
     for (let size = 64; size >= 44; size -= 2) {
@@ -5773,7 +5781,7 @@ function createTaskPanel(bubble, { t: t2, onAnswer, onNext }) {
         b.innerHTML = `<span></span><span class="key">${k + 1}</span>`;
         b.firstChild.textContent = label2;
         b.addEventListener("click", () => {
-          if (locked) return;
+          if (locked || !answerReady()) return;
           locked = true;
           buttons.forEach((x) => {
             x.disabled = true;
@@ -5794,6 +5802,7 @@ function createTaskPanel(bubble, { t: t2, onAnswer, onNext }) {
       ref.next.hidden = true;
       bubble.hidden = false;
       locked = false;
+      openedAt = performance.now();
       if (!ref.eq.hidden) fitEq();
       fitAnswers();
     },
@@ -5805,7 +5814,7 @@ function createTaskPanel(bubble, { t: t2, onAnswer, onNext }) {
       });
     },
     choose(k) {
-      if (locked || !buttons[k]) return false;
+      if (locked || !buttons[k] || !answerReady()) return false;
       buttons[k].click();
       return true;
     },
@@ -6648,7 +6657,8 @@ function mountCombat(root, { config, t: t2, game, audio, onWon, onLost, tutorial
       shake(b);
       return;
     }
-    const events = await run({ type: "playCard", cardUid: uid, targetUid: def.target === "enemy" ? targetUid : void 0 });
+    const aimed = def.target === "enemy" || def.effect.type === "damagePerStep" && targetUid;
+    const events = await run({ type: "playCard", cardUid: uid, targetUid: aimed ? targetUid : void 0 });
     if (combat.phase === "cycle" && combat.cycle.required === 0) await run({ type: "confirmCycle", cardUids: [] });
     if (events[0]?.type === "rejected") shake(b);
   });

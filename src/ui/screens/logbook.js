@@ -3,11 +3,11 @@
 //   Deck: alle Karten mit Anzahl
 //   Regeln: sechs kurze Sätze mit Bild
 //   Übungsliste: Aufgaben mit Lösung, ohne Zähler (A7)
-import { wayText } from '../text.js?v=36a3ca2d';
-import { ICON } from '../icons.js?v=36a3ca2d';
-import { renderAsset } from '../assets.js?v=36a3ca2d';
-import { renderCard } from '../components/card.js?v=36a3ca2d';
-import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=36a3ca2d';
+import { wayText } from '../text.js?v=5d2bb76b';
+import { ICON } from '../icons.js?v=5d2bb76b';
+import { renderAsset } from '../assets.js?v=5d2bb76b';
+import { renderCard } from '../components/card.js?v=5d2bb76b';
+import { addWorld, homeAreaId, worldLayer } from '../components/world.js?v=5d2bb76b';
 
 const PAGES = ['hero', 'talents', 'deck', 'collection', 'gear', 'rules', 'practice']; // talents, collection: Phase 9
 const SLOTS = ['kopf', 'koerper', 'hand'];

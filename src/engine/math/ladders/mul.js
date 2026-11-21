@@ -5,7 +5,7 @@
 //              `units` (3 · 60, 2 · 300, 9 · 4000, 700 · 100); Produkt höchstens `productMax`
 //   roundPair  beide Faktoren eine Ziffer aus `digits` mal einer Zahl aus `units` (40 · 70, 400 · 70)
 // Die Reihenfolge der Faktoren ist zufällig.
-import { drawUntil } from '../formats/common.js?v=36a3ca2d';
+import { drawUntil } from '../formats/common.js?v=5d2bb76b';
 
 export const kinds = ['facts', 'scaled', 'roundPair'];
 

@@ -4,7 +4,7 @@
 // (Zahl von 10 000 bis 99 999 in Worten als Ziffern eintippen) vor dem ganzen Bereich.
 // Mit Konto (Etappe 10, D37) gibt es kein Zurücksetzen auf dem Gerät (onReset = null), das macht die
 // Lehrkraft im Perlentaucher; dafür ein Hinweis zum Speicherort und ein Link zur Datenschutzseite.
-import { createGateChallenge, GATE_DIGITS } from '../../engine/adult-gate.js?v=36a3ca2d';
+import { createGateChallenge, GATE_DIGITS } from '../../engine/adult-gate.js?v=5d2bb76b';
 
 const TOGGLES = ['ton', 'musik', 'wenigBewegung'];
 

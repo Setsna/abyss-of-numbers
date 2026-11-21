@@ -326,7 +326,10 @@
   margin-top: calc(12 * var(--u)); padding: calc(26 * var(--u)) calc(20 * var(--u)) calc(18 * var(--u));
   background: var(--sea-deep); border: var(--line) solid var(--ink); border-radius: var(--radius);
 }
-.lb-deck-cell { position: relative; }
+.lb-deck-cell { position: relative; display: grid; }
+/* „3×“ hängt an der Karte, nicht am Zellenende: der Satz darunter ist seit dem Handytest (21.11.2026) mehrzeilig */
+.lb-deck-cell > .card { grid-area: 1 / 1; }
+.lb-deck-cell > .lb-count { grid-area: 1 / 1; position: relative; bottom: auto; align-self: end; justify-self: end; margin: 0 calc(-8 * var(--u)) calc(-14 * var(--u)) 0; }
 .lb-deck-cell .card { width: 100%; min-height: calc(250 * var(--u)); }
 .lb-next { margin-top: calc(8 * var(--u)); font-weight: 700; font-size: calc(20 * var(--u)); text-align: center; color: var(--paper); }
 .lb-count { position: absolute; z-index: 3; bottom: calc(40 * var(--u)); right: calc(-8 * var(--u)); /* unten rechts: oben rechts sitzt das Rechenzeichen der Karte */ background: var(--paper); border: var(--line-thin) solid var(--ink); border-radius: calc(999 * var(--u)); padding: 0 calc(10 * var(--u)); font-weight: 700; font-size: calc(24 * var(--u)); }
@@ -648,6 +651,17 @@
     padding-top: calc(78 * var(--u));
   }
   .station-art { max-height: calc(420 * var(--u)); }
+}
+/* Handy hochkant (Handytest 21.11.2026): Die Einheit u schrumpft auf etwa die Hälfte des iPads, die Bullaugen
+   wurden 77 px breit und „Noch 3 Seesterne“ (mindestens 16 px) lief über das Schild. Hier drei Bullaugen
+   je Reihe über die volle Breite, Schrift in festen Pixeln. Handy quer (bis 500 px hoch) genauso. */
+@media (orientation: portrait) and (max-width: 600px), (orientation: landscape) and (max-height: 500px) {
+  .station-dives[data-n] { max-width: none; gap: 8px; width: 100%; }
+  .station-dives[data-n] .porthole { width: calc((100% - 16px) / 3); gap: 4px; }
+  .station-dives[data-n] .porthole-window { width: min(70%, 90px); border-width: 5px; }
+  .station-dives[data-n] .porthole-label { font-size: 13px; padding: 4px 3px; min-height: 0; }
+  .station-dives[data-n] .porthole-sub { font-size: 12px; }
+  .station-dives[data-n="1"] .porthole, .station-dives[data-n="2"] .porthole { width: calc((100% - 8px) / 2); }
 }
 
 /* ---------- „Gebiet geschafft!“ als Comicseite ---------- */

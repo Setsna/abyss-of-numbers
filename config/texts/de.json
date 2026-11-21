@@ -624,7 +624,7 @@
     "hp": "{n} Leben",
     "deckCount": "{n}×",
     "deckTotal": "{n} Karten im Deck",
-    "deckNext": "noch {n} richtige",
+    "deckNext": "Noch {n} richtige bis zur Verbesserung der Karte",
     "deckMax": "stärkste Stufe",
     "rules": [
       "Tippe einen Gegner an.",
@@ -658,7 +658,7 @@
       "conchHorn": "Wie geht die Zahlenfolge weiter? Richtig? Dann bist du in diesem Kampf stärker.",
       "kelpPotion": "Was fehlt bis zur Zahl? Richtig? Dann bekommst du Leben.",
       "shellCracker": "Tippe einen Gegner mit Immunität an. Finde die richtige Rechnung. Dann wirkt drei Züge lang jede Karte gegen ihn.",
-      "bubbleChain": "Rechne mit dem Ergebnis weiter. Jedes richtige Glied trifft einen Gegner.",
+      "bubbleChain": "Rechne mit dem Ergebnis weiter. Jedes richtige Glied trifft den Gegner, den du angetippt hast.",
       "coralWall": "Fülle die Zahlenmauer. Zwei Fehler sind frei. Dann trifft die Mauer sehr hart.",
       "pearlFind": "Finde zu jeder Aufgabe das Ergebnis. Zwei Fehler sind frei. Dann bekommst du Energie.",
       "inkCloud": "Tippe einen Gegner an. Finde die Rechnung mit demselben Wert. Dann greift er drei Züge lang schwächer an.",

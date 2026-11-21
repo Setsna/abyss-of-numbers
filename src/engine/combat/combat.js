@@ -1,15 +1,15 @@
 // Kampf-Engine (Konzept 7, Architektur 6.2). Die Oberfläche schickt Befehle,
 // die Engine ändert den Zustand und liefert Ereignisse. Kein Browser, keine Uhr.
-import { createRng, deriveSeed } from '../rng.js?v=36a3ca2d';
-import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=36a3ca2d';
-import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=36a3ca2d';
-import { chooseSource } from '../learning/learning.js?v=36a3ca2d';
-import { crossPlace } from '../math/places.js?v=36a3ca2d';
-import { neighborWay } from '../math/ways.js?v=36a3ca2d';
-import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=36a3ca2d';
-import { intentFor, advancePattern } from '../enemies/intents.js?v=36a3ca2d';
-import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=36a3ca2d';
-import { cardEffect } from '../cards/effect.js?v=36a3ca2d';
+import { createRng, deriveSeed } from '../rng.js?v=5d2bb76b';
+import { generateTask, generateFromStage, taskFromNumbers, taskKey } from '../math/generate.js?v=5d2bb76b';
+import { LADDERS, FORMAT_LADDER, curriculumOf, planWithoutLearning, stageAt, stageById } from '../math/ladders/index.js?v=5d2bb76b';
+import { chooseSource } from '../learning/learning.js?v=5d2bb76b';
+import { crossPlace } from '../math/places.js?v=5d2bb76b';
+import { neighborWay } from '../math/ways.js?v=5d2bb76b';
+import { createPiles, drawTo, drawCount, moveToDiscard, moveToExhausted } from '../cards/piles.js?v=5d2bb76b';
+import { intentFor, advancePattern } from '../enemies/intents.js?v=5d2bb76b';
+import { judgeTempo, applyMultiplier, timeLimitFor } from './tempo.js?v=5d2bb76b';
+import { cardEffect } from '../cards/effect.js?v=5d2bb76b';
 
 // Alle Gründe, aus denen ein Befehl abgelehnt wird (jeder hat einen Text reject.<grund>).
 export const REJECT_REASONS = ['phase', 'card', 'target', 'energy', 'immune', 'shielded', 'noImmunity', 'cycleCount', 'discards', 'command'];
@@ -314,10 +314,11 @@ function setStep(task, i) {
 }
 
 // Blasenkette: trifft den lebenden, nicht geschützten Gegner mit den wenigsten Leben.
-function hitWeakest(c, amount) {
+// Blasenkette: das gewählte Ziel, solange es lebt und nicht geschützt ist, sonst der schwächste Gegner
+function hitChain(c, amount, preferredUid = null) {
   const targets = c.enemies.filter((e) => alive(e) && !isShielded(c, e));
   if (targets.length === 0) return [];
-  const target = targets.reduce((low, e) => (e.hp < low.hp ? e : low));
+  const target = targets.find((e) => e.uid === preferredUid) ?? targets.reduce((low, e) => (e.hp < low.hp ? e : low));
   const r = hit(target, amount);
   const events = [{ type: 'damageDealt', targetUid: target.uid, amount: r.amount, blocked: r.blocked }];
   if (!alive(target)) events.push({ type: 'enemyDefeated', enemyUid: target.uid });
@@ -357,7 +358,7 @@ function answerStep(c, outcome, choiceIndex) {
   if (outcome === 'correct') {
     if (def.effect.type === 'damagePerStep') {
       const fx = effectOf(c, pending.cardId);
-      events.push(...hitWeakest(c, fx.amount + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c)));
+      events.push(...hitChain(c, fx.amount + c.hero.strength * c.config.game.stats.strengthDamagePerPoint + streakBonus(c), pending.targetUid));
       if (c.enemies.every((e) => !alive(e))) {
         events.push({ type: 'answerJudged', outcome: 'correct', tierId: 'normal', solutionText: task.solutionText, cardId: pending.cardId });
         setStreak(c, c.streak + 1, events);
@@ -479,6 +480,12 @@ function playCard(c, { cardUid, targetUid }) {
     target = c.enemies.find((e) => e.uid === targetUid && alive(e));
     if (!target) return reject('target');
   }
+  // Blasenkette (Handytest 21.11.2026, Ingo: „Empfehlung A“): ein gewähltes Ziel ist freiwillig, muss aber leben
+  let chainTarget = null;
+  if (def.effect.type === 'damagePerStep' && targetUid != null) {
+    chainTarget = c.enemies.find((e) => e.uid === targetUid && alive(e));
+    if (!chainTarget) return reject('target');
+  }
   const reason = blockedReason(c, def, target);
   if (reason) return reject(reason);
 
@@ -545,7 +552,7 @@ function playCard(c, { cardUid, targetUid }) {
   // Ruhige Strömung: gilt für alle Schritte dieser Aufgabe (Review Etappe 5–8)
   if (c.slowNext && task.timeLimitMs > 0) { task.slow = c.slowNext; task.timeLimitMs = Math.round(task.timeLimitMs * task.slow); c.slowNext = 0; }
   if (c.forgiving) task.forgiving = true;
-  c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? null, task };
+  c.pending = { cardUid, cardId: card.cardId, targetUid: target?.uid ?? chainTarget?.uid ?? null, task };
   c.phase = 'task';
   events.push({ type: 'taskOpened', task: clone(task) });
   return events;
