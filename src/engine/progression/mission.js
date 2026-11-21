@@ -3,8 +3,8 @@
 //   { tag: 'JJJJ-MM-TT', art: 'uebung' | 'rechenart' | 'serie', leiter (nur rechenart), ziel, stand, geschafft, gemeldet }
 // Ein Auftrag je Spieltag; er entsteht, wenn das Kind an dem Tag zum ersten Mal die Station sieht (game.js).
 // Welche Art kommt, hängt nur vom Stand ab (kein Zufall). Der alte Auftrag verfällt still.
-import { dayKey } from './statistics.js?v=b0dbf0d6';
-import { curriculumOf } from '../math/ladders/index.js?v=b0dbf0d6';
+import { dayKey } from './statistics.js?v=6737eab0';
+import { curriculumOf } from '../math/ladders/index.js?v=6737eab0';
 
 const OPS = ['add', 'sub', 'mul', 'div'];
 const ARTS = ['uebung', 'rechenart', 'serie'];

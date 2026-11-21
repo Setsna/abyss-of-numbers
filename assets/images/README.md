@@ -44,3 +44,4 @@ Alle Bilder: Canva `generate-image`, erzeugt am 17.11.2026 für den Prototyp des
 - `source/`: dieselben Bilder in voller Größe als PNG (für Godot und größere Darstellung).
 - Freigestellt wurde lokal (helle Pixel vom Rand her bis zur Tuschekontur transparent), weil der Canva-Export keine echte Transparenz lieferte.
 - Austausch: Datei gleichen Namens ersetzen. Im Spiel stehen nur Schlüssel (`enemy.crab`), die Zuordnung macht die Asset-Liste.
+- `favicon-64.png`: Browser-Symbol (21.11.2026), 64 × 64. Kopf der Taucherin aus `heroes/diver.webp` auf meerblauem Grund (`--sea`) mit Tuschekontur, lokal mit Pillow gebaut, kein neues Bild. Eingebunden in `index.html`, `datenschutz.html` und `impressum.html`. Ändert sich das Symbol, bekommt es einen neuen Dateinamen (Bilder tragen keine Kennung).

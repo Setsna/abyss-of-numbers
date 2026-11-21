@@ -11,9 +11,9 @@
 // null: ohne Übergang, Kernaufgaben und einschrittiges Ergänzen bekommen nur die richtige Rechnung.
 // Ausnahme Geteilt (Durchsicht Phase 10, Etappe 6, Ingo 20.11.2026): jede Aufgabe bekommt die Umkehraufgabe,
 // weil der Hinweis „Die Umkehraufgabe zeigt es.“ sonst auf etwas verweist, das nicht da ist.
-import { calcPlace, digitAt } from './places.js?v=b0dbf0d6';
-import { commonRound } from './mistakes.js?v=b0dbf0d6';
-import { formatEquation, formatNumber } from './format.js?v=b0dbf0d6';
+import { calcPlace, digitAt } from './places.js?v=6737eab0';
+import { commonRound } from './mistakes.js?v=6737eab0';
+import { formatEquation, formatNumber } from './format.js?v=6737eab0';
 
 const SIGN = { add: '+', sub: '−', mul: '·', div: ':' };
 const APPLY = { add: (x, y) => x + y, sub: (x, y) => x - y, mul: (x, y) => x * y, div: (x, y) => x / y };
