@@ -12,6 +12,9 @@
 // Datenbank (hierGeaendert). Ein Spielstand lässt sich nicht Feld für Feld vereinigen.
 
 export const COLLECTION = 'an_stand';
+// Schlüssel im Lehrerbereich des Perlentauchers (oeffentlich/plattformen, Plattform-Freigabe seit 21.11.2026).
+// Steht dort abyss: false, meldet konto-cloud.js nach der Code-Eingabe { ok: false, zu: true } (Testkind ausgenommen).
+export const FREIGABE = 'abyss';
 export const MAX_SAVE_CHARS = 20000;
 export const LOCAL_KEY = 'abyss-of-numbers-v2'; // Name der Einträge in konto-speicher.js (v1 = Stand ohne Konto)
 
@@ -88,6 +91,7 @@ export function createAccount(LK, firebase) {
     speicher: S,
     mische: rules.mische,
     neuanfang: rules.neuanfang,
+    freigabe: FREIGABE,
   });
   return { S, cloud, rules };
 }

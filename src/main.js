@@ -5,32 +5,32 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=73a74faa';
-import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=73a74faa';
-import { createAccount, accountBackend } from './platform/account.js?v=73a74faa';
-import { FIREBASE } from './platform/firebase-config.js?v=73a74faa';
-import { createAudio } from './platform/audio.js?v=73a74faa';
-import { validateConfig } from './engine/config/validate.js?v=73a74faa';
-import { createSave } from './engine/save/save.js?v=73a74faa';
-import { createGame } from './engine/game.js?v=73a74faa';
-import { setTexts, t } from './ui/text.js?v=73a74faa';
-import { setManifest } from './ui/assets.js?v=73a74faa';
-import { isLocalHost } from './ui/app.js?v=73a74faa';
-import { mountCombat } from './ui/screens/combat.js?v=73a74faa';
-import { mountReward } from './ui/screens/reward.js?v=73a74faa';
-import { mountShop } from './ui/screens/shop.js?v=73a74faa';
-import { mountEvent } from './ui/screens/event.js?v=73a74faa';
-import { mountRiddle } from './ui/screens/riddle.js?v=73a74faa';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=73a74faa';
-import { mountBase } from './ui/screens/base.js?v=73a74faa';
-import { mountTitle } from './ui/screens/title.js?v=73a74faa';
-import { mountLogin } from './ui/screens/login.js?v=73a74faa';
-import { mountStop } from './ui/screens/stop.js?v=73a74faa';
-import { mountGrade } from './ui/screens/grade.js?v=73a74faa';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=73a74faa';
-import { mountLogbook } from './ui/screens/logbook.js?v=73a74faa';
-import { mountAdult } from './ui/screens/adult.js?v=73a74faa';
-import { createRng } from './engine/rng.js?v=73a74faa';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=f988db35';
+import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=f988db35';
+import { createAccount, accountBackend } from './platform/account.js?v=f988db35';
+import { FIREBASE } from './platform/firebase-config.js?v=f988db35';
+import { createAudio } from './platform/audio.js?v=f988db35';
+import { validateConfig } from './engine/config/validate.js?v=f988db35';
+import { createSave } from './engine/save/save.js?v=f988db35';
+import { createGame } from './engine/game.js?v=f988db35';
+import { setTexts, t } from './ui/text.js?v=f988db35';
+import { setManifest } from './ui/assets.js?v=f988db35';
+import { isLocalHost } from './ui/app.js?v=f988db35';
+import { mountCombat } from './ui/screens/combat.js?v=f988db35';
+import { mountReward } from './ui/screens/reward.js?v=f988db35';
+import { mountShop } from './ui/screens/shop.js?v=f988db35';
+import { mountEvent } from './ui/screens/event.js?v=f988db35';
+import { mountRiddle } from './ui/screens/riddle.js?v=f988db35';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=f988db35';
+import { mountBase } from './ui/screens/base.js?v=f988db35';
+import { mountTitle } from './ui/screens/title.js?v=f988db35';
+import { mountLogin, mountClosed } from './ui/screens/login.js?v=f988db35';
+import { mountStop } from './ui/screens/stop.js?v=f988db35';
+import { mountGrade } from './ui/screens/grade.js?v=f988db35';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=f988db35';
+import { mountLogbook } from './ui/screens/logbook.js?v=f988db35';
+import { mountAdult } from './ui/screens/adult.js?v=f988db35';
+import { createRng } from './engine/rng.js?v=f988db35';
 
 const app = document.getElementById('app');
 
@@ -419,6 +419,8 @@ function enter(config, LK) {
 
   function fail(r) {
     clearTimeout(slowTimer);
+    // Die Lehrkraft hat Abyss of Numbers gesperrt (oeffentlich/plattformen): „Bald offen“ statt Code-Eingabe
+    if (r.zu) { showClosed(); return; }
     // Die Lehrkraft hat den Code gesperrt: nicht auf dem Gerät weiterspielen lassen
     if (r.grund === cloud.TEXT.gesperrt && S.aktiv()) S.abmelden();
     if (login) login.fail(r.grund || cloud.TEXT.sonst);
@@ -437,6 +439,12 @@ function enter(config, LK) {
       if (!playing && login) login.fail(t('login.slow', { step: `${cloud.schritt()}, Firebase ${typeof firebase === 'undefined' ? 'fehlt' : 'da'}${lastError ? `, Fehler: ${lastError}` : ''}` }));
     }, 15000);
   };
+
+  // „Bald offen“ (Plattform-Freigabe, 21.11.2026). Das Kind ist schon abgemeldet; „Abmelden“ führt zur Code-Eingabe.
+  function showClosed() {
+    login = null;
+    mountClosed(app, { t, text: cloud.TEXT.zu, onLogout: () => { cloud.abmelden().then(() => showLogin(), () => showLogin()); } });
+  }
 
   function showLogin(hint = '', busy = false) {
     login = mountLogin(app, {

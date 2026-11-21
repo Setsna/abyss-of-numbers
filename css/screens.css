@@ -716,6 +716,11 @@
 .login-info { font-size: calc(18 * var(--u)); color: var(--muted); font-weight: 700; text-align: center; }
 .login-privacy { text-decoration: none; color: var(--ink); display: inline-flex; align-items: center; }
 
+/* Plattform gesperrt („Bald offen“, Lehrerbereich des Perlentauchers, 21.11.2026): Aufbau wie die Code-Eingabe */
+.closed-title { display: flex; align-items: center; gap: 0.4em; font-size: calc(40 * var(--u)); }
+.closed-lock { flex: none; width: 0.85em; height: 0.85em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.closed-text { font-weight: 700; font-size: calc(26 * var(--u)); text-align: center; }
+
 /* Halt vor dem Spiel (Update-Sicherheit): Stand aus einer neueren Fassung oder nicht lesbar */
 .stop-box { gap: calc(14 * var(--u)); }
 .stop-title { margin: 0; font-weight: 700; font-size: calc(34 * var(--u)); line-height: 1.2; text-align: center; }

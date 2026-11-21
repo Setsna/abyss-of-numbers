@@ -2908,6 +2908,7 @@ function createStorage(backend, config) {
 
 // src/platform/account.js
 var COLLECTION = "an_stand";
+var FREIGABE = "abyss";
 var MAX_SAVE_CHARS = 2e4;
 var LOCAL_KEY = "abyss-of-numbers-v2";
 var text = (x) => typeof x === "string" && x.length > 0 && x.length <= MAX_SAVE_CHARS ? x : "";
@@ -2972,7 +2973,8 @@ function createAccount(LK, firebase2) {
     sammlung: COLLECTION,
     speicher: S2,
     mische: rules.mische,
-    neuanfang: rules.neuanfang
+    neuanfang: rules.neuanfang,
+    freigabe: FREIGABE
   });
   return { S: S2, cloud, rules };
 }
@@ -7947,6 +7949,35 @@ function mountLogin(root, { t: t2, hint = "", busy = false, onSubmit }) {
   else ready(hint);
   return { fail: (text2) => ready(text2), ready };
 }
+function mountClosed(root, { t: t2, text: text2, onLogout }) {
+  const i = text2.indexOf("! ");
+  const titel = i > 0 ? text2.slice(0, i + 1) : text2;
+  const rest = i > 0 ? text2.slice(i + 2) : "";
+  root.innerHTML = `
+  <main class="screen title-screen login-screen closed-screen">
+    <div class="title-bg" data-ref="bg"></div>
+    <section class="title-box">
+      <h1 class="title-word"></h1>
+      <section class="login-box closed-box" aria-labelledby="closed-title">
+        <h2 class="closed-title" id="closed-title"><svg class="closed-lock" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span></span></h2>
+        <p class="closed-text"></p>
+        <button class="btn btn-go closed-logout" type="button"></button>
+      </section>
+    </section>
+    <a class="title-adult login-privacy" href="datenschutz.html"></a>
+  </main>`;
+  root.querySelector("[data-ref=bg]").append(renderAsset("area.reef", ""));
+  root.querySelector(".title-word").textContent = t2("title.name");
+  root.querySelector(".closed-title span").textContent = titel;
+  root.querySelector(".closed-text").textContent = rest;
+  root.querySelector(".login-privacy").textContent = t2("login.privacy");
+  const out = root.querySelector(".closed-logout");
+  out.textContent = t2("login.logout");
+  out.addEventListener("click", () => {
+    out.disabled = true;
+    onLogout();
+  });
+}
 
 // src/ui/screens/stop.js
 function mountStop(root, { t: t2, kind, onReload, onLogout = null }) {
@@ -9110,6 +9141,10 @@ function enter(config, LK) {
   }
   function fail(r) {
     clearTimeout(slowTimer);
+    if (r.zu) {
+      showClosed();
+      return;
+    }
     if (r.grund === cloud.TEXT.gesperrt && S2.aktiv()) S2.abmelden();
     if (login) login.fail(r.grund || cloud.TEXT.sonst);
     else showLogin(r.grund || cloud.TEXT.sonst);
@@ -9128,6 +9163,12 @@ function enter(config, LK) {
       if (!playing && login) login.fail(t("login.slow", { step: `${cloud.schritt()}, Firebase ${typeof firebase === "undefined" ? "fehlt" : "da"}${lastError ? `, Fehler: ${lastError}` : ""}` }));
     }, 15e3);
   };
+  function showClosed() {
+    login = null;
+    mountClosed(app, { t, text: cloud.TEXT.zu, onLogout: () => {
+      cloud.abmelden().then(() => showLogin(), () => showLogin());
+    } });
+  }
   function showLogin(hint = "", busy = false) {
     login = mountLogin(app, {
       t,

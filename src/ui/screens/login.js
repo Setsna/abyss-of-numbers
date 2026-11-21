@@ -2,7 +2,7 @@
 // Aufbau wie der Titel (Riff im Hintergrund), darauf ein Papierkasten mit Eingabefeld.
 // busy: „Einen Moment …“ statt Eingabe (z. B. während der Aufkleber-Code geprüft wird).
 // Rückgabe: { fail(text), ready(text) } zum Melden eines Fehlers bzw. zum Freigeben der Eingabe.
-import { renderAsset } from '../assets.js?v=73a74faa';
+import { renderAsset } from '../assets.js?v=f988db35';
 
 export function mountLogin(root, { t, hint = '', busy = false, onSubmit }) {
   root.innerHTML = `
@@ -54,4 +54,34 @@ export function mountLogin(root, { t, hint = '', busy = false, onSubmit }) {
 
   if (busy) wait(); else ready(hint);
   return { fail: (text) => ready(text), ready };
+}
+
+// Die Lehrkraft hat Abyss of Numbers im Lehrerbereich des Perlentauchers gesperrt (Plattform-Freigabe, 21.11.2026).
+// Das Kind ist schon wieder abgemeldet, sein Spielstand bleibt. text = cloud.TEXT.zu (von Ingo gewählt):
+// „Bald offen!“ als Überschrift mit Schloss, der Rest darunter, dazu „Abmelden“. Aufbau wie die Code-Eingabe.
+export function mountClosed(root, { t, text, onLogout }) {
+  const i = text.indexOf('! ');
+  const titel = i > 0 ? text.slice(0, i + 1) : text;
+  const rest = i > 0 ? text.slice(i + 2) : '';
+  root.innerHTML = `
+  <main class="screen title-screen login-screen closed-screen">
+    <div class="title-bg" data-ref="bg"></div>
+    <section class="title-box">
+      <h1 class="title-word"></h1>
+      <section class="login-box closed-box" aria-labelledby="closed-title">
+        <h2 class="closed-title" id="closed-title"><svg class="closed-lock" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span></span></h2>
+        <p class="closed-text"></p>
+        <button class="btn btn-go closed-logout" type="button"></button>
+      </section>
+    </section>
+    <a class="title-adult login-privacy" href="datenschutz.html"></a>
+  </main>`;
+  root.querySelector('[data-ref=bg]').append(renderAsset('area.reef', ''));
+  root.querySelector('.title-word').textContent = t('title.name');
+  root.querySelector('.closed-title span').textContent = titel;
+  root.querySelector('.closed-text').textContent = rest;
+  root.querySelector('.login-privacy').textContent = t('login.privacy');
+  const out = root.querySelector('.closed-logout');
+  out.textContent = t('login.logout');
+  out.addEventListener('click', () => { out.disabled = true; onLogout(); });
 }

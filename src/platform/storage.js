@@ -2,7 +2,7 @@
 // Ein ungültiger Stand wird nicht gelöscht, sondern unter "<Schlüssel>.defekt" aufbewahrt.
 // Ein Stand aus einer NEUEREN Fassung des Spiels (höhere Versionsnummer) ist nicht defekt: Dieses Gerät hat
 // nur noch die ältere Fassung geladen. Er bleibt unberührt, Status "newer" (Update-Sicherheit, 20.11.2026).
-import { validateSave, migrateSave, repairSave, SAVE_VERSION } from '../engine/save/save.js?v=73a74faa';
+import { validateSave, migrateSave, repairSave, SAVE_VERSION } from '../engine/save/save.js?v=f988db35';
 
 export const STORAGE_KEY = 'abyss-of-numbers-v1';
 const BROKEN_KEY = `${STORAGE_KEY}.defekt`;

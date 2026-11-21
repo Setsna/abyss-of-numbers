@@ -1,7 +1,7 @@
 // Ereignisraum (Phase 9, Jahresausbau Etappe 2; Konzept 8): Bild des Gebiets, zwei bis drei kurze Sätze,
 // zwei große Knöpfe. Kostet eine Option Perlen und reichen sie nicht, ist der Knopf grau und sagt warum.
-import { ICON } from '../icons.js?v=73a74faa';
-import { worldLayer } from '../components/world.js?v=73a74faa';
+import { ICON } from '../icons.js?v=f988db35';
+import { worldLayer } from '../components/world.js?v=f988db35';
 
 export function mountEvent(root, { t, game, onChoose }) {
   const v = game.view();

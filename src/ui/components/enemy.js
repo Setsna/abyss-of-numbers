@@ -1,7 +1,7 @@
 // Gegner im Szenenpanel: Absicht, Immunität, Bild, Name, Leben, Schutz, Lebensbalken.
-import { ICON, OP_ICON } from '../icons.js?v=73a74faa';
-import { renderAsset } from '../assets.js?v=73a74faa';
-import { OPERATOR_SIGN } from '../../engine/math/format.js?v=73a74faa';
+import { ICON, OP_ICON } from '../icons.js?v=f988db35';
+import { renderAsset } from '../assets.js?v=f988db35';
+import { OPERATOR_SIGN } from '../../engine/math/format.js?v=f988db35';
 
 export function renderEnemy(e, { t, selected }) {
   const name = t(`enemies.${e.typeId}.name`);
