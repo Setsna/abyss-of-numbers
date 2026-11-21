@@ -782,6 +782,14 @@
    (unten links läge es auf Stufe und Perlen) */
 .station-who { z-index: 3; left: auto; bottom: auto; right: calc(14 * var(--u)); top: calc(12 * var(--u)); background: rgb(251 251 247 / 0.9); }
 .station-who[hidden] { display: none; }
+/* Schmal und untereinander am rechten Rand (Handytest 21.11.2026, mit „Für Erwachsene“): quer neben den Bullaugen,
+   hochkant unter dem Auftragsschild ohne die Heldin zu verdecken (die Höhe setzt dann base.js) */
+.station-who { flex-direction: column; align-items: stretch; text-align: center; width: calc(108 * var(--u)); right: calc(6 * var(--u)); gap: calc(6 * var(--u)); padding: calc(6 * var(--u)); font-size: calc(15 * var(--u)); }
+.station-who .title-logout { padding-inline: calc(6 * var(--u)); }
+@media (orientation: portrait) {
+  .station-who { width: auto; max-width: 30%; }
+}
+
 
 /* Held ändern (18.11.2026): Knopf unter dem Heldenbild, in der Heldenwahl „Zurück“ neben „Fertig“ */
 .lb-hero { flex-wrap: wrap; }

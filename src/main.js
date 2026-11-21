@@ -5,32 +5,32 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=5d2bb76b';
-import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=5d2bb76b';
-import { createAccount, accountBackend } from './platform/account.js?v=5d2bb76b';
-import { FIREBASE } from './platform/firebase-config.js?v=5d2bb76b';
-import { createAudio } from './platform/audio.js?v=5d2bb76b';
-import { validateConfig } from './engine/config/validate.js?v=5d2bb76b';
-import { createSave } from './engine/save/save.js?v=5d2bb76b';
-import { createGame } from './engine/game.js?v=5d2bb76b';
-import { setTexts, t } from './ui/text.js?v=5d2bb76b';
-import { setManifest } from './ui/assets.js?v=5d2bb76b';
-import { isLocalHost } from './ui/app.js?v=5d2bb76b';
-import { mountCombat } from './ui/screens/combat.js?v=5d2bb76b';
-import { mountReward } from './ui/screens/reward.js?v=5d2bb76b';
-import { mountShop } from './ui/screens/shop.js?v=5d2bb76b';
-import { mountEvent } from './ui/screens/event.js?v=5d2bb76b';
-import { mountRiddle } from './ui/screens/riddle.js?v=5d2bb76b';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=5d2bb76b';
-import { mountBase } from './ui/screens/base.js?v=5d2bb76b';
-import { mountTitle } from './ui/screens/title.js?v=5d2bb76b';
-import { mountLogin } from './ui/screens/login.js?v=5d2bb76b';
-import { mountStop } from './ui/screens/stop.js?v=5d2bb76b';
-import { mountGrade } from './ui/screens/grade.js?v=5d2bb76b';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=5d2bb76b';
-import { mountLogbook } from './ui/screens/logbook.js?v=5d2bb76b';
-import { mountAdult } from './ui/screens/adult.js?v=5d2bb76b';
-import { createRng } from './engine/rng.js?v=5d2bb76b';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=73a74faa';
+import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=73a74faa';
+import { createAccount, accountBackend } from './platform/account.js?v=73a74faa';
+import { FIREBASE } from './platform/firebase-config.js?v=73a74faa';
+import { createAudio } from './platform/audio.js?v=73a74faa';
+import { validateConfig } from './engine/config/validate.js?v=73a74faa';
+import { createSave } from './engine/save/save.js?v=73a74faa';
+import { createGame } from './engine/game.js?v=73a74faa';
+import { setTexts, t } from './ui/text.js?v=73a74faa';
+import { setManifest } from './ui/assets.js?v=73a74faa';
+import { isLocalHost } from './ui/app.js?v=73a74faa';
+import { mountCombat } from './ui/screens/combat.js?v=73a74faa';
+import { mountReward } from './ui/screens/reward.js?v=73a74faa';
+import { mountShop } from './ui/screens/shop.js?v=73a74faa';
+import { mountEvent } from './ui/screens/event.js?v=73a74faa';
+import { mountRiddle } from './ui/screens/riddle.js?v=73a74faa';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=73a74faa';
+import { mountBase } from './ui/screens/base.js?v=73a74faa';
+import { mountTitle } from './ui/screens/title.js?v=73a74faa';
+import { mountLogin } from './ui/screens/login.js?v=73a74faa';
+import { mountStop } from './ui/screens/stop.js?v=73a74faa';
+import { mountGrade } from './ui/screens/grade.js?v=73a74faa';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=73a74faa';
+import { mountLogbook } from './ui/screens/logbook.js?v=73a74faa';
+import { mountAdult } from './ui/screens/adult.js?v=73a74faa';
+import { createRng } from './engine/rng.js?v=73a74faa';
 
 const app = document.getElementById('app');
 
@@ -189,6 +189,22 @@ function runGame(config, session = null) {
   let stationBought = null; // eben gekauftes Stück der Station, nur für die nächste Anzeige
   const takeBought = () => { const id = stationBought; stationBought = null; return id; };
 
+  // Für Erwachsene: vom Titel und seit dem Handytest (21.11.2026) auch aus der Station; zurück geht es dorthin,
+  // wo der Knopf war (der Bildschirm im Spiel bleibt derselbe)
+  const openAdult = () => show(mountAdult(app, {
+    t, config, game, rng: createRng(Date.now() >>> 0),
+    onSetting: (key, value) => { act({ type: 'setSetting', key, value }); applySettings(); },
+    // Mit Konto setzt nur die Lehrkraft zurück (Perlentaucher, D37)
+    onReset: session ? null : () => {
+      game.dispatch({ type: 'resetSave' });
+      storage.clear();
+      applySettings();
+      showNotice(t('adult.done'));
+      route();
+    },
+    onBack: route,
+  }));
+
   function route() {
     const v = game.view();
     // Hintergrundklang: im Bosskampf das Boss-Stück, im Tauchgang das Gebiet, sonst die Station
@@ -199,19 +215,7 @@ function runGame(config, session = null) {
         t, hasSave: Boolean(v.profile),
         account: session?.title ?? null,
         onStart: () => { act({ type: 'start' }); route(); },
-        onAdult: () => show(mountAdult(app, {
-          t, config, game, rng: createRng(Date.now() >>> 0),
-          onSetting: (key, value) => { act({ type: 'setSetting', key, value }); applySettings(); },
-          // Mit Konto setzt nur die Lehrkraft zurück (Perlentaucher, D37)
-          onReset: session ? null : () => {
-            game.dispatch({ type: 'resetSave' });
-            storage.clear();
-            applySettings();
-            showNotice(t('adult.done'));
-            route();
-          },
-          onBack: route,
-        })),
+        onAdult: openAdult,
       }));
     } else if (v.screen === 'grade') {
       show(mountGrade(app, {
@@ -252,6 +256,7 @@ function runGame(config, session = null) {
         },
         bought: takeBought(),
         account: session?.title ?? null,
+        onAdult: openAdult,
       }));
     } else if (v.screen === 'map') {
       show(mountMap(app, {

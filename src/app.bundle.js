@@ -7404,7 +7404,7 @@ function mountAreaCleared(root, { t: t2, config, cleared, profile, onDone }) {
 }
 
 // src/ui/screens/base.js
-function mountBase(root, { t: t2, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null }) {
+function mountBase(root, { t: t2, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null, onAdult = null }) {
   const v = game.view();
   const p = v.profile;
   root.innerHTML = `
@@ -7425,7 +7425,8 @@ function mountBase(root, { t: t2, config, game, onDive, onLogbook, onAckNewCards
       </div>
       <div class="title-who station-who" data-ref="who" hidden>
         <span data-ref="whoName"></span>
-        <button class="title-logout" type="button" data-ref="logout"></button>
+        <button class="title-logout" type="button" data-ref="logout" hidden></button>
+        <button class="title-logout" type="button" data-ref="adult" hidden></button>
       </div>
       <div class="station-news" data-ref="news" role="status" hidden>
         <p class="station-news-title" data-ref="newsTitle"></p>
@@ -7572,9 +7573,18 @@ function mountBase(root, { t: t2, config, game, onDive, onLogbook, onAckNewCards
     busy = true;
     onYes();
   });
+  if (onAdult) {
+    ref.who.hidden = false;
+    ref.adult.hidden = false;
+    ref.adult.textContent = t2("adult.open");
+    ref.adult.addEventListener("click", () => {
+      if (!busy) onAdult();
+    });
+  }
   if (account) {
     ref.who.hidden = false;
     ref.whoName.textContent = t2("login.who", { name: account.name });
+    ref.logout.hidden = false;
     ref.logout.textContent = t2("login.logout");
     ref.logout.addEventListener("click", () => {
       if (busy) return;
@@ -7813,10 +7823,25 @@ function mountBase(root, { t: t2, config, game, onDive, onLogbook, onAckNewCards
   };
   document.addEventListener("keydown", onKey);
   root.querySelector(".porthole:not(:disabled)")?.focus({ preventScroll: true });
+  const placeWho = () => {
+    if (ref.who.hidden) return;
+    ref.who.style.top = "";
+    if (!ref.text.textContent.trim()) return;
+    const cap = ref.text.getBoundingClientRect();
+    const who = ref.who.getBoundingClientRect();
+    if (cap.right > who.left && cap.left < who.right && cap.bottom > who.top && cap.top < who.bottom) {
+      const top = ref.who.offsetParent?.getBoundingClientRect().top ?? 0;
+      ref.who.style.top = `${Math.ceil(cap.bottom - top + 6)}px`;
+    }
+  };
+  placeWho();
+  document.fonts?.ready.then(placeWho);
+  window.addEventListener("resize", placeWho);
   return {
     destroy() {
       document.removeEventListener("keydown", onKey);
       portraitQuery.removeEventListener("change", place);
+      window.removeEventListener("resize", placeWho);
     }
   };
 }
@@ -8773,6 +8798,25 @@ function runGame(config, session = null) {
     stationBought = null;
     return id;
   };
+  const openAdult = () => show(mountAdult(app, {
+    t,
+    config,
+    game,
+    rng: createRng(Date.now() >>> 0),
+    onSetting: (key, value) => {
+      act({ type: "setSetting", key, value });
+      applySettings();
+    },
+    // Mit Konto setzt nur die Lehrkraft zurück (Perlentaucher, D37)
+    onReset: session ? null : () => {
+      game.dispatch({ type: "resetSave" });
+      storage.clear();
+      applySettings();
+      showNotice(t("adult.done"));
+      route();
+    },
+    onBack: route
+  }));
   function route() {
     const v = game.view();
     const bossFight = v.screen === "combat" && v.combat?.enemies.some((e) => config.bosses.bosses[e.typeId]);
@@ -8786,25 +8830,7 @@ function runGame(config, session = null) {
           act({ type: "start" });
           route();
         },
-        onAdult: () => show(mountAdult(app, {
-          t,
-          config,
-          game,
-          rng: createRng(Date.now() >>> 0),
-          onSetting: (key, value) => {
-            act({ type: "setSetting", key, value });
-            applySettings();
-          },
-          // Mit Konto setzt nur die Lehrkraft zurück (Perlentaucher, D37)
-          onReset: session ? null : () => {
-            game.dispatch({ type: "resetSave" });
-            storage.clear();
-            applySettings();
-            showNotice(t("adult.done"));
-            route();
-          },
-          onBack: route
-        }))
+        onAdult: openAdult
       }));
     } else if (v.screen === "grade") {
       show(mountGrade(app, {
@@ -8874,7 +8900,8 @@ function runGame(config, session = null) {
           route();
         },
         bought: takeBought(),
-        account: session?.title ?? null
+        account: session?.title ?? null,
+        onAdult: openAdult
       }));
     } else if (v.screen === "map") {
       show(mountMap(app, {

@@ -1,7 +1,7 @@
 // Ereignisräume (Phase 9, Jahresausbau Etappe 2; Konzept 8): ein Bild, zwei bis drei kurze Sätze, zwei Knöpfe.
 // Die Wirkungen kommen aus einer festen Liste; ein Ereignis drückt die Leben nie unter 1 und nimmt nichts
 // Dauerhaftes weg. Welches Ereignis kommt, entsteht aus dem Seed des Tauchgangs und der Raumkennung.
-import { createRng, deriveSeed } from '../rng.js?v=5d2bb76b';
+import { createRng, deriveSeed } from '../rng.js?v=73a74faa';
 
 // hp: ± Leben im Tauchgang · heal: Anteil der Höchstleben · pearls: ± Perlen (bei −n nur wählbar, wenn genug da sind)
 // card: Beute 1 aus 3 · item: ein Gegenstand, den das Kind noch nicht hat · fight: Kampf mit den Gegnern des Raums, danach Beute plus bonusPearls

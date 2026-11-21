@@ -4,7 +4,7 @@
 //   'corrupt' Der Spielstand im gemeinsamen Konto lässt sich nicht lesen. Die Lehrkraft entscheidet.
 // In beiden Fällen bliebe sonst nur „Los!“: Ein neuer Held würde den echten Stand im Konto überschreiben.
 // Aufbau wie die Anmeldung (Riff im Hintergrund, Papierkasten). Die Seite schreibt nichts.
-import { renderAsset } from '../assets.js?v=5d2bb76b';
+import { renderAsset } from '../assets.js?v=73a74faa';
 
 export function mountStop(root, { t, kind, onReload, onLogout = null }) {
   root.innerHTML = `

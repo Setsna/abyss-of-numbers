@@ -7,13 +7,13 @@
 // Mit Konto (Ingo, iPad 19.11.2026) unten links, wer angemeldet ist, und „Abmelden“ mit Rückfrage
 // (account: { name, onLogout } wie auf dem Titel), damit ein anderes Kind sich anmelden kann.
 // Hintergrund: das Bild der Station (place.station), bis es da ist das Bild des Heimatgebiets.
-import { ICON } from '../icons.js?v=5d2bb76b';
-import { renderAsset, assetUrl } from '../assets.js?v=5d2bb76b';
-import { homeAreaId, worldLayer } from '../components/world.js?v=5d2bb76b';
-import { renderCard } from '../components/card.js?v=5d2bb76b';
-import { isCalm } from '../app.js?v=5d2bb76b';
+import { ICON } from '../icons.js?v=73a74faa';
+import { renderAsset, assetUrl } from '../assets.js?v=73a74faa';
+import { homeAreaId, worldLayer } from '../components/world.js?v=73a74faa';
+import { renderCard } from '../components/card.js?v=73a74faa';
+import { isCalm } from '../app.js?v=73a74faa';
 
-export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null }) {
+export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCards = null, onAckMission = null, onBuy = null, bought = null, account = null, onAdult = null }) {
   const v = game.view();
   const p = v.profile;
   root.innerHTML = `
@@ -34,7 +34,8 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
       </div>
       <div class="title-who station-who" data-ref="who" hidden>
         <span data-ref="whoName"></span>
-        <button class="title-logout" type="button" data-ref="logout"></button>
+        <button class="title-logout" type="button" data-ref="logout" hidden></button>
+        <button class="title-logout" type="button" data-ref="adult" hidden></button>
       </div>
       <div class="station-news" data-ref="news" role="status" hidden>
         <p class="station-news-title" data-ref="newsTitle"></p>
@@ -171,9 +172,17 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
   });
   ref.askYes.addEventListener('click', () => { if (busy || !onYes) return; busy = true; onYes(); });
 
+  // „Für Erwachsene“ oben rechts neben „Abmelden“ (Ingo, Handytest 21.11.2026: nach der Anmeldung nicht zu finden)
+  if (onAdult) {
+    ref.who.hidden = false;
+    ref.adult.hidden = false;
+    ref.adult.textContent = t('adult.open');
+    ref.adult.addEventListener('click', () => { if (!busy) onAdult(); });
+  }
   if (account) {
     ref.who.hidden = false;
     ref.whoName.textContent = t('login.who', { name: account.name });
+    ref.logout.hidden = false;
     ref.logout.textContent = t('login.logout');
     ref.logout.addEventListener('click', () => {
       if (busy) return;
@@ -424,11 +433,30 @@ export function mountBase(root, { t, config, game, onDive, onLogbook, onAckNewCa
   document.addEventListener('keydown', onKey);
 
   root.querySelector('.porthole:not(:disabled)')?.focus({ preventScroll: true });
+
+  // Kasten „Angemeldet … Abmelden · Für Erwachsene“ oben rechts: Hochkant ist das Auftragsschild so breit wie der
+  // Bildschirm und lag darüber (Handytest 21.11.2026). Überlappen sie, rückt der Kasten unter das Schild.
+  const placeWho = () => {
+    if (ref.who.hidden) return;
+    ref.who.style.top = '';
+    if (!ref.text.textContent.trim()) return;
+    const cap = ref.text.getBoundingClientRect();
+    const who = ref.who.getBoundingClientRect();
+    if (cap.right > who.left && cap.left < who.right && cap.bottom > who.top && cap.top < who.bottom) {
+      const top = ref.who.offsetParent?.getBoundingClientRect().top ?? 0;
+      ref.who.style.top = `${Math.ceil(cap.bottom - top + 6)}px`;
+    }
+  };
+  placeWho();
+  document.fonts?.ready.then(placeWho); // Schrift kann die Höhe des Schilds noch ändern
+  window.addEventListener('resize', placeWho);
+
   // Beim Wechsel des Bildschirms (show() in main.js) melden sich die Zuhörer ab
   return {
     destroy() {
       document.removeEventListener('keydown', onKey);
       portraitQuery.removeEventListener('change', place);
+      window.removeEventListener('resize', placeWho);
     },
   };
 }
