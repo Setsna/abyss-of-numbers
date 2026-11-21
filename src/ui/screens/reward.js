@@ -1,11 +1,11 @@
 // Beute nach einem Sieg (Plan Etappe 5, Schritt 6): Erfahrung, Perlen, ggf. neue Stufe,
 // eine von drei Karten oder „Keine Karte“, darunter bis zu 5 Übungsaufgaben mit Lösung.
 // Keine Quote, keine Zeit, kein Vergleich (A7).
-import { wayText } from '../text.js?v=f988db35';
-import { ICON } from '../icons.js?v=f988db35';
-import { renderCard } from '../components/card.js?v=f988db35';
-import { renderAsset } from '../assets.js?v=f988db35';
-import { addWorld } from '../components/world.js?v=f988db35';
+import { wayText } from '../text.js?v=2f163403';
+import { ICON } from '../icons.js?v=2f163403';
+import { renderCard } from '../components/card.js?v=2f163403';
+import { renderAsset } from '../assets.js?v=2f163403';
+import { addWorld } from '../components/world.js?v=2f163403';
 
 export function mountReward(root, { config, t, reward, onPick, levels = {}, areaId = null }) {
   root.innerHTML = `
