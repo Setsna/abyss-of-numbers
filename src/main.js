@@ -5,32 +5,32 @@
 // Etappe 10 (D37): Vor dem Spiel meldet sich das Kind mit seinem Code an (platform/account.js); der Spielstand
 // liegt dann im Konto und wird mit Firebase abgeglichen. Auf localhost ohne Firebase-Attrappe läuft das Spiel
 // wie bisher ohne Anmeldung nur im Browser (für Testkämpfe, Klick-Testspieler und Audit-Werkzeuge).
-import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=2f163403';
-import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=2f163403';
-import { createAccount, accountBackend } from './platform/account.js?v=2f163403';
-import { FIREBASE } from './platform/firebase-config.js?v=2f163403';
-import { createAudio } from './platform/audio.js?v=2f163403';
-import { validateConfig } from './engine/config/validate.js?v=2f163403';
-import { createSave } from './engine/save/save.js?v=2f163403';
-import { createGame } from './engine/game.js?v=2f163403';
-import { setTexts, t } from './ui/text.js?v=2f163403';
-import { setManifest } from './ui/assets.js?v=2f163403';
-import { isLocalHost } from './ui/app.js?v=2f163403';
-import { mountCombat } from './ui/screens/combat.js?v=2f163403';
-import { mountReward } from './ui/screens/reward.js?v=2f163403';
-import { mountShop } from './ui/screens/shop.js?v=2f163403';
-import { mountEvent } from './ui/screens/event.js?v=2f163403';
-import { mountRiddle } from './ui/screens/riddle.js?v=2f163403';
-import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=2f163403';
-import { mountBase } from './ui/screens/base.js?v=2f163403';
-import { mountTitle } from './ui/screens/title.js?v=2f163403';
-import { mountLogin, mountClosed } from './ui/screens/login.js?v=2f163403';
-import { mountStop } from './ui/screens/stop.js?v=2f163403';
-import { mountGrade } from './ui/screens/grade.js?v=2f163403';
-import { mountHeroCreate } from './ui/screens/hero-create.js?v=2f163403';
-import { mountLogbook } from './ui/screens/logbook.js?v=2f163403';
-import { mountAdult } from './ui/screens/adult.js?v=2f163403';
-import { createRng } from './engine/rng.js?v=2f163403';
+import { loadConfig, browserFetchJson } from './platform/config-loader.js?v=b0dbf0d6';
+import { createStorage, loadVerdict, STORAGE_KEY } from './platform/storage.js?v=b0dbf0d6';
+import { createAccount, accountBackend } from './platform/account.js?v=b0dbf0d6';
+import { FIREBASE } from './platform/firebase-config.js?v=b0dbf0d6';
+import { createAudio } from './platform/audio.js?v=b0dbf0d6';
+import { validateConfig } from './engine/config/validate.js?v=b0dbf0d6';
+import { createSave } from './engine/save/save.js?v=b0dbf0d6';
+import { createGame } from './engine/game.js?v=b0dbf0d6';
+import { setTexts, t } from './ui/text.js?v=b0dbf0d6';
+import { setManifest } from './ui/assets.js?v=b0dbf0d6';
+import { isLocalHost } from './ui/app.js?v=b0dbf0d6';
+import { mountCombat } from './ui/screens/combat.js?v=b0dbf0d6';
+import { mountReward } from './ui/screens/reward.js?v=b0dbf0d6';
+import { mountShop } from './ui/screens/shop.js?v=b0dbf0d6';
+import { mountEvent } from './ui/screens/event.js?v=b0dbf0d6';
+import { mountRiddle } from './ui/screens/riddle.js?v=b0dbf0d6';
+import { mountMap, mountAreaCleared } from './ui/screens/map.js?v=b0dbf0d6';
+import { mountBase } from './ui/screens/base.js?v=b0dbf0d6';
+import { mountTitle } from './ui/screens/title.js?v=b0dbf0d6';
+import { mountLogin, mountClosed } from './ui/screens/login.js?v=b0dbf0d6';
+import { mountStop } from './ui/screens/stop.js?v=b0dbf0d6';
+import { mountGrade } from './ui/screens/grade.js?v=b0dbf0d6';
+import { mountHeroCreate } from './ui/screens/hero-create.js?v=b0dbf0d6';
+import { mountLogbook } from './ui/screens/logbook.js?v=b0dbf0d6';
+import { mountAdult } from './ui/screens/adult.js?v=b0dbf0d6';
+import { createRng } from './engine/rng.js?v=b0dbf0d6';
 
 const app = document.getElementById('app');
 

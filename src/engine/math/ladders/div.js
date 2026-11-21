@@ -2,7 +2,7 @@
 // Mal-Stufe n (`from`). Der Divisor ist einer der beiden Faktoren: zufällig (divisor: any, Standard),
 // immer die einstellige Zahl (small) oder immer 10 beziehungsweise 100 (pow10).
 // Die Mal-Stufe wird beim Laden des Lehrplans eingehängt (stage.fromStage, siehe index.js).
-import * as mul from './mul.js?v=2f163403';
+import * as mul from './mul.js?v=b0dbf0d6';
 
 export const kinds = ['inverse'];
 

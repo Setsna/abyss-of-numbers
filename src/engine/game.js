@@ -5,22 +5,22 @@
 // Bildschirme: 'title' | 'grade' | 'heroCreate' | 'base' | 'logbook' | 'map' | 'combat' | 'reward' | 'shop' | 'areaCleared'
 // (dazu 'defeat' und null nur beim Testkampf über startCombat ohne Tauchgang).
 // Ohne Spielstand (save null) entsteht der Stand erst bei createHero.
-import { createRng, deriveSeed } from './rng.js?v=2f163403';
-import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=2f163403';
-import { wayForKey } from './math/ways.js?v=2f163403';
-import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=2f163403';
-import { nextCurrent, answerCode } from './combat/current.js?v=2f163403';
-import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=2f163403';
-import { generateMap, addExtraRest } from './dungeon/map.js?v=2f163403';
-import { createSave } from './save/save.js?v=2f163403';
-import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=2f163403';
-import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=2f163403';
-import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=2f163403';
-import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=2f163403';
-import { rollEvent, optionCost } from './dungeon/events.js?v=2f163403';
-import { createRiddle } from './dungeon/riddle.js?v=2f163403';
-import { noteDive, noteDay, noteRun, noteAnswer, noteRescue, dayKey } from './progression/statistics.js?v=2f163403';
-import { ensureMission, noteMission, missionPracticeEvery } from './progression/mission.js?v=2f163403';
+import { createRng, deriveSeed } from './rng.js?v=b0dbf0d6';
+import { curriculumOf, planWithoutLearning } from './math/ladders/index.js?v=b0dbf0d6';
+import { wayForKey } from './math/ways.js?v=b0dbf0d6';
+import { stageFor, recordAnswer, isIntroduced, markIntroduced, noteHighest, atTopEverywhere, mixCounts, saveMixCounts } from './learning/learning.js?v=b0dbf0d6';
+import { nextCurrent, answerCode } from './combat/current.js?v=b0dbf0d6';
+import { createCombat, combatDispatch, combatView } from './combat/combat.js?v=b0dbf0d6';
+import { generateMap, addExtraRest } from './dungeon/map.js?v=b0dbf0d6';
+import { createSave } from './save/save.js?v=b0dbf0d6';
+import { maxHp, heroStats, heroName, freePoints, spendPoint as spendHeroPoint, resetPoints as resetHeroPoints, STATS, SLOTS, TALENT_LEVELS } from './hero/hero.js?v=b0dbf0d6';
+import { unlockedCards, grantXp, rollRewardCards, addCardToDeck, deckList, addPractice, countCorrect, cardLevels, cardLevel, toNextLevel } from './progression/progression.js?v=b0dbf0d6';
+import { createShopOffer, removalBlockedReason } from './shop/shop.js?v=b0dbf0d6';
+import { depthPower, rewardFactor, starCount, openDepths, areasToOpen } from './progression/depth.js?v=b0dbf0d6';
+import { rollEvent, optionCost } from './dungeon/events.js?v=b0dbf0d6';
+import { createRiddle } from './dungeon/riddle.js?v=b0dbf0d6';
+import { noteDive, noteDay, noteRun, noteAnswer, noteRescue, dayKey } from './progression/statistics.js?v=b0dbf0d6';
+import { ensureMission, noteMission, missionPracticeEvery } from './progression/mission.js?v=b0dbf0d6';
 
 const reject = (reason) => [{ type: 'rejected', reason }];
 const clone = (o) => JSON.parse(JSON.stringify(o));

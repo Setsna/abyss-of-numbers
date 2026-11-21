@@ -5,7 +5,7 @@
 // dem iPad). Falsche Markierungen: F-LINE-a Nachbarstrich oder übernächster (± markGap, ± 2 markGap),
 // F-LINE-b Zahlendreher (640 → 460), nur wenn er auf einem Strich liegt, F-LINE-c vom falschen Ende gezählt.
 
-import { formatNumber } from '../format.js?v=2f163403';
+import { formatNumber } from '../format.js?v=b0dbf0d6';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
 
